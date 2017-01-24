@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">PegCityTransit</string>
+
+    <!--    Keys, default values, etc.  -->
+    <string name="api_base_url">https://api.winnipegtransit.com/v2/</string>
+
+    <!--    There are no doubles/float resource files that we can use, so we'll hack around that with this. -->
+    <string name="default_lat">49.895157</string>
+    <string name="default_long">-97.139280</string>
+
+    <!--    Date format used "yyyy-MM-dd'T'HH:mm:ss" Example: "2016-12-19T16:37:35" -->
+    <string name="date_format">yyyy-MM-dd\'T\'HH:mm:ss</string>
+
+    <!--    Font Path   -->
+    <string name="default_font_path">fonts/bariol_regular.ttf</string>
+
+    <!--    URLs    -->
+    <!--    See https://developers.google.com/maps/documentation/static-maps/intro  -->
+    <string name="static_map_url">https://maps.googleapis.com/maps/api/staticmap?center={center}&amp;zoom={zoom}&amp;size={size}&amp;markers={markers}&amp;key={key}</string>
+
+    <!--    Permissions    -->
+    <string name="location_permission_dialog_title">Allow access to this device\'s location?</string>
+    <string name="location_permission_rational">Location services is required to find bus stops near your location.</string>
+    <string name="location_permission_denied">This app uses location services to find bus stops near your location. If the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'PegCityTransit\'.</string>
+
+    <!--    UI Labels   -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_settings">Settings</string>
+    <string name="generic_error">Sorry. An error occurred.</string>
+    <string name="list_load_error_message">Sorry. An error occurred.</string>
+    <string name="list_no_results_message">Sorry. We couldn\'t find any results.</string>
+    <string name="try_again">Try Again</string>
+
+</resources>

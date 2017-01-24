@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="message"
+            type="String"/>
+
+        <variable
+            name="retryHandler"
+            type="jessevivanco.com.pegcitytransit.ui.view_holders.ErrorCellViewHolder.OnRetryClickListener"/>
+    </data>
+
+    <LinearLayout
+        style="@style/container_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/error_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/material_spacing_x_small"
+            android:text="@{message}"/>
+
+        <Button
+            android:id="@+id/retry_button"
+            style="@style/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/material_spacing_x_small"
+            android:onClick="@{() -> retryHandler.onRetryLoad()}"
+            android:text="@string/try_again"/>
+
+    </LinearLayout>
+</layout>

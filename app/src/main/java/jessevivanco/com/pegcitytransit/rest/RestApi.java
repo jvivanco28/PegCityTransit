@@ -1,0 +1,58 @@
+package jessevivanco.com.pegcitytransit.rest;
+
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import jessevivanco.com.pegcitytransit.rest.models.BusStop;
+import jessevivanco.com.pegcitytransit.rest.models.ScheduleStatus;
+import jessevivanco.com.pegcitytransit.rest.models.list.BusStopsList;
+import jessevivanco.com.pegcitytransit.rest.models.list.RoutesList;
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
+
+/**
+ * Winnipeg Transits' open API.
+ *
+ * @see <a href="https://api.winnipegtransit.com/home/api/v2">https://api.winnipegtransit.com/home/api/v2</a>
+ */
+public interface RestApi {
+
+    @GET("statuses/schedule.json")
+    Call<ScheduleStatus> getScheduleStatus();
+
+
+    @GET("stops/{id}.json")
+    Call<BusStop> getStopInfo(@Path("id") long id);
+
+    /**
+     * Retrieves a list of bus stops at a location (given <code>longitude</code> and <code>latitude</code>) within
+     * given <code>radius</code> in meters.
+     *
+     * @param latitude  The latitude of the point to find stops near. Use in conjunction with 'lon' and 'distance'.
+     * @param longitude The longitude of the point to find stops near. Use in conjunction with 'lat' and 'distance'.
+     * @param radius    The distance in metres from the given point which returned stops must fall within.
+     * @return
+     * @see <a href="https://api.winnipegtransit.com/home/api/v2/services/stops">https://api.winnipegtransit
+     * .com/home/api/v2/services/stops</a>
+     */
+    @GET("stops.json")
+    Call<BusStopsList> getBusStopsNearLocation(@Query("lat") Double latitude,
+                                               @Query("lon") Double longitude,
+                                               @Nullable @Query("distance") Integer radius);
+
+
+    /**
+     * Retrieves a list of bus routes for a given bus stop.
+     *
+     * @param busStop The bus stop we want to get the list of bus routes for.
+     * @return
+     * @see <a href="https://api.winnipegtransit.com/home/api/v2/services/routes">https://api.winnipegtransit
+     * .com/home/api/v2/services/routes</a>
+     */
+    @GET("routes.json")
+    Call<RoutesList> getRoutesForStop(@Query("stop") @NonNull Integer busStop);
+
+}

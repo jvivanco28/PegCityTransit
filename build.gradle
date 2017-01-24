@@ -1,0 +1,31 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+
+        // Gradle
+        classpath 'com.android.tools.build:gradle:2.2.3'
+
+        // Realm, our ORM.
+        classpath "io.realm:realm-gradle-plugin:2.2.1"
+
+        // Retrolambda let's us use lambdas without using Java 8
+        classpath 'me.tatarka:gradle-retrolambda:3.4.0'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

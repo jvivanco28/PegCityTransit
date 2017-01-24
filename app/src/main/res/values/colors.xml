@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="button">@color/colorAccent</color>
+    <color name="button_pressed_prelollipop">#b94141</color>
+    <color name="button_ripple">@color/white_transparent_75</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="white_transparent_75">#40ffffff</color>
+    <color name="black_transparent_75">#40000000</color>
+
+</resources>
