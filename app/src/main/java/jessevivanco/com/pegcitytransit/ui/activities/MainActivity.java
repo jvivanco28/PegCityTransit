@@ -310,7 +310,7 @@ public class MainActivity
         }
     }
 
-    //    // TODO MOVE THIS
+    // TODO MOVE THIS
     private String buildStaticMapUrl(Double latitude, Double longitude) {
 
         return Phrase.from(getResources(), R.string.static_map_url)

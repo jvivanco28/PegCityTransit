@@ -14,6 +14,9 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class PegCityTransitApp extends Application {
 
+    /**
+     * The bridge between our dependencies and our targets.
+     */
     private static AppComponent appComponent;
 
     @Override
@@ -28,7 +31,6 @@ public class PegCityTransitApp extends Application {
         Realm.init(this);
 
         initDependencies();
-
         initIconify();
         initFonts();
     }
@@ -38,13 +40,12 @@ public class PegCityTransitApp extends Application {
                 .appModule(new AppModule(this))
                 .restModule(new RestModule(getApplicationContext(),
                         getString(R.string.api_base_url),
-                        getString(R.string.api_key), BuildConfig
-                        .DEBUG))
+                        getString(R.string.api_key), BuildConfig.DEBUG))
                 .build();
     }
 
     /**
-     * So we can display decent-looking icons for free.
+     * So we can use vector icons for free.
      */
     protected void initIconify() {
         // Icon font.
