@@ -10,7 +10,7 @@ import jessevivanco.com.pegcitytransit.ui.provider.BusRoutesProvider;
 import jessevivanco.com.pegcitytransit.ui.provider.BusStopsProvider;
 
 /**
- * TODO DOC
+ * The bridge between our dependencies and our targets
  */
 @Singleton
 @Component(modules = {
@@ -19,6 +19,8 @@ import jessevivanco.com.pegcitytransit.ui.provider.BusStopsProvider;
         RepositoriesModule.class
 })
 public interface AppComponent {
+
+    // Add injection targets here.
 
     void injectFields(BusStopsProvider busStopsProvider);
 

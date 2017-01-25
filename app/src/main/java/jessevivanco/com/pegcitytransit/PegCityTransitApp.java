@@ -17,7 +17,7 @@ public class PegCityTransitApp extends Application {
     /**
      * The bridge between our dependencies and our targets.
      */
-    private static AppComponent appComponent;
+    private AppComponent injector;
 
     @Override
     public void onCreate() {
@@ -36,7 +36,7 @@ public class PegCityTransitApp extends Application {
     }
 
     private void initDependencies() {
-        appComponent = DaggerAppComponent.builder()
+        injector = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
                 .restModule(new RestModule(getApplicationContext(),
                         getString(R.string.api_base_url),
@@ -69,8 +69,8 @@ public class PegCityTransitApp extends Application {
      *
      * @return
      */
-    public static AppComponent getAppComponent() {
-        return appComponent;
+    public AppComponent getInjector() {
+        return injector;
     }
 
 }

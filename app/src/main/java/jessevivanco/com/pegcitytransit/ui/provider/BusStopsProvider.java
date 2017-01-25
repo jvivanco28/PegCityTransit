@@ -9,8 +9,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import jessevivanco.com.pegcitytransit.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.R;
+import jessevivanco.com.pegcitytransit.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.repositories.BusStopRepository;
 import jessevivanco.com.pegcitytransit.repositories.OnDataRetrievedCallback;
 import jessevivanco.com.pegcitytransit.rest.models.BusStop;
@@ -43,8 +43,8 @@ public class BusStopsProvider implements Provider<List<BusStop>> {
     Integer radius;
 
 
-    public BusStopsProvider(Context context) {
-        PegCityTransitApp.getAppComponent().injectFields(this);
+    public BusStopsProvider(Context context, AppComponent injector) {
+        injector.injectFields(this);
 
         // Load out default lat and long values.
         DEFAULT_LAT = Double.parseDouble(context.getString(R.string.default_lat));

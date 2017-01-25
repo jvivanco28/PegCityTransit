@@ -8,6 +8,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import jessevivanco.com.pegcitytransit.PegCityTransitApp;
+import jessevivanco.com.pegcitytransit.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.repositories.OnDataRetrievedCallback;
 import jessevivanco.com.pegcitytransit.rest.models.BusRoute;
@@ -23,9 +24,12 @@ public class BusRoutesProvider implements Provider<List<BusRoute>> {
     @Nullable
     Integer busStop;
 
+    public BusRoutesProvider(AppComponent injector) {
+        injector.injectFields(this);
+    }
+
     @Override
     public void loadData(OnDataRetrievedCallback<List<BusRoute>> onDataRetrievedCallback) {
-        PegCityTransitApp.getAppComponent().injectFields(this);
         busRoutesRepository.getBusStopsNearLocation(busStop, onDataRetrievedCallback);
     }
 

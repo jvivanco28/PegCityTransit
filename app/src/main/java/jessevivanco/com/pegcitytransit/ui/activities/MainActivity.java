@@ -161,7 +161,7 @@ public class MainActivity
     }
 
     protected void setupAdapter(@Nullable Bundle savedInstanceState) {
-        busStopsProvider = new BusStopsProvider(this);
+        busStopsProvider = new BusStopsProvider(this, getInjector());
         busStopsAdapter = new BusStopsAdapter(busStopsProvider, savedInstanceState, this);
     }
 

@@ -20,21 +20,22 @@ public abstract class PermissionUtils {
      */
     public static void requestPermission(AppCompatActivity fromActivity,
                                          int requestId,
-                                         String permission,
+                                         String permissionId,
                                          String permissionDialogTitle,
                                          String permissionRationale,
                                          String dialogFragmentTag) {
 
         // If the user has already denied the request, we'll show a different dialog with permission rationale.
-        if (ActivityCompat.shouldShowRequestPermissionRationale(fromActivity, permission)) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(fromActivity, permissionId)) {
 
             FragmentUtils.showFragment(fromActivity, RationaleDialog.newInstance(requestId,
+                    permissionId,
                     permissionDialogTitle,
                     permissionRationale),
                     dialogFragmentTag);
         } else {
             // Location permission has not been granted yet, request it.
-            ActivityCompat.requestPermissions(fromActivity, new String[]{permission}, requestId);
+            ActivityCompat.requestPermissions(fromActivity, new String[]{permissionId}, requestId);
         }
     }
 
