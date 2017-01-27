@@ -6,20 +6,21 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import jessevivanco.com.pegcitytransit.R;
+import jessevivanco.com.pegcitytransit.provider.BusStopsListProvider;
+import jessevivanco.com.pegcitytransit.provider.base.ListProvider;
 import jessevivanco.com.pegcitytransit.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.ui.adapters.base.BaseAdapter;
-import jessevivanco.com.pegcitytransit.ui.provider.BusStopsProvider;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusStopCellViewHolder;
 
 public class BusStopsAdapter extends BaseAdapter<BusStop> {
 
     private final int BUS_STOP_CELL_VIEW_TYPE_ID = R.layout.cell_bus_stop;
 
-    private BusStopsProvider busStopsProvider;
+    private BusStopsListProvider busStopsProvider;
 
-    public BusStopsAdapter(BusStopsProvider busStopsProvider,
+    public BusStopsAdapter(BusStopsListProvider busStopsProvider,
                            @Nullable Bundle savedInstanceState,
-                           @Nullable OnListLoadedCallback listLoadedCallback) {
+                           @Nullable ListProvider.ListProviderViewContract listLoadedCallback) {
         super(savedInstanceState, listLoadedCallback, busStopsProvider);
 
         this.busStopsProvider = busStopsProvider;

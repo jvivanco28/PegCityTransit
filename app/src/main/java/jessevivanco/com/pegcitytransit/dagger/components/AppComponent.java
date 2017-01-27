@@ -6,8 +6,8 @@ import dagger.Component;
 import jessevivanco.com.pegcitytransit.dagger.modules.AppModule;
 import jessevivanco.com.pegcitytransit.dagger.modules.RepositoriesModule;
 import jessevivanco.com.pegcitytransit.dagger.modules.RestModule;
-import jessevivanco.com.pegcitytransit.ui.provider.BusRoutesProvider;
-import jessevivanco.com.pegcitytransit.ui.provider.BusStopsProvider;
+import jessevivanco.com.pegcitytransit.provider.BusRoutesListProvider;
+import jessevivanco.com.pegcitytransit.provider.BusStopsListProvider;
 
 /**
  * The bridge between our dependencies and our targets
@@ -22,7 +22,7 @@ public interface AppComponent {
 
     // Add injection targets here.
 
-    void injectFields(BusStopsProvider busStopsProvider);
+    void injectFields(BusStopsListProvider busStopsProvider);
 
-    void injectFields(BusRoutesProvider busRoutesProvider);
+    void injectFields(BusRoutesListProvider busRoutesProvider);
 }

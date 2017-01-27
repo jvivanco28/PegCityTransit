@@ -1,9 +1,9 @@
-package jessevivanco.com.pegcitytransit.ui.provider;
+package jessevivanco.com.pegcitytransit.provider.base;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import jessevivanco.com.pegcitytransit.repositories.OnDataRetrievedCallback;
+import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
 
 /**
  * A generic interface for our adapters. Each adapter in this app sends a request for a list of items. This layer
@@ -13,14 +13,14 @@ import jessevivanco.com.pegcitytransit.repositories.OnDataRetrievedCallback;
  *
  * @param <D>
  */
-public interface Provider<D> {
+public interface ListProvider<D> {
 
     /**
      * Send a request to fetch a list data of type &lt;D&gt;.
      *
      * @param onDataRetrievedCallback
      */
-    void loadData(OnDataRetrievedCallback<D> onDataRetrievedCallback);
+    void loadData(OnRepositoryDataRetrievedListener<D> onDataRetrievedCallback);
 
     /**
      * Signal to save our adapter's state (the main list, or any other field members that need to be retained).
@@ -36,4 +36,23 @@ public interface Provider<D> {
      * @param state
      */
     void onRestoreInstanceState(@Nullable Bundle state);
+
+    /**
+     * Callbacks to any View who is hosting a <code>ListProvider</code>. If you're using a
+     * <code>ListProvider</code>, then you must implement these methods.
+     */
+    interface ListProviderViewContract {
+
+        /**
+         * Signal that the list finished loading.
+         */
+        void onFinishedLoading();
+
+        /**
+         * Signal that the list had finished loading with an error.
+         *
+         * @param message
+         */
+        void onListLoadError(String message);
+    }
 }

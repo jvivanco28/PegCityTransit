@@ -2,7 +2,7 @@ package jessevivanco.com.pegcitytransit.repositories;
 
 import android.support.annotation.Nullable;
 
-public interface OnDataRetrievedCallback<D> {
+public interface OnRepositoryDataRetrievedListener<D> {
 
     /**
      * Returns the response data.

@@ -24,7 +24,7 @@ public class RepositoryUtils {
      * @param callback
      * @param <T>
      */
-    public static <T> void handleResponse(Context context, Response<T> response, final OnDataRetrievedCallback<T>
+    public static <T> void handleResponse(Context context, Response<T> response, final OnRepositoryDataRetrievedListener<T>
             callback) {
         if (response.isSuccessful()) {
             callback.onDataRetrieved(response.body());
@@ -47,7 +47,7 @@ public class RepositoryUtils {
                 context.getString(R.string.generic_error);
     }
 
-    public static void handleErrorResponse(Context context, Throwable t, OnDataRetrievedCallback callback) {
+    public static void handleErrorResponse(Context context, Throwable t, OnRepositoryDataRetrievedListener callback) {
         callback.onError(t.getLocalizedMessage() != null ?
                 t.getLocalizedMessage() :
                 context.getString(R.string.generic_error));

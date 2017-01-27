@@ -1,4 +1,4 @@
-package jessevivanco.com.pegcitytransit.ui.provider;
+package jessevivanco.com.pegcitytransit.provider;
 
 import android.Manifest;
 import android.content.Context;
@@ -8,6 +8,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -16,23 +17,22 @@ import com.google.android.gms.location.LocationServices;
 import com.squareup.phrase.Phrase;
 
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.ui.contracts.MapsProviderViewContract;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 
-public class MapsProvider implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class LocationProvider implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private final int MAP_ZOOM_RATIO;
 
     private Context context;
     private GoogleApiClient googleApiClient;
 
-    private BusStopsProvider busStopsProvider;
+    private BusStopsListProvider busStopsProvider;
 
-    private MapsProviderViewContract view;
+    private LocationProviderViewContract view;
 
-    public MapsProvider(Context context,
-                        BusStopsProvider busStopsProvider,
-                        MapsProviderViewContract view) {
+    public LocationProvider(Context context,
+                            BusStopsListProvider busStopsProvider,
+                            LocationProviderViewContract view) {
 
         MAP_ZOOM_RATIO = context.getResources().getInteger(R.integer.default_map_zoom);
 
@@ -147,5 +147,35 @@ public class MapsProvider implements GoogleApiClient.ConnectionCallbacks, Google
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         // Do nothing.
+    }
+
+    /**
+     * If you're using an instance of {@link LocationProvider}, then you must implement the view
+     * contract so that you may receive callbacks.
+     */
+    public interface LocationProviderViewContract extends ActivityCompat.OnRequestPermissionsResultCallback {
+
+        /**
+         * Sets the static map cover image with the image URL.
+         *
+         * @param imageUrl
+         */
+        void setStaticMapCoverImage(String imageUrl);
+
+        /**
+         * Requests a device permission. If permission has been rejected once before, then asks the user
+         * displaying rationale.
+         *
+         * @param intentRequestCode
+         * @param permission
+         * @param dialogTitle
+         * @param dialogRationale
+         */
+        void onRequestPermission(int intentRequestCode, String permission, String dialogTitle, String dialogRationale);
+
+        /**
+         * Resets all data and starts loading from the beginning.
+         */
+        void refreshList();
     }
 }

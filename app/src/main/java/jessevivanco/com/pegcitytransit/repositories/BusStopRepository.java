@@ -29,7 +29,7 @@ public class BusStopRepository {
     public void getBusStopsNearLocation(Double latitude,
                                         Double longitude,
                                         @Nullable Integer radius,
-                                        final OnDataRetrievedCallback<List<BusStop>> callback) {
+                                        final OnRepositoryDataRetrievedListener<List<BusStop>> callback) {
 
         restApi.getBusStopsNearLocation(latitude, longitude, radius)
                 .enqueue(new Callback<BusStopsList>() {

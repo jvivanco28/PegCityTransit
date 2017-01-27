@@ -12,8 +12,8 @@ import org.parceler.Parcels;
 import java.util.List;
 
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.repositories.OnDataRetrievedCallback;
-import jessevivanco.com.pegcitytransit.ui.provider.Provider;
+import jessevivanco.com.pegcitytransit.provider.base.ListProvider;
+import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
 import jessevivanco.com.pegcitytransit.ui.view_holders.ErrorCellViewHolder;
 
 /**
@@ -24,25 +24,25 @@ import jessevivanco.com.pegcitytransit.ui.view_holders.ErrorCellViewHolder;
  */
 public abstract class BaseAdapter<T>
         extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-        implements OnDataRetrievedCallback<List<T>>,
+        implements OnRepositoryDataRetrievedListener<List<T>>,
         ErrorCellViewHolder.OnRetryClickListener {
 
     private static final String STATE_KEY_IS_LOADING = "is_loading";
     private static final String STATE_KEY_IS_ERROR = "is_error";
     private static final String STATE_KEY_LIST = "list";
 
-    protected OnListLoadedCallback onListLoadedCallback;
+    protected ListProvider.ListProviderViewContract onListLoadedCallback;
 
     private List<T> list;
-    private Provider provider;
+    private ListProvider provider;
 
     private boolean isLoading = false;
     private boolean isError = false;
 
 
     public BaseAdapter(@Nullable Bundle savedInstanceState,
-                       @Nullable OnListLoadedCallback onListLoadedCallback,
-                       @Nullable Provider provider) {
+                       @Nullable ListProvider.ListProviderViewContract onListLoadedCallback,
+                       @Nullable ListProvider provider) {
 
         this.provider = provider;
 
@@ -173,7 +173,7 @@ public abstract class BaseAdapter<T>
         }
     }
 
-    public void setOnListLoadedCallback(OnListLoadedCallback onListLoadedCallback) {
+    public void setOnListLoadedCallback(ListProvider.ListProviderViewContract onListLoadedCallback) {
         this.onListLoadedCallback = onListLoadedCallback;
     }
 
@@ -264,11 +264,11 @@ public abstract class BaseAdapter<T>
         this.list = list;
     }
 
-    public Provider getProvider() {
+    public ListProvider getProvider() {
         return provider;
     }
 
-    public void setProvider(Provider provider) {
+    public void setProvider(ListProvider provider) {
         this.provider = provider;
     }
 
@@ -387,12 +387,5 @@ public abstract class BaseAdapter<T>
         private ViewHolder(ViewGroup parent, @LayoutRes int layoutRes) {
             super(LayoutInflater.from(parent.getContext()).inflate(layoutRes, parent, false));
         }
-    }
-
-    public interface OnListLoadedCallback {
-
-        void onFinishedLoading();
-
-        void onListLoadError(String message);
     }
 }

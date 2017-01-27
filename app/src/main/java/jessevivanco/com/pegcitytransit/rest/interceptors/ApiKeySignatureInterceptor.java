@@ -4,7 +4,6 @@ import android.content.Context;
 
 import java.io.IOException;
 
-import jessevivanco.com.pegcitytransit.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.R;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;

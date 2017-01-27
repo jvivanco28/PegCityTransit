@@ -1,4 +1,4 @@
-package jessevivanco.com.pegcitytransit.ui.provider;
+package jessevivanco.com.pegcitytransit.provider;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,13 +7,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import jessevivanco.com.pegcitytransit.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.dagger.components.AppComponent;
+import jessevivanco.com.pegcitytransit.provider.base.ListProvider;
 import jessevivanco.com.pegcitytransit.repositories.BusRoutesRepository;
-import jessevivanco.com.pegcitytransit.repositories.OnDataRetrievedCallback;
+import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
 import jessevivanco.com.pegcitytransit.rest.models.BusRoute;
 
-public class BusRoutesProvider implements Provider<List<BusRoute>> {
+public class BusRoutesListProvider implements ListProvider<List<BusRoute>> {
 
     private static final String STATE_KEY_BUS_STOP = "STATE_KEY_BUS_STOP";
 
@@ -24,12 +24,12 @@ public class BusRoutesProvider implements Provider<List<BusRoute>> {
     @Nullable
     Integer busStop;
 
-    public BusRoutesProvider(AppComponent injector) {
+    public BusRoutesListProvider(AppComponent injector) {
         injector.injectFields(this);
     }
 
     @Override
-    public void loadData(OnDataRetrievedCallback<List<BusRoute>> onDataRetrievedCallback) {
+    public void loadData(OnRepositoryDataRetrievedListener<List<BusRoute>> onDataRetrievedCallback) {
         busRoutesRepository.getBusStopsNearLocation(busStop, onDataRetrievedCallback);
     }
 

@@ -28,7 +28,7 @@ public class BusRoutesRepository {
     }
 
     public void getBusStopsNearLocation(Integer busStop,
-                                        final OnDataRetrievedCallback<List<BusRoute>> callback) {
+                                        final OnRepositoryDataRetrievedListener<List<BusRoute>> callback) {
 
         if (busStop != null) {
             restApi.getRoutesForStop(busStop).enqueue(new Callback<RoutesList>() {

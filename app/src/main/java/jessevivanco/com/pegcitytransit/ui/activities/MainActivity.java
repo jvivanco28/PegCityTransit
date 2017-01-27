@@ -21,15 +21,14 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import jessevivanco.com.pegcitytransit.R;
+import jessevivanco.com.pegcitytransit.provider.BusStopsListProvider;
+import jessevivanco.com.pegcitytransit.provider.LocationProvider;
+import jessevivanco.com.pegcitytransit.provider.base.ListProvider;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopsAdapter;
-import jessevivanco.com.pegcitytransit.ui.adapters.base.BaseAdapter;
-import jessevivanco.com.pegcitytransit.ui.contracts.MapsProviderViewContract;
 import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
 import jessevivanco.com.pegcitytransit.ui.fragments.PermissionDeniedDialog;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.DefaultListItemDecorator;
-import jessevivanco.com.pegcitytransit.ui.provider.BusStopsProvider;
-import jessevivanco.com.pegcitytransit.ui.provider.MapsProvider;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
 import jessevivanco.com.pegcitytransit.ui.util.SnackbarUtils;
@@ -37,8 +36,8 @@ import jessevivanco.com.pegcitytransit.ui.util.SnackbarUtils;
 public class MainActivity
         extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        BaseAdapter.OnListLoadedCallback,
-        MapsProviderViewContract {
+        ListProvider.ListProviderViewContract,
+        LocationProvider.LocationProviderViewContract {
 
     private static final String PERMISSION_DIALOG_TAG = "dialog";
 
@@ -50,8 +49,8 @@ public class MainActivity
     protected SwipeRefreshLayout refreshLayout;
     protected RecyclerView recyclerView;
 
-    private MapsProvider mapsProvider;
-    private BusStopsProvider busStopsProvider;
+    private LocationProvider locationProvider;
+    private BusStopsListProvider busStopsProvider;
     private BusStopsAdapter busStopsAdapter;
 
     @Override
@@ -73,16 +72,16 @@ public class MainActivity
     @Override
     protected void onStart() {
         super.onStart();
-        if (mapsProvider != null) {
-            mapsProvider.start();
+        if (locationProvider != null) {
+            locationProvider.start();
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mapsProvider != null) {
-            mapsProvider.stop();
+        if (locationProvider != null) {
+            locationProvider.stop();
         }
     }
 
@@ -130,7 +129,7 @@ public class MainActivity
     }
 
     protected void setupAdapter(@Nullable Bundle savedInstanceState) {
-        busStopsProvider = new BusStopsProvider(this, getInjector());
+        busStopsProvider = new BusStopsListProvider(this, getInjector());
         busStopsAdapter = new BusStopsAdapter(busStopsProvider, savedInstanceState, this);
     }
 
@@ -145,7 +144,7 @@ public class MainActivity
     }
 
     protected void setupMapsProvider() {
-        mapsProvider = new MapsProvider(this, busStopsProvider, this);
+        locationProvider = new LocationProvider(this, busStopsProvider, this);
     }
 
     @Override
@@ -248,7 +247,7 @@ public class MainActivity
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
 
             // Enable the my location layer if the permission has been granted.
-            mapsProvider.getUserLocation();
+            locationProvider.getUserLocation();
         } else {
 
             // Permission was denied. Let's display a dialog explaining why we need location services, and how to grant

@@ -1,4 +1,4 @@
-package jessevivanco.com.pegcitytransit.ui.provider;
+package jessevivanco.com.pegcitytransit.provider;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -11,11 +11,12 @@ import javax.inject.Inject;
 
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.dagger.components.AppComponent;
+import jessevivanco.com.pegcitytransit.provider.base.ListProvider;
 import jessevivanco.com.pegcitytransit.repositories.BusStopRepository;
-import jessevivanco.com.pegcitytransit.repositories.OnDataRetrievedCallback;
+import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
 import jessevivanco.com.pegcitytransit.rest.models.BusStop;
 
-public class BusStopsProvider implements Provider<List<BusStop>> {
+public class BusStopsListProvider implements ListProvider<List<BusStop>> {
 
     private static final String STATE_KEY_LATITUDE = "STATE_KEY_LATITUDE";
     private static final String STATE_KEY_LONGITUDE = "STATE_KEY_LONGITUDE";
@@ -43,7 +44,7 @@ public class BusStopsProvider implements Provider<List<BusStop>> {
     Integer radius;
 
 
-    public BusStopsProvider(Context context, AppComponent injector) {
+    public BusStopsListProvider(Context context, AppComponent injector) {
         injector.injectFields(this);
 
         // Load out default lat and long values.
@@ -55,7 +56,7 @@ public class BusStopsProvider implements Provider<List<BusStop>> {
     }
 
     @Override
-    public void loadData(final OnDataRetrievedCallback<List<BusStop>> onDataRetrievedCallback) {
+    public void loadData(final OnRepositoryDataRetrievedListener<List<BusStop>> onDataRetrievedCallback) {
         // NOTE: if lat, long, and radius are not supplied, then we just resort to the default values.
         busStopRepository.getBusStopsNearLocation(
                 latitude != null ? latitude : DEFAULT_LAT,
