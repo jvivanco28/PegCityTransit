@@ -37,10 +37,11 @@
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"/>
 
+                <!-- This is just an overlay on top of the cover image. -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/black_transparent_75"/>
+                    android:background="@color/black_transparent_88"/>
 
             </RelativeLayout>
 

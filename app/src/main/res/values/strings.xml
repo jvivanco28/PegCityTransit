@@ -16,7 +16,7 @@
 
     <!--    URLs    -->
     <!--    See https://developers.google.com/maps/documentation/static-maps/intro  -->
-    <string name="static_map_url">https://maps.googleapis.com/maps/api/staticmap?center={center}&amp;zoom={zoom}&amp;size={size}&amp;markers={markers}&amp;key={key}</string>
+    <string name="static_map_url">https://maps.googleapis.com/maps/api/staticmap?center={center}&amp;zoom={zoom}&amp;size={width}x{height}&amp;markers={markers}&amp;scale=2&amp;key={key}</string>
 
     <!--    Permissions    -->
     <string name="location_permission_dialog_title">Allow access to this device\'s location?</string>

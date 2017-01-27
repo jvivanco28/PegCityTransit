@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -63,14 +64,24 @@ public class LocationProvider implements GoogleApiClient.ConnectionCallbacks, Go
      */
     private String buildStaticMapUrl(Double latitude, Double longitude) {
 
+        // TODO we need to pass in the list of bus stops and add them as markers
+
         Resources res = context.getResources();
+
+        Log.v("DEBUG", "width = " + Resources.getSystem().getDisplayMetrics().widthPixels);
+        Log.v("DEBUG", "height = " + res.getDimensionPixelSize(R.dimen.default_app_bar_height));
 
         return Phrase.from(res, R.string.static_map_url)
                 .put("center", latitude + "," + longitude)
                 .put("zoom", MAP_ZOOM_RATIO)
-                .put("size", Resources.getSystem().getDisplayMetrics().widthPixels + "x" + res
-                        .getDimensionPixelSize(R.dimen.default_app_bar_height))
-                .put("markers", "color:blue|size:tiny|" + latitude + "," + longitude)
+
+                // TODO still need to figure out image sizing.
+                .put("width", Resources.getSystem().getDisplayMetrics().widthPixels)
+                .put("height", res.getDimensionPixelSize(R.dimen.default_app_bar_height))
+
+                // TODO probably make a method to help with this
+                .put("markers", "color:blue|size:mid|" + latitude + "," + longitude)
+
                 .put("key", context.getString(R.string.google_maps_key))
                 .format().toString();
     }
@@ -128,7 +139,9 @@ public class LocationProvider implements GoogleApiClient.ConnectionCallbacks, Go
 
             }
 
-            view.setStaticMapCoverImage(buildStaticMapUrl(busStopsProvider.getLatitude(), busStopsProvider.getLongitude()));
+            String url = buildStaticMapUrl(busStopsProvider.getLatitude(), busStopsProvider.getLongitude());
+            Log.v("DEBUG", "staticMapUrl = " + url);
+            view.setStaticMapCoverImage(url);
         }
     }
 
