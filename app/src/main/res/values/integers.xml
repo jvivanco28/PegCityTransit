@@ -2,4 +2,6 @@
 <resources>
     <!-- TODO: tweak this value as we see fit -->
     <integer name="default_max_bus_stop_distance">200</integer>
+
+    <integer name="default_map_zoom">15</integer>
 </resources>

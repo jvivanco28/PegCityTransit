@@ -215,7 +215,7 @@ public abstract class BaseAdapter<T>
         notifyDataSetChanged();
 
         if (onListLoadedCallback != null) {
-            onListLoadedCallback.onError(message);
+            onListLoadedCallback.onListLoadError(message);
             onListLoadedCallback.onFinishedLoading();
         }
     }
@@ -383,16 +383,16 @@ public abstract class BaseAdapter<T>
     /**
      * Generic ViewHolder class.
      */
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        public ViewHolder(ViewGroup parent, @LayoutRes int layoutRes) {
+    private static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(ViewGroup parent, @LayoutRes int layoutRes) {
             super(LayoutInflater.from(parent.getContext()).inflate(layoutRes, parent, false));
         }
     }
 
-    public static interface OnListLoadedCallback {
+    public interface OnListLoadedCallback {
 
         void onFinishedLoading();
 
-        void onError(String message);
+        void onListLoadError(String message);
     }
 }

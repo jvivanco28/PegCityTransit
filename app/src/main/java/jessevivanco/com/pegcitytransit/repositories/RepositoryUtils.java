@@ -9,7 +9,7 @@ import retrofit2.Response;
 
 /**
  * Convenience methods for handling Retrofit responses. Checks if requests were successful and calls back
- * <code>onDataRetrieved(T)</code>. If successful, the <code>onError(String)</code> callback is invoked with the error
+ * <code>onDataRetrieved(T)</code>. If successful, the <code>onListLoadError(String)</code> callback is invoked with the error
  * message that came with the response. if no error message exist, then uses a generic error message.
  */
 public class RepositoryUtils {

@@ -28,7 +28,6 @@
     <style name="button" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/button</item>
         <item name="android:textColor">@color/white</item>
-        <item name="fontPath">fonts/bariol_bold-webfont.ttf</item>
     </style>
 
 </resources>

@@ -1,17 +1,12 @@
 package jessevivanco.com.pegcitytransit.ui.activities;
 
 import android.Manifest;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -19,25 +14,22 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.squareup.phrase.Phrase;
 import com.squareup.picasso.Picasso;
 
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopsAdapter;
 import jessevivanco.com.pegcitytransit.ui.adapters.base.BaseAdapter;
+import jessevivanco.com.pegcitytransit.ui.contracts.MapsProviderViewContract;
 import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
 import jessevivanco.com.pegcitytransit.ui.fragments.PermissionDeniedDialog;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.DefaultListItemDecorator;
 import jessevivanco.com.pegcitytransit.ui.provider.BusStopsProvider;
+import jessevivanco.com.pegcitytransit.ui.provider.MapsProvider;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
 import jessevivanco.com.pegcitytransit.ui.util.SnackbarUtils;
@@ -46,13 +38,9 @@ public class MainActivity
         extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         BaseAdapter.OnListLoadedCallback,
-        ActivityCompat.OnRequestPermissionsResultCallback,
+        MapsProviderViewContract {
 
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-
-    public static final String PERMISSION_DIALOG_TAG = "dialog";
-
-    public static final int MAP_ZOOM_RATIO = 15;
+    private static final String PERMISSION_DIALOG_TAG = "dialog";
 
     protected Toolbar toolbar;
     protected ImageView staticMapCoverImage;
@@ -62,16 +50,13 @@ public class MainActivity
     protected SwipeRefreshLayout refreshLayout;
     protected RecyclerView recyclerView;
 
+    private MapsProvider mapsProvider;
     private BusStopsProvider busStopsProvider;
     private BusStopsAdapter busStopsAdapter;
-
-    private GoogleApiClient googleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setupGoogleApiClient();
 
         // Setup UI elements.
         setupToolbar();
@@ -82,39 +67,23 @@ public class MainActivity
         setupRefresh();
         setupAdapter(savedInstanceState);
         setupRecyclerView();
-
-//        // TODO. MOVE THIS. don't do this until we know if we can use the user's location.
-//        // If the restored list is empty, then we'll need to fetch the results.
-//        if (busStopsAdapter.getDataCount() == 0) {
-//            startFromScratch();
-//        }
-    }
-
-    protected void setupGoogleApiClient() {
-        // Create an instance of GoogleAPIClient.
-        if (googleApiClient == null) {
-            googleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
+        setupMapsProvider();
     }
 
     @Override
     protected void onStart() {
-        if (googleApiClient != null && (!googleApiClient.isConnected() && !googleApiClient.isConnecting())) {
-            googleApiClient.connect();
+        super.onStart();
+        if (mapsProvider != null) {
+            mapsProvider.start();
         }
-        super.onStop();
     }
 
     @Override
     protected void onStop() {
-        if (googleApiClient != null && (googleApiClient.isConnected() || googleApiClient.isConnecting())) {
-            googleApiClient.disconnect();
-        }
         super.onStop();
+        if (mapsProvider != null) {
+            mapsProvider.stop();
+        }
     }
 
     @Override
@@ -157,7 +126,7 @@ public class MainActivity
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresh_layout);
 
         // FYI using method reference here. The callback just delegates to this.refreshList().
-        refreshLayout.setOnRefreshListener(this::startFromScratch);
+        refreshLayout.setOnRefreshListener(this::refreshList);
     }
 
     protected void setupAdapter(@Nullable Bundle savedInstanceState) {
@@ -173,6 +142,10 @@ public class MainActivity
         recyclerView.addItemDecoration(new DefaultListItemDecorator(this));
 
         recyclerView.setAdapter(busStopsAdapter);
+    }
+
+    protected void setupMapsProvider() {
+        mapsProvider = new MapsProvider(this, busStopsProvider, this);
     }
 
     @Override
@@ -233,7 +206,9 @@ public class MainActivity
     /**
      * Resets all data and starts loading from the beginning.
      */
-    protected void startFromScratch() {
+    @Override
+    public void refreshList() {
+
         // Note that showing the list view implicitly shows the loading indicator when loading.
         busStopsAdapter.refreshList();
     }
@@ -252,75 +227,10 @@ public class MainActivity
     }
 
     @Override
-    public void onError(String message) {
+    public void onListLoadError(String message) {
         if (recyclerView != null) {
             SnackbarUtils.showError(message, recyclerView);
         }
-    }
-
-    /**
-     * Initiates location services to find the user's current location. If the permission has not yet been granted,
-     * then we'll ask for permission.
-     */
-    private void getUserLocation() {
-
-        Log.v("DEBUG", "Called getUserLocation");
-
-        // If permission has not yet been granted, then ask the user.
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Permission to access the location is missing.
-            PermissionUtils.requestPermission(this,
-                    IntentRequestCodes.LOCATION_PERMISSION_REQUEST_CODE.ordinal(),
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    getString(R.string.location_permission_dialog_title),
-                    getString(R.string.location_permission_rational),
-                    PERMISSION_DIALOG_TAG);
-
-        } else {
-
-            // TODO zoom? google api client connected?
-
-            // Permission was granted. Get the user's location.
-            Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-
-            if (lastLocation != null) {
-//            if (lastLocation != null && busStopsProvider.isDifferentLocation(lastLocation.getLatitude(),
-// lastLocation.getLongitude())) {
-
-                busStopsProvider.setLatitude(lastLocation.getLatitude());
-                busStopsProvider.setLongitude(lastLocation.getLongitude());
-
-                if (busStopsAdapter.getDataCount() == 0) {
-                    startFromScratch();
-                }
-
-            } else {
-                Log.v("DEBUG", "Last known location is null!");
-            }
-
-            Log.v("DEBUG", "url = " + buildStaticMapUrl(busStopsProvider.getLatitude(), busStopsProvider.getLongitude
-                    ()));
-            Picasso.with(this)
-                    .load(buildStaticMapUrl(busStopsProvider.getLatitude(), busStopsProvider.getLongitude()))
-                    .fit()
-                    .centerCrop()
-                    .into(staticMapCoverImage);
-        }
-    }
-
-    // TODO MOVE THIS
-    private String buildStaticMapUrl(Double latitude, Double longitude) {
-
-        return Phrase.from(getResources(), R.string.static_map_url)
-                .put("center", latitude + "," + longitude)
-                .put("zoom", MAP_ZOOM_RATIO)
-                .put("size", Resources.getSystem().getDisplayMetrics().widthPixels + "x" + getResources()
-                        .getDimensionPixelSize(R.dimen.default_app_bar_height))
-                .put("markers", "color:blue|size:tiny|" + latitude + "," + longitude)
-                .put("key", getString(R.string.google_maps_key))
-                .format().toString();
     }
 
     @Override
@@ -333,15 +243,13 @@ public class MainActivity
             return;
         }
 
-        // If the permission was granted, then let's get the user's location now.
+        // If the permission was granted, then let's get the user's location.
         if (PermissionUtils.isPermissionGranted(permissions, grantResults,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
 
             // Enable the my location layer if the permission has been granted.
-            getUserLocation();
+            mapsProvider.getUserLocation();
         } else {
-
-            // TODO zoom in at a default location in winnipeg?
 
             // Permission was denied. Let's display a dialog explaining why we need location services, and how to grant
             // the permission if it's permanently denied.
@@ -351,22 +259,26 @@ public class MainActivity
         }
     }
 
-
     @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        Log.v("DEBUG", "GOOGLE API CLIENT onConnected");
-
-        // TODO TEST
-        getUserLocation();
+    public void setStaticMapCoverImage(String imageUrl) {
+        Picasso.with(this)
+                .load(imageUrl)
+                .fit()
+                .centerCrop()
+                .into(staticMapCoverImage);
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
-        Log.v("DEBUG", "onConnectionSuspended");
-    }
+    public void onRequestPermission(int intentRequestCode,
+                                    String permission,
+                                    String dialogTitle,
+                                    String dialogRationale) {
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.v("DEBUG", "onConnectionFailed " + connectionResult.getErrorMessage());
+        PermissionUtils.requestPermission(this,
+                intentRequestCode,
+                permission,
+                dialogTitle,
+                dialogRationale,
+                PERMISSION_DIALOG_TAG);
     }
 }
