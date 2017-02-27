@@ -1,5 +1,6 @@
 package jessevivanco.com.pegcitytransit.provider;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
@@ -7,35 +8,47 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.provider.base.ListProvider;
 import jessevivanco.com.pegcitytransit.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
+import jessevivanco.com.pegcitytransit.rest.RetrofitResponseUtils;
 import jessevivanco.com.pegcitytransit.rest.models.BusRoute;
 
 public class BusRoutesListProvider implements ListProvider<List<BusRoute>> {
 
     private static final String STATE_KEY_BUS_STOP = "STATE_KEY_BUS_STOP";
 
+    private final String LOG_TAG = getClass().getSimpleName();
+
     @Inject
     BusRoutesRepository busRoutesRepository;
+    @Inject
+    Context context;
 
     private
     @Nullable
     Integer busStop;
 
     public BusRoutesListProvider(AppComponent injector) {
-        injector.injectFields(this);
+        injector.injectInto(this);
     }
 
     @Override
     public void loadData(OnRepositoryDataRetrievedListener<List<BusRoute>> onDataRetrievedCallback) {
-        busRoutesRepository.getBusStopsNearLocation(busStop, onDataRetrievedCallback);
+        busRoutesRepository.getRoutesForBusStop(busStop)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((busRoutes, throwable) -> {
+                    RetrofitResponseUtils.handleResponse(context, busRoutes, LOG_TAG, throwable, onDataRetrievedCallback);
+                });
     }
 
     @Override
     public Bundle onSaveInstanceState(Bundle outState) {
-        if (outState != null) {
+        if (outState != null && busStop != null) {
             outState.putInt(STATE_KEY_BUS_STOP, busStop);
         }
         return outState;
@@ -43,7 +56,7 @@ public class BusRoutesListProvider implements ListProvider<List<BusRoute>> {
 
     @Override
     public void onRestoreInstanceState(@Nullable Bundle state) {
-        if (state != null) {
+        if (state != null && state.containsKey(STATE_KEY_BUS_STOP)) {
             busStop = state.getInt(STATE_KEY_BUS_STOP);
         }
     }

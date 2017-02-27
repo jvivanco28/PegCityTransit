@@ -22,7 +22,7 @@ public interface AppComponent {
 
     // Add injection targets here.
 
-    void injectFields(BusStopsListProvider busStopsProvider);
+    void injectInto(BusStopsListProvider busStopsProvider);
 
-    void injectFields(BusRoutesListProvider busRoutesProvider);
+    void injectInto(BusRoutesListProvider busRoutesProvider);
 }

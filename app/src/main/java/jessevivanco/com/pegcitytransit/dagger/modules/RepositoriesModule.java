@@ -1,7 +1,5 @@
 package jessevivanco.com.pegcitytransit.dagger.modules;
 
-import android.content.Context;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -17,14 +15,14 @@ public class RepositoriesModule {
     @Provides
     @Singleton
     @Inject
-    BusRoutesRepository provideBusRoutesRepository(Context context, RestApi restApi) {
-        return new BusRoutesRepository(context, restApi);
+    BusRoutesRepository provideBusRoutesRepository(RestApi restApi) {
+        return new BusRoutesRepository(restApi);
     }
 
     @Provides
     @Singleton
     @Inject
-    BusStopRepository provideBusStopRepository(Context context, RestApi restApi) {
-        return new BusStopRepository(context, restApi);
+    BusStopRepository provideBusStopRepository(RestApi restApi) {
+        return new BusStopRepository(restApi);
     }
 }

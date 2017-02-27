@@ -9,11 +9,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.provider.base.ListProvider;
+import jessevivanco.com.pegcitytransit.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.repositories.BusStopRepository;
 import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
+import jessevivanco.com.pegcitytransit.rest.RetrofitResponseUtils;
 import jessevivanco.com.pegcitytransit.rest.models.BusStop;
 
 public class BusStopsListProvider implements ListProvider<List<BusStop>> {
@@ -22,15 +26,22 @@ public class BusStopsListProvider implements ListProvider<List<BusStop>> {
     private static final String STATE_KEY_LONGITUDE = "STATE_KEY_LONGITUDE";
     private static final String STATE_KEY_RADIUS = "STATE_KEY_RADIUS";
 
+    private final String LOG_TAG = getClass().getSimpleName();
+
     /**
      * Default lat and long will only be used if the user has GPS disabled.
      */
-    public final double DEFAULT_LAT;
-    public final double DEFAULT_LONG;
-    public final int DEFAULT_RADIUS;
+    private final double DEFAULT_LAT;
+    private final double DEFAULT_LONG;
+    private final int DEFAULT_RADIUS;
 
     @Inject
-    BusStopRepository busStopRepository;
+    BusStopRepository stopsRepository;
+
+    @Inject
+    BusRoutesRepository routesRepository;
+    @Inject
+    Context context;
 
     // Lat and Long might be null if we don't have GPS permission.
     private
@@ -43,9 +54,11 @@ public class BusStopsListProvider implements ListProvider<List<BusStop>> {
     @Nullable
     Integer radius;
 
+    // TODO DOC
+    private boolean shouldLoadRoutesForStops;
 
     public BusStopsListProvider(Context context, AppComponent injector) {
-        injector.injectFields(this);
+        injector.injectInto(this);
 
         // Load out default lat and long values.
         DEFAULT_LAT = Double.parseDouble(context.getString(R.string.default_lat));
@@ -57,12 +70,74 @@ public class BusStopsListProvider implements ListProvider<List<BusStop>> {
 
     @Override
     public void loadData(final OnRepositoryDataRetrievedListener<List<BusStop>> onDataRetrievedCallback) {
+
         // NOTE: if lat, long, and radius are not supplied, then we just resort to the default values.
-        busStopRepository.getBusStopsNearLocation(
+        stopsRepository.getBusStopsNearLocation(
                 latitude != null ? latitude : DEFAULT_LAT,
                 longitude != null ? longitude : DEFAULT_LONG,
-                radius != null ? radius : DEFAULT_RADIUS,
-                onDataRetrievedCallback);
+                radius != null ? radius : DEFAULT_RADIUS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((busStops, throwable) -> {
+                    RetrofitResponseUtils.handleResponse(context, busStops, LOG_TAG, throwable, onDataRetrievedCallback);
+                });
+
+        // TODO
+        // Intercept the callback to the adapter so that we can also load the bus routes for each bus stop.
+//                new OnRepositoryDataRetrievedListener<List<BusStop>>() {
+//                    @Override
+//                    public void onDataRetrieved(@Nullable List<BusStop> data) {
+//
+//                        handleFetchedBusStops(data, onDataRetrievedCallback);
+//                    }
+//
+//                    @Override
+//                    public void onError(String message) {
+//                        onDataRetrievedCallback.onError(message);
+//                    }
+//                });
+    }
+
+    /**
+     * // TODO re-doc?
+     * Calls back to the adapter with the fetched list of bus stops like we normally would. Also
+     * loads the routes for each bus stop which invokes callbacks to the adapter.
+     *
+     * @param busStops
+     * @param onDataRetrievedCallback
+     */
+    private void handleFetchedBusStops(List<BusStop> busStops, final OnRepositoryDataRetrievedListener<List<BusStop>> onDataRetrievedCallback) {
+
+        // callback like we normally would.
+        onDataRetrievedCallback.onDataRetrieved(busStops);
+
+        // Fetch routes for each bus stop. Load the routes from cache if possible.
+        if (busStops != null && busStops.size() > 0) {
+            for (BusStop stop : busStops) {
+
+                loadRoutesForBusStop(onDataRetrievedCallback, stop);
+            }
+        }
+    }
+
+    private void loadRoutesForBusStop(final OnRepositoryDataRetrievedListener<List<BusStop>> onDataRetrievedCallback, BusStop stop) {
+
+        // Todo check if routes exist in cache before fetching.
+//        routesRepository.getRoutesForBusStop(stop.getNumber(), new OnRepositoryDataRetrievedListener<List<BusRoute>>() {
+//            @Override
+//            public void onDataRetrieved(@Nullable List<BusRoute> data) {
+//                Log.v("Yolo", "got routes for stop " + stop.getNumber() + ": " + data);
+//
+//                // TODO what now??
+//            }
+//
+//            @Override
+//            public void onError(String message) {
+//                Log.v("Error", "Failed " + stop.getNumber() + ": " + message);
+//
+//                // Todo callback?
+//            }
+//        });
     }
 
     @Override

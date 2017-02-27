@@ -4,11 +4,13 @@ package jessevivanco.com.pegcitytransit.rest;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.List;
+
+import io.reactivex.Single;
+import jessevivanco.com.pegcitytransit.rest.models.BusRoute;
 import jessevivanco.com.pegcitytransit.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.rest.models.ScheduleStatus;
-import jessevivanco.com.pegcitytransit.rest.models.list.BusStopsList;
-import jessevivanco.com.pegcitytransit.rest.models.list.RoutesList;
-import retrofit2.Call;
+import jessevivanco.com.pegcitytransit.rest.models.base.WinnipegTransitResponse;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -21,11 +23,10 @@ import retrofit2.http.Query;
 public interface RestApi {
 
     @GET("statuses/schedule.json")
-    Call<ScheduleStatus> getScheduleStatus();
-
+    Single<ScheduleStatus> getScheduleStatus();
 
     @GET("stops/{id}.json")
-    Call<BusStop> getStopInfo(@Path("id") long id);
+    Single<BusStop> getStopInfo(@Path("id") long id);
 
     /**
      * Retrieves a list of bus stops at a location (given <code>longitude</code> and <code>latitude</code>) within
@@ -39,9 +40,9 @@ public interface RestApi {
      * .com/home/api/v2/services/stops</a>
      */
     @GET("stops.json")
-    Call<BusStopsList> getBusStopsNearLocation(@Query("lat") Double latitude,
-                                               @Query("lon") Double longitude,
-                                               @Nullable @Query("distance") Integer radius);
+    Single<WinnipegTransitResponse<List<BusStop>>> getBusStopsNearLocation(@Query("lat") Double latitude,
+                                                                           @Query("lon") Double longitude,
+                                                                           @Nullable @Query("distance") Integer radius);
 
 
     /**
@@ -53,6 +54,6 @@ public interface RestApi {
      * .com/home/api/v2/services/routes</a>
      */
     @GET("routes.json")
-    Call<RoutesList> getRoutesForStop(@Query("stop") @NonNull Integer busStop);
+    Single<WinnipegTransitResponse<List<BusRoute>>> getRoutesForBusStop(@Query("stop") @NonNull Integer busStop);
 
 }

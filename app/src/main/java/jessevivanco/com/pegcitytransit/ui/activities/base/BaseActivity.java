@@ -41,7 +41,7 @@ abstract public class BaseActivity extends AppCompatActivity {
 
     /**
      * Our field injector. If you have any members annotated with <code>@Inject</code>, then make
-     * sure you call <code>AppComponent#injectFields(T)</code> where <code>T</code> is an instance
+     * sure you call <code>AppComponent#injectInto(T)</code> where <code>T</code> is an instance
      * of yourself.
      *
      * @return
