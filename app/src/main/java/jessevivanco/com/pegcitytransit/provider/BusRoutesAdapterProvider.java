@@ -11,13 +11,13 @@ import javax.inject.Inject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.dagger.components.AppComponent;
-import jessevivanco.com.pegcitytransit.provider.base.ListProvider;
+import jessevivanco.com.pegcitytransit.provider.base.AdapterProvider;
 import jessevivanco.com.pegcitytransit.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
 import jessevivanco.com.pegcitytransit.rest.RetrofitResponseUtils;
 import jessevivanco.com.pegcitytransit.rest.models.BusRoute;
 
-public class BusRoutesListProvider implements ListProvider<List<BusRoute>> {
+public class BusRoutesAdapterProvider implements AdapterProvider<List<BusRoute>> {
 
     private static final String STATE_KEY_BUS_STOP = "STATE_KEY_BUS_STOP";
 
@@ -32,7 +32,7 @@ public class BusRoutesListProvider implements ListProvider<List<BusRoute>> {
     @Nullable
     Integer busStop;
 
-    public BusRoutesListProvider(AppComponent injector) {
+    public BusRoutesAdapterProvider(AppComponent injector) {
         injector.injectInto(this);
     }
 

@@ -13,7 +13,7 @@ import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedLis
  *
  * @param <D>
  */
-public interface ListProvider<D> {
+public interface AdapterProvider<D> {
 
     /**
      * Send a request to fetch a list data of type &lt;D&gt;.
@@ -36,23 +36,4 @@ public interface ListProvider<D> {
      * @param state
      */
     void onRestoreInstanceState(@Nullable Bundle state);
-
-    /**
-     * Callbacks to any View who is hosting a <code>ListProvider</code>. If you're using a
-     * <code>ListProvider</code>, then you must implement these methods.
-     */
-    interface ListProviderViewContract {
-
-        /**
-         * Signal that the list finished loading.
-         */
-        void onFinishedLoading();
-
-        /**
-         * Signal that the list had finished loading with an error.
-         *
-         * @param message
-         */
-        void onListLoadError(String message);
-    }
 }

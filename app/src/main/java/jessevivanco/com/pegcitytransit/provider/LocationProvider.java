@@ -27,12 +27,12 @@ public class LocationProvider implements GoogleApiClient.ConnectionCallbacks, Go
     private Context context;
     private GoogleApiClient googleApiClient;
 
-    private BusStopsListProvider busStopsProvider;
+    private BusStopsAdapterProvider busStopsProvider;
 
     private LocationProviderViewContract view;
 
     public LocationProvider(Context context,
-                            BusStopsListProvider busStopsProvider,
+                            BusStopsAdapterProvider busStopsProvider,
                             LocationProviderViewContract view) {
 
         MAP_ZOOM_RATIO = context.getResources().getInteger(R.integer.default_map_zoom);

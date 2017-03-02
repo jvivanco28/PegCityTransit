@@ -12,7 +12,7 @@ import org.parceler.Parcels;
 import java.util.List;
 
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.provider.base.ListProvider;
+import jessevivanco.com.pegcitytransit.provider.base.AdapterProvider;
 import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
 import jessevivanco.com.pegcitytransit.ui.view_holders.ErrorCellViewHolder;
 
@@ -22,7 +22,7 @@ import jessevivanco.com.pegcitytransit.ui.view_holders.ErrorCellViewHolder;
  *
  * @param <T> The adapter will contain a <code>List</code> of type <code>T</code>.
  */
-public abstract class BaseAdapter<T>
+public abstract class RefreshableAdapter<T>
         extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements OnRepositoryDataRetrievedListener<List<T>>,
         ErrorCellViewHolder.OnRetryClickListener {
@@ -31,23 +31,19 @@ public abstract class BaseAdapter<T>
     private static final String STATE_KEY_IS_ERROR = "is_error";
     private static final String STATE_KEY_LIST = "list";
 
-    protected ListProvider.ListProviderViewContract onListLoadedCallback;
-
     private List<T> list;
-    private ListProvider provider;
+    private AdapterProvider provider;
 
     private boolean isLoading = false;
     private boolean isError = false;
 
 
-    public BaseAdapter(@Nullable Bundle savedInstanceState,
-                       @Nullable ListProvider.ListProviderViewContract onListLoadedCallback,
-                       @Nullable ListProvider provider) {
+    public RefreshableAdapter(@Nullable Bundle savedInstanceState,
+                              @Nullable AdapterProvider provider) {
 
         this.provider = provider;
 
         onRestoreInstanceState(savedInstanceState);
-        setOnListLoadedCallback(onListLoadedCallback);
         setHasStableIds(dataHasStableIds());
     }
 
@@ -173,10 +169,6 @@ public abstract class BaseAdapter<T>
         }
     }
 
-    public void setOnListLoadedCallback(ListProvider.ListProviderViewContract onListLoadedCallback) {
-        this.onListLoadedCallback = onListLoadedCallback;
-    }
-
     /**
      * Saves the state of the adapter to the instance state bundle.
      *
@@ -202,10 +194,6 @@ public abstract class BaseAdapter<T>
         setLoading(false);
         setError(false);
         notifyDataSetChanged();
-
-        if (onListLoadedCallback != null) {
-            onListLoadedCallback.onFinishedLoading();
-        }
     }
 
     @Override
@@ -213,11 +201,6 @@ public abstract class BaseAdapter<T>
         setLoading(false);
         setError(true);
         notifyDataSetChanged();
-
-        if (onListLoadedCallback != null) {
-            onListLoadedCallback.onListLoadError(message);
-            onListLoadedCallback.onFinishedLoading();
-        }
     }
 
     /**
@@ -225,13 +208,13 @@ public abstract class BaseAdapter<T>
      */
     @Override
     public void onRetryLoad() {
-        refreshList();
+        refreshList(null);
     }
 
     /**
      * Clears the list, displays a loading cell, and fetches the request.
      */
-    public void refreshList() {
+    public void refreshList(@Nullable ViewContract listener) {
         setError(false);
         setLoading(true);
         setList(null);
@@ -264,11 +247,11 @@ public abstract class BaseAdapter<T>
         this.list = list;
     }
 
-    public ListProvider getProvider() {
+    public AdapterProvider getProvider() {
         return provider;
     }
 
-    public void setProvider(ListProvider provider) {
+    public void setProvider(AdapterProvider provider) {
         this.provider = provider;
     }
 
@@ -387,5 +370,17 @@ public abstract class BaseAdapter<T>
         private ViewHolder(ViewGroup parent, @LayoutRes int layoutRes) {
             super(LayoutInflater.from(parent.getContext()).inflate(layoutRes, parent, false));
         }
+    }
+
+    /**
+     * Callbacks to any View who is hosting a subclass of <code>RefreshableAdapter</code>. If you're using
+     * a <code>RefreshableAdapter</code>, then you must implement these methods.
+     */
+    public interface ViewContract {
+
+        /**
+         * Signal that the list finished loading.
+         */
+        void onRefreshFinished(String message);
     }
 }

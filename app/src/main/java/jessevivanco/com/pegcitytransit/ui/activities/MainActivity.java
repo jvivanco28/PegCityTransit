@@ -21,9 +21,8 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.provider.BusStopsListProvider;
+import jessevivanco.com.pegcitytransit.provider.BusStopsAdapterProvider;
 import jessevivanco.com.pegcitytransit.provider.LocationProvider;
-import jessevivanco.com.pegcitytransit.provider.base.ListProvider;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopsAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
@@ -36,7 +35,6 @@ import jessevivanco.com.pegcitytransit.ui.util.SnackbarUtils;
 public class MainActivity
         extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        ListProvider.ListProviderViewContract,
         LocationProvider.LocationProviderViewContract {
 
     private static final String PERMISSION_DIALOG_TAG = "dialog";
@@ -50,7 +48,7 @@ public class MainActivity
     protected RecyclerView recyclerView;
 
     private LocationProvider locationProvider;
-    private BusStopsListProvider busStopsProvider;
+    private BusStopsAdapterProvider busStopsProvider;
     private BusStopsAdapter busStopsAdapter;
 
     @Override
@@ -129,8 +127,8 @@ public class MainActivity
     }
 
     protected void setupAdapter(@Nullable Bundle savedInstanceState) {
-        busStopsProvider = new BusStopsListProvider(this, getInjector());
-        busStopsAdapter = new BusStopsAdapter(busStopsProvider, savedInstanceState, this);
+        busStopsProvider = new BusStopsAdapterProvider(this, getInjector());
+        busStopsAdapter = new BusStopsAdapter(busStopsProvider, savedInstanceState);
     }
 
     protected void setupRecyclerView() {
@@ -209,27 +207,21 @@ public class MainActivity
     public void refreshList() {
 
         // Note that showing the list view implicitly shows the loading indicator when loading.
-        busStopsAdapter.refreshList();
+        busStopsAdapter.refreshList(message -> {
+
+            refreshLayout.setRefreshing(false);
+
+            // Display the error if we got one.
+            if (message != null) {
+                SnackbarUtils.showError(message, recyclerView);
+            }
+        });
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         busStopsAdapter.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onFinishedLoading() {
-        if (refreshLayout != null) {
-            refreshLayout.setRefreshing(false);
-        }
-    }
-
-    @Override
-    public void onListLoadError(String message) {
-        if (recyclerView != null) {
-            SnackbarUtils.showError(message, recyclerView);
-        }
     }
 
     @Override

@@ -6,22 +6,20 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.provider.BusStopsListProvider;
-import jessevivanco.com.pegcitytransit.provider.base.ListProvider;
+import jessevivanco.com.pegcitytransit.provider.BusStopsAdapterProvider;
 import jessevivanco.com.pegcitytransit.rest.models.BusStop;
-import jessevivanco.com.pegcitytransit.ui.adapters.base.BaseAdapter;
+import jessevivanco.com.pegcitytransit.ui.adapters.base.RefreshableAdapter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusStopCellViewHolder;
 
-public class BusStopsAdapter extends BaseAdapter<BusStop> {
+public class BusStopsAdapter extends RefreshableAdapter<BusStop> {
 
     private final int BUS_STOP_CELL_VIEW_TYPE_ID = R.layout.cell_bus_stop;
 
-    private BusStopsListProvider busStopsProvider;
+    private BusStopsAdapterProvider busStopsProvider;
 
-    public BusStopsAdapter(BusStopsListProvider busStopsProvider,
-                           @Nullable Bundle savedInstanceState,
-                           @Nullable ListProvider.ListProviderViewContract listLoadedCallback) {
-        super(savedInstanceState, listLoadedCallback, busStopsProvider);
+    public BusStopsAdapter(BusStopsAdapterProvider busStopsProvider,
+                           @Nullable Bundle savedInstanceState) {
+        super(savedInstanceState, busStopsProvider);
 
         this.busStopsProvider = busStopsProvider;
     }
@@ -67,5 +65,4 @@ public class BusStopsAdapter extends BaseAdapter<BusStop> {
     public void fetchData() {
         busStopsProvider.loadData(this);
     }
-
 }

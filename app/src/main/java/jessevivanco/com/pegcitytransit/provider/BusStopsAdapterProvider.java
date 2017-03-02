@@ -15,14 +15,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.dagger.components.AppComponent;
-import jessevivanco.com.pegcitytransit.provider.base.ListProvider;
+import jessevivanco.com.pegcitytransit.provider.base.AdapterProvider;
 import jessevivanco.com.pegcitytransit.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.repositories.BusStopRepository;
 import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
-import jessevivanco.com.pegcitytransit.rest.RetrofitResponseUtils;
 import jessevivanco.com.pegcitytransit.rest.models.BusStop;
 
-public class BusStopsListProvider implements ListProvider<List<BusStop>> {
+public class BusStopsAdapterProvider implements AdapterProvider<List<BusStop>> {
 
     private static final String STATE_KEY_LATITUDE = "STATE_KEY_LATITUDE";
     private static final String STATE_KEY_LONGITUDE = "STATE_KEY_LONGITUDE";
@@ -56,10 +55,7 @@ public class BusStopsListProvider implements ListProvider<List<BusStop>> {
     @Nullable
     Integer radius;
 
-    // TODO DOC
-    private boolean shouldLoadRoutesForStops;
-
-    public BusStopsListProvider(Context context, AppComponent injector) {
+    public BusStopsAdapterProvider(Context context, AppComponent injector) {
         injector.injectInto(this);
 
         // Load out default lat and long values.
@@ -70,6 +66,7 @@ public class BusStopsListProvider implements ListProvider<List<BusStop>> {
                 .default_max_bus_stop_distance);
     }
 
+    // TODO try returning an Observable
     @Override
     public void loadData(final OnRepositoryDataRetrievedListener<List<BusStop>> onDataRetrievedCallback) {
 
@@ -110,11 +107,6 @@ public class BusStopsListProvider implements ListProvider<List<BusStop>> {
         Observable.fromIterable(busStops).subscribe(busStop -> {
             Log.v("DEBUG", "load routes for stop " + busStop.getName());
             loadRoutesForBusStop(onDataRetrievedCallback, busStop);
-        }, throwable -> {
-
-        }, () -> {
-            // TODO probably toss this
-
         });
     }
 
@@ -132,7 +124,7 @@ public class BusStopsListProvider implements ListProvider<List<BusStop>> {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((busRoutes, throwable) -> {
                     // TODO
-                    if ( throwable != null ) {
+                    if (throwable != null) {
                         // TODO remove this
                         Log.v("DEBUG", "Error", throwable);
                     } else {
