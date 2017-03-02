@@ -18,6 +18,7 @@ import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.rest.RestApi;
 import jessevivanco.com.pegcitytransit.rest.deserializers.WinnipegTransitResponseDeserializer;
 import jessevivanco.com.pegcitytransit.rest.interceptors.ApiKeySignatureInterceptor;
+import jessevivanco.com.pegcitytransit.rest.models.BusRoute;
 import jessevivanco.com.pegcitytransit.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.rest.models.base.WinnipegTransitResponse;
 import okhttp3.OkHttpClient;
@@ -60,8 +61,9 @@ public class RestModule {
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
                 .setDateFormat(context.getString(R.string.date_format))
 
-                .registerTypeAdapter(new TypeToken<WinnipegTransitResponse<List<BusStop>>>() {}.getType(),
-                        new WinnipegTransitResponseDeserializer<List<BusStop>>("stops", new TypeToken<List<BusStop>>() {}.getType(), gsonForTypeAdapters)) // TODO string const
+                // This is sorta nasty.
+                .registerTypeAdapter(new TypeToken<WinnipegTransitResponse<List<BusStop>>>() {}.getType(), new WinnipegTransitResponseDeserializer<List<BusStop>>("stops", new TypeToken<List<BusStop>>() {}.getType(), gsonForTypeAdapters))
+                .registerTypeAdapter(new TypeToken<WinnipegTransitResponse<List<BusRoute>>>() {}.getType(), new WinnipegTransitResponseDeserializer<List<BusRoute>>("routes", new TypeToken<List<BusRoute>>() {}.getType(), gsonForTypeAdapters))
                 .create();
     }
 
