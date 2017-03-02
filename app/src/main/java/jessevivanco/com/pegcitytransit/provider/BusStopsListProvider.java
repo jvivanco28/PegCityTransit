@@ -4,11 +4,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
@@ -78,24 +80,15 @@ public class BusStopsListProvider implements ListProvider<List<BusStop>> {
                 radius != null ? radius : DEFAULT_RADIUS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((busStops, throwable) -> {
-                    RetrofitResponseUtils.handleResponse(context, busStops, LOG_TAG, throwable, onDataRetrievedCallback);
-                });
+                .subscribe(busStops -> {
 
-        // TODO
-        // Intercept the callback to the adapter so that we can also load the bus routes for each bus stop.
-//                new OnRepositoryDataRetrievedListener<List<BusStop>>() {
-//                    @Override
-//                    public void onDataRetrieved(@Nullable List<BusStop> data) {
-//
-//                        handleFetchedBusStops(data, onDataRetrievedCallback);
-//                    }
-//
-//                    @Override
-//                    public void onError(String message) {
-//                        onDataRetrievedCallback.onError(message);
-//                    }
-//                });
+                    // Callback with the list of bus stops
+                    handleFetchedBusStops(busStops, onDataRetrievedCallback);
+
+                }, throwable -> {
+                    // TODO Use different error message
+                    onDataRetrievedCallback.onError(throwable.getMessage());
+                });
     }
 
     /**
@@ -108,36 +101,44 @@ public class BusStopsListProvider implements ListProvider<List<BusStop>> {
      */
     private void handleFetchedBusStops(List<BusStop> busStops, final OnRepositoryDataRetrievedListener<List<BusStop>> onDataRetrievedCallback) {
 
-        // callback like we normally would.
+        // Callback like we normally would.
         onDataRetrievedCallback.onDataRetrieved(busStops);
 
-        // Fetch routes for each bus stop. Load the routes from cache if possible.
-        if (busStops != null && busStops.size() > 0) {
-            for (BusStop stop : busStops) {
+        // Iterate each bus stop and load the routes for each one. Load from cache if possible.
+        // NOTE: I'm using two subscribes here b/c the callbacks to the UI need to
+        // happen on the main thread.
+        Observable.fromIterable(busStops).subscribe(busStop -> {
+            Log.v("DEBUG", "load routes for stop " + busStop.getName());
+            loadRoutesForBusStop(onDataRetrievedCallback, busStop);
+        }, throwable -> {
 
-                loadRoutesForBusStop(onDataRetrievedCallback, stop);
-            }
-        }
+        }, () -> {
+            // TODO probably toss this
+
+        });
     }
 
+    /**
+     * Load the bus routes for a given bus stop.
+     *
+     * @param onDataRetrievedCallback
+     * @param stop
+     */
     private void loadRoutesForBusStop(final OnRepositoryDataRetrievedListener<List<BusStop>> onDataRetrievedCallback, BusStop stop) {
 
         // Todo check if routes exist in cache before fetching.
-//        routesRepository.getRoutesForBusStop(stop.getNumber(), new OnRepositoryDataRetrievedListener<List<BusRoute>>() {
-//            @Override
-//            public void onDataRetrieved(@Nullable List<BusRoute> data) {
-//                Log.v("Yolo", "got routes for stop " + stop.getNumber() + ": " + data);
-//
-//                // TODO what now??
-//            }
-//
-//            @Override
-//            public void onError(String message) {
-//                Log.v("Error", "Failed " + stop.getNumber() + ": " + message);
-//
-//                // Todo callback?
-//            }
-//        });
+        routesRepository.getRoutesForBusStop(stop.getNumber())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((busRoutes, throwable) -> {
+                    // TODO
+                    if ( throwable != null ) {
+                        // TODO remove this
+                        Log.v("DEBUG", "Error", throwable);
+                    } else {
+                        Log.v("DEBUG", "Got Routes for " + stop.getName() + " -> " + busRoutes);
+                    }
+                });
     }
 
     @Override
