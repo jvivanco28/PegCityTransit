@@ -16,7 +16,7 @@ public class WinnipegTransitResponse<T> {
     }
 
     // @SerializedName for this member is different for most REST calls, so we'll use a TypeAdapter
-    // to deserialize most of our REST responses.
+    // to deserialize the majority of our REST responses.
     private T element;
 
     private Date queryTime;
