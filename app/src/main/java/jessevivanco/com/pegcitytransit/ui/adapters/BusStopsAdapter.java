@@ -5,6 +5,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import java.util.List;
+
+import io.reactivex.Observable;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.provider.BusStopsAdapterProvider;
 import jessevivanco.com.pegcitytransit.rest.models.BusStop;
@@ -62,7 +65,7 @@ public class BusStopsAdapter extends RefreshableAdapter<BusStop> {
     }
 
     @Override
-    public void fetchData() {
-        busStopsProvider.loadData(this);
+    public Observable<List<BusStop>> fetchData() {
+        return busStopsProvider.loadData();
     }
 }

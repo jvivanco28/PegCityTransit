@@ -3,7 +3,7 @@ package jessevivanco.com.pegcitytransit.provider.base;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
+import io.reactivex.Observable;
 
 /**
  * A generic interface for our adapters. Each adapter in this app sends a request for a list of items. This layer
@@ -17,10 +17,8 @@ public interface AdapterProvider<D> {
 
     /**
      * Send a request to fetch a list data of type &lt;D&gt;.
-     *
-     * @param onDataRetrievedCallback
      */
-    void loadData(OnRepositoryDataRetrievedListener<D> onDataRetrievedCallback);
+    Observable<D> loadData();
 
     /**
      * Signal to save our adapter's state (the main list, or any other field members that need to be retained).

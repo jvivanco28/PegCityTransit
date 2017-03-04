@@ -5,6 +5,8 @@ import com.google.gson.annotations.SerializedName;
 
 import org.parceler.Parcel;
 
+import java.util.List;
+
 @Parcel
 public class BusStop {
 
@@ -36,11 +38,11 @@ public class BusStop {
     @Expose
     Distance distances;
 
-//    /**
-//     * A list of bus routes for this specific bus stop. NOTE: An additional query or fetch may be required in order
-//     * to expose this data.
-//     */
-//    List<BusRoute> busRoutes;
+    /**
+     * A list of bus routes for this specific bus stop. NOTE: An additional query or fetch may be required in order
+     * to expose this data.
+     */
+    List<BusRoute> busRoutes;
 
     public Long getKey() {
         return key;
@@ -82,13 +84,13 @@ public class BusStop {
         return distances;
     }
 
-//    public List<BusRoute> getBusRoutes() {
-//        return busRoutes;
-//    }
-//
-//    public void setBusRoutes(List<BusRoute> busRoutes) {
-//        this.busRoutes = busRoutes;
-//    }
+    public List<BusRoute> getBusRoutes() {
+        return busRoutes;
+    }
+
+    public void setBusRoutes(List<BusRoute> busRoutes) {
+        this.busRoutes = busRoutes;
+    }
 
     @Override
     public String toString() {
@@ -102,6 +104,7 @@ public class BusStop {
                 ", crossStreet=" + crossStreet +
                 ", centre=" + centre +
                 ", distances=" + distances +
+                ", busRoutes=" + busRoutes +
                 '}';
     }
 }

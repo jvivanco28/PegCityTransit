@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -11,9 +12,13 @@ import org.parceler.Parcels;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.provider.base.AdapterProvider;
 import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
+import jessevivanco.com.pegcitytransit.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.ui.view_holders.ErrorCellViewHolder;
 
 /**
@@ -220,7 +225,26 @@ public abstract class RefreshableAdapter<T>
         setList(null);
         notifyDataSetChanged();
 
-        fetchData();
+        fetchData().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(list -> {
+                    Log.v("DEBUG", "Adapter refresh Success" + list);
+
+                    // TODO set list.
+                    if (listener != null)
+                        listener.onRefreshFinished(null);
+                }, throwable -> {
+                    Log.v("DEBUG", "Adapter refresh Failed", throwable);
+
+
+                    if (listener != null)
+                        listener.onRefreshFinished(throwable.getMessage());
+                });
+    }
+
+    // tODO test
+    private Observable<List<BusStop>> test() {
+        return null;
     }
 
     public boolean isLoading() {
@@ -302,7 +326,7 @@ public abstract class RefreshableAdapter<T>
     /**
      * Signal that we need to fetch/refresh the content.
      */
-    abstract public void fetchData();
+    abstract public Observable<List<T>> fetchData();
 
     /**
      * Return the unique id for the element in this position.

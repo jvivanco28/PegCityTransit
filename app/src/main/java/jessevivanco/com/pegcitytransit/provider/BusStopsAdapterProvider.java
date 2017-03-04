@@ -11,6 +11,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
@@ -18,7 +19,6 @@ import jessevivanco.com.pegcitytransit.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.provider.base.AdapterProvider;
 import jessevivanco.com.pegcitytransit.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.repositories.BusStopRepository;
-import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
 import jessevivanco.com.pegcitytransit.rest.models.BusStop;
 
 public class BusStopsAdapterProvider implements AdapterProvider<List<BusStop>> {
@@ -38,7 +38,6 @@ public class BusStopsAdapterProvider implements AdapterProvider<List<BusStop>> {
 
     @Inject
     BusStopRepository stopsRepository;
-
     @Inject
     BusRoutesRepository routesRepository;
     @Inject
@@ -68,70 +67,121 @@ public class BusStopsAdapterProvider implements AdapterProvider<List<BusStop>> {
 
     // TODO try returning an Observable
     @Override
-    public void loadData(final OnRepositoryDataRetrievedListener<List<BusStop>> onDataRetrievedCallback) {
+    public Observable<List<BusStop>> loadData() {
 
-        // NOTE: if lat, long, and radius are not supplied, then we just resort to the default values.
-        stopsRepository.getBusStopsNearLocation(
-                latitude != null ? latitude : DEFAULT_LAT,
-                longitude != null ? longitude : DEFAULT_LONG,
-                radius != null ? radius : DEFAULT_RADIUS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(busStops -> {
+        return Observable.create(e -> {
 
-                    // Callback with the list of bus stops
-                    handleFetchedBusStops(busStops, onDataRetrievedCallback);
+            // NOTE: if lat, long, and radius are not supplied, then we just resort to the default values.
+            stopsRepository.getBusStopsNearLocation(
+                    latitude != null ? latitude : DEFAULT_LAT,
+                    longitude != null ? longitude : DEFAULT_LONG,
+                    radius != null ? radius : DEFAULT_RADIUS)
 
-                }, throwable -> {
-                    // TODO Use different error message
-                    onDataRetrievedCallback.onError(throwable.getMessage());
-                });
-    }
+                    .toObservable()
 
-    /**
-     * // TODO re-doc?
-     * Calls back to the adapter with the fetched list of bus stops like we normally would. Also
-     * loads the routes for each bus stop which invokes callbacks to the adapter.
-     *
-     * @param busStops
-     * @param onDataRetrievedCallback
-     */
-    private void handleFetchedBusStops(List<BusStop> busStops, final OnRepositoryDataRetrievedListener<List<BusStop>> onDataRetrievedCallback) {
+                    // Respond with the initial list of bus stops
+                    .doOnNext(busStops -> {
 
-        // Callback like we normally would.
-        onDataRetrievedCallback.onDataRetrieved(busStops);
+                        Log.v("DEBUG", "Loaded bus stops.");
+                        e.onNext(busStops);
+                    })
 
-        // Iterate each bus stop and load the routes for each one. Load from cache if possible.
-        // NOTE: I'm using two subscribes here b/c the callbacks to the UI need to
-        // happen on the main thread.
-        Observable.fromIterable(busStops).subscribe(busStop -> {
-            Log.v("DEBUG", "load routes for stop " + busStop.getName());
-            loadRoutesForBusStop(onDataRetrievedCallback, busStop);
+                    // Iterate though each bust stop so that we can load the bus routes for each stop.
+                    .flatMapIterable(busStops -> busStops)
+                    .flatMap(busStop -> getRoutesForBusStop(busStop).toObservable())
+
+                    // TODO callback for each element after routes loaded
+
+                    // Once we've iterated every element, convert back into a list and notify the observer.
+                    .toList()
+                    .doOnSuccess(busStops -> {
+
+                        Log.v("DEBUG", "Finished loading routes for each bus stop " + busStops);
+                        e.onNext(busStops);
+                        e.onComplete();
+                    });
+
         });
     }
 
-    /**
-     * Load the bus routes for a given bus stop.
-     *
-     * @param onDataRetrievedCallback
-     * @param stop
-     */
-    private void loadRoutesForBusStop(final OnRepositoryDataRetrievedListener<List<BusStop>> onDataRetrievedCallback, BusStop stop) {
+    private Single<BusStop> getRoutesForBusStop(BusStop stop) {
+        return routesRepository.getRoutesForBusStop(stop.getNumber())
+                .flatMap(busRoutes -> {
 
-        // Todo check if routes exist in cache before fetching.
-        routesRepository.getRoutesForBusStop(stop.getNumber())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((busRoutes, throwable) -> {
-                    // TODO
-                    if (throwable != null) {
-                        // TODO remove this
-                        Log.v("DEBUG", "Error", throwable);
-                    } else {
-                        Log.v("DEBUG", "Got Routes for " + stop.getName() + " -> " + busRoutes);
-                    }
+                    stop.setBusRoutes(busRoutes);
+                    Log.v("DEBUG", "Got Routes for stop " + stop.getName());
+                    return Single.just(stop);
                 });
     }
+
+
+//    /**
+//     * Load the bus routes for a given bus stop.
+//     *
+//     * @param stop
+//     */
+//    private BusStop loadRoutesForBusStop(BusStop stop) {
+//
+//        // Todo check if routes exist in cache before fetching.
+//        routesRepository.getRoutesForBusStop(stop.getNumber())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe((busRoutes, throwable) -> {
+//                    // TODO
+//                    if (throwable != null) {
+//                        // TODO remove this
+//                        Log.v("DEBUG", "Error", throwable);
+//                    } else {
+//                        Log.v("DEBUG", "Got Routes for " + stop.getName() + " -> " + busRoutes);
+//                    }
+//                });
+//    }
+
+
+//    /**
+//     * // TODO re-doc?
+//     * Calls back to the adapter with the fetched list of bus stops like we normally would. Also
+//     * loads the routes for each bus stop which invokes callbacks to the adapter.
+//     *
+//     * @param busStops
+//     * @param onDataRetrievedCallback
+//     */
+//    private void handleFetchedBusStops(List<BusStop> busStops, final OnRepositoryDataRetrievedListener<List<BusStop>> onDataRetrievedCallback) {
+//
+//        // Callback like we normally would.
+//        onDataRetrievedCallback.onDataRetrieved(busStops);
+//
+//        // Iterate each bus stop and load the routes for each one. Load from cache if possible.
+//        // NOTE: I'm using two subscribes here b/c the callbacks to the UI need to
+//        // happen on the main thread.
+//        Observable.fromIterable(busStops).subscribe(busStop -> {
+//            Log.v("DEBUG", "load routes for stop " + busStop.getName());
+//            loadRoutesForBusStop(onDataRetrievedCallback, busStop);
+//        });
+//    }
+//
+//    /**
+//     * Load the bus routes for a given bus stop.
+//     *
+//     * @param onDataRetrievedCallback
+//     * @param stop
+//     */
+//    private void loadRoutesForBusStop(final OnRepositoryDataRetrievedListener<List<BusStop>> onDataRetrievedCallback, BusStop stop) {
+//
+//        // Todo check if routes exist in cache before fetching.
+//        routesRepository.getRoutesForBusStop(stop.getNumber())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe((busRoutes, throwable) -> {
+//                    // TODO
+//                    if (throwable != null) {
+//                        // TODO remove this
+//                        Log.v("DEBUG", "Error", throwable);
+//                    } else {
+//                        Log.v("DEBUG", "Got Routes for " + stop.getName() + " -> " + busRoutes);
+//                    }
+//                });
+//    }
 
     @Override
     public Bundle onSaveInstanceState(Bundle outState) {
