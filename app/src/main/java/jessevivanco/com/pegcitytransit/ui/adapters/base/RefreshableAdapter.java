@@ -18,7 +18,6 @@ import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.provider.base.AdapterProvider;
 import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
-import jessevivanco.com.pegcitytransit.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.ui.view_holders.ErrorCellViewHolder;
 
 /**
@@ -225,26 +224,25 @@ public abstract class RefreshableAdapter<T>
         setList(null);
         notifyDataSetChanged();
 
-        fetchData().subscribeOn(Schedulers.io())
+        fetchData()
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(list -> {
-                    Log.v("DEBUG", "Adapter refresh Success" + list);
+                    Log.v("DEBUG", "Adapter refreshed" + list);
 
-                    // TODO set list.
-                    if (listener != null)
-                        listener.onRefreshFinished(null);
+                    onDataRetrieved(list);
+
                 }, throwable -> {
                     Log.v("DEBUG", "Adapter refresh Failed", throwable);
 
-
                     if (listener != null)
                         listener.onRefreshFinished(throwable.getMessage());
-                });
-    }
+                }, () -> {
 
-    // tODO test
-    private Observable<List<BusStop>> test() {
-        return null;
+                    Log.v("DEBUG", "Adapter refresh Finished");
+                    if (listener != null)
+                        listener.onRefreshFinished(null);
+                });
     }
 
     public boolean isLoading() {

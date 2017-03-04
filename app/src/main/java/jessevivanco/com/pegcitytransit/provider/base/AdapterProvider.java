@@ -29,7 +29,7 @@ public interface AdapterProvider<D> {
     Bundle onSaveInstanceState(Bundle outState);
 
     /**
-     * Signal to restore the state of our adater.
+     * Signal to restore the state of our adapter.
      *
      * @param state
      */
