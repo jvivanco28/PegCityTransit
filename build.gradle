@@ -10,7 +10,7 @@ buildscript {
         // in the individual module build.gradle files
 
         // Gradle
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.0'
 
         // Realm, our ORM.
         classpath "io.realm:realm-gradle-plugin:2.3.0"
