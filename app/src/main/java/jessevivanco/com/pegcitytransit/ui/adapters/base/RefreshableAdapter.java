@@ -1,5 +1,6 @@
 package jessevivanco.com.pegcitytransit.ui.adapters.base;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
@@ -17,7 +18,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.provider.base.AdapterProvider;
-import jessevivanco.com.pegcitytransit.repositories.OnRepositoryDataRetrievedListener;
 import jessevivanco.com.pegcitytransit.ui.view_holders.ErrorCellViewHolder;
 
 /**
@@ -28,23 +28,24 @@ import jessevivanco.com.pegcitytransit.ui.view_holders.ErrorCellViewHolder;
  */
 public abstract class RefreshableAdapter<T>
         extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-        implements OnRepositoryDataRetrievedListener<List<T>>,
-        ErrorCellViewHolder.OnRetryClickListener {
+        implements ErrorCellViewHolder.OnRetryClickListener {
 
     private static final String STATE_KEY_IS_LOADING = "is_loading";
     private static final String STATE_KEY_IS_ERROR = "is_error";
     private static final String STATE_KEY_LIST = "list";
 
     private List<T> list;
+
+    private Context context;
     private AdapterProvider provider;
 
     private boolean isLoading = false;
     private boolean isError = false;
 
-
-    public RefreshableAdapter(@Nullable Bundle savedInstanceState,
+    public RefreshableAdapter(Context context,
+                              @Nullable Bundle savedInstanceState,
                               @Nullable AdapterProvider provider) {
-
+        this.context = context;
         this.provider = provider;
 
         onRestoreInstanceState(savedInstanceState);
@@ -192,21 +193,6 @@ public abstract class RefreshableAdapter<T>
         return outState;
     }
 
-    @Override
-    public void onDataRetrieved(@Nullable List<T> data) {
-        setList(data);
-        setLoading(false);
-        setError(false);
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public void onError(String message) {
-        setLoading(false);
-        setError(true);
-        notifyDataSetChanged();
-    }
-
     /**
      * The user tapped on the "try again" button. We'll just invoke a refresh of the list.
      */
@@ -218,7 +204,7 @@ public abstract class RefreshableAdapter<T>
     /**
      * Clears the list, displays a loading cell, and fetches the request.
      */
-    public void refreshList(@Nullable ViewContract listener) {
+    public void refreshList(@Nullable ViewContract view) {
         setError(false);
         setLoading(true);
         setList(null);
@@ -228,21 +214,43 @@ public abstract class RefreshableAdapter<T>
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(list -> {
+
                     Log.v("DEBUG", "Adapter refreshed" + list);
-
-                    onDataRetrieved(list);
-
+                    handleDataRetrieved(list);
                 }, throwable -> {
+
                     Log.v("DEBUG", "Adapter refresh Failed", throwable);
-
-                    if (listener != null)
-                        listener.onRefreshFinished(throwable.getMessage());
+                    handleError(view, throwable);
                 }, () -> {
-
                     Log.v("DEBUG", "Adapter refresh Finished");
-                    if (listener != null)
-                        listener.onRefreshFinished(null);
+                    if (view != null)
+                        view.onRefreshFinished(null);
                 });
+    }
+
+    protected void handleDataRetrieved(@Nullable List<T> data) {
+        setList(data);
+        setLoading(false);
+        setError(false);
+        notifyDataSetChanged();
+    }
+
+    protected void handleError(@Nullable ViewContract view, Throwable throwable) {
+        setLoading(false);
+        setError(true);
+        notifyDataSetChanged();
+
+        if (view != null)
+            view.onRefreshFinished(convertErrorToMessage(throwable));
+    }
+
+    // TODO actually do something with this
+    private String convertErrorToMessage(Throwable t) {
+        // Set a user-friend error message base on the type of exception thrown.
+
+        return t.getLocalizedMessage() != null ?
+                t.getLocalizedMessage() :
+                context.getString(R.string.generic_error);
     }
 
     public boolean isLoading() {

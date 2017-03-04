@@ -128,7 +128,7 @@ public class MainActivity
 
     protected void setupAdapter(@Nullable Bundle savedInstanceState) {
         busStopsProvider = new BusStopsAdapterProvider(this, getInjector());
-        busStopsAdapter = new BusStopsAdapter(busStopsProvider, savedInstanceState);
+        busStopsAdapter = new BusStopsAdapter(this, busStopsProvider, savedInstanceState);
     }
 
     protected void setupRecyclerView() {

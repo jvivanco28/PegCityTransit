@@ -1,5 +1,6 @@
 package jessevivanco.com.pegcitytransit.ui.adapters;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -20,9 +21,10 @@ public class BusStopsAdapter extends RefreshableAdapter<BusStop> {
 
     private BusStopsAdapterProvider busStopsProvider;
 
-    public BusStopsAdapter(BusStopsAdapterProvider busStopsProvider,
+    public BusStopsAdapter(Context context,
+                           BusStopsAdapterProvider busStopsProvider,
                            @Nullable Bundle savedInstanceState) {
-        super(savedInstanceState, busStopsProvider);
+        super(context, savedInstanceState, busStopsProvider);
 
         this.busStopsProvider = busStopsProvider;
     }
