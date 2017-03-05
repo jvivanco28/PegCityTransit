@@ -206,10 +206,11 @@ public class MainActivity
     @Override
     public void refreshList() {
 
+        // Hide the SwipeRefreshLayout's refresh spinner. We'll just use our adapter's loading spinner instead.
+        refreshLayout.setRefreshing(false);
+
         // Note that showing the list view implicitly shows the loading indicator when loading.
         busStopsAdapter.refreshList(message -> {
-
-            refreshLayout.setRefreshing(false);
 
             // Display the error if we got one.
             if (message != null) {

@@ -404,7 +404,7 @@ public abstract class RefreshableAdapter<T>
 
     /**
      * Callbacks to any View who is hosting a subclass of <code>RefreshableAdapter</code>. If you're using
-     * a <code>RefreshableAdapter</code>, then you must implement these methods.
+     * a <code>RefreshableAdapter</code>, then you must implement this interface.
      */
     public interface ViewContract {
 

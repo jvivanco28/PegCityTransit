@@ -41,6 +41,12 @@
                 android:layout_height="wrap_content"
                 android:text="@{busStop.distance.direct}"/>
 
+            <TextView
+                android:id="@+id/bus_routes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{busStop.getRoutesFormatted}"/>
+
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
