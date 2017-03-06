@@ -105,6 +105,18 @@ public class BusStop {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof BusStop) {
+            BusStop busStop = (BusStop) obj;
+
+            return busStop.getKey() != null &&
+                    this.key != null &&
+                    busStop.getKey().equals(this.key);
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         return "BusStop{" +
                 "key=" + key +

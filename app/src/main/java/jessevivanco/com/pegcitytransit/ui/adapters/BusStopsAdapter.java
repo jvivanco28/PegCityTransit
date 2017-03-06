@@ -4,11 +4,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.provider.BusStopsAdapterProvider;
 import jessevivanco.com.pegcitytransit.rest.models.BusStop;
@@ -69,5 +72,35 @@ public class BusStopsAdapter extends RefreshableAdapter<BusStop> {
     @Override
     public Observable<List<BusStop>> fetchData() {
         return busStopsProvider.loadData();
+    }
+
+    /**
+     * Hooking into superclass impl. We need to load the routes for each bus stop.
+     *
+     * @param data
+     */
+    @Override
+    protected void handleDataRetrieved(@Nullable List<BusStop> data) {
+        super.handleDataRetrieved(data);
+
+        subscriptions.add(
+                busStopsProvider.getRoutesForBusStops(data)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(busStop -> {
+
+                            // Probably not the best way of handling this, but good enough for now.
+                            int updateIndex = data.indexOf(busStop);
+
+                            // The item *should* exist, but just in case.
+                            if (updateIndex >= 0 && updateIndex < data.size()) {
+                                getList().set(updateIndex, busStop);
+                                notifyItemChanged(updateIndex);
+                            }
+                        }, throwable -> {
+                            // TODO report error?
+                            Log.e(LOG_TAG, "Error loading bus routes.", throwable);
+                        })
+        );
     }
 }

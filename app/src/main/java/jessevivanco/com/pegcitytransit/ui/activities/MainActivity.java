@@ -226,6 +226,15 @@ public class MainActivity
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (busStopsAdapter != null) {
+            busStopsAdapter.onDestroy();
+        }
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {

@@ -64,34 +64,23 @@ public class BusStopsAdapterProvider implements AdapterProvider<List<BusStop>> {
 
     @Override
     public Observable<List<BusStop>> loadData() {
+        // NOTE: If lat, long, and radius are not supplied, then we just resort to the default values.
+        return stopsRepository.getBusStopsNearLocation(
+                latitude != null ? latitude : DEFAULT_LAT,
+                longitude != null ? longitude : DEFAULT_LONG,
+                radius != null ? radius : DEFAULT_RADIUS)
+                .toObservable();
+    }
 
-        return Observable.create(emitter -> {
-
-            // NOTE: If lat, long, and radius are not supplied, then we just resort to the default values.
-            stopsRepository.getBusStopsNearLocation(
-                    latitude != null ? latitude : DEFAULT_LAT,
-                    longitude != null ? longitude : DEFAULT_LONG,
-                    radius != null ? radius : DEFAULT_RADIUS)
-                    .toObservable()
-
-                    // Respond with the initial list of bus stops
-                    .doOnNext(busStops -> emitter.onNext(busStops))
-
-                    // Iterate though each bus stop so that we can load the bus routes for each stop.
-                    .flatMapIterable(busStops -> busStops)
-                    .flatMap(busStop -> getRoutesForBusStop(busStop))
-
-                    // TODO callback for each element after routes loaded
-
-                    // Once we've iterated every element, convert back into a list and notify the observer.
-                    .toList()
-                    .doOnSuccess(busStops -> {
-
-                        emitter.onNext(busStops);
-                        emitter.onComplete();
-                    })
-                    .subscribe();
-        });
+    /**
+     * Loads the bus routes for each bus stop. Emits as each stop is populated with bus routes.
+     *
+     * @param stops
+     * @return
+     */
+    public Observable<BusStop> getRoutesForBusStops(List<BusStop> stops) {
+        return Observable.fromIterable(stops)
+                .flatMap(busStop -> getRoutesForBusStop(busStop));
     }
 
     /**
@@ -101,6 +90,9 @@ public class BusStopsAdapterProvider implements AdapterProvider<List<BusStop>> {
      * @return
      */
     private Observable<BusStop> getRoutesForBusStop(BusStop stop) {
+
+        // TODO We should check the cache before sending a new API request.
+
         // Fetch the routes for the provided bus stop.
         return routesRepository.getRoutesForBusStop(stop.getNumber())
                 .flatMap(busRoutes -> {

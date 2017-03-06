@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -15,6 +14,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.provider.base.AdapterProvider;
@@ -34,6 +34,8 @@ public abstract class RefreshableAdapter<T>
     private static final String STATE_KEY_IS_ERROR = "is_error";
     private static final String STATE_KEY_LIST = "list";
 
+    protected final String LOG_TAG = getClass().getSimpleName();
+
     private List<T> list;
 
     private Context context;
@@ -42,11 +44,15 @@ public abstract class RefreshableAdapter<T>
     private boolean isLoading = false;
     private boolean isError = false;
 
+    protected CompositeDisposable subscriptions;
+
     public RefreshableAdapter(Context context,
                               @Nullable Bundle savedInstanceState,
                               @Nullable AdapterProvider provider) {
         this.context = context;
         this.provider = provider;
+
+        subscriptions = new CompositeDisposable();
 
         onRestoreInstanceState(savedInstanceState);
         setHasStableIds(dataHasStableIds());
@@ -193,6 +199,12 @@ public abstract class RefreshableAdapter<T>
         return outState;
     }
 
+    public void onDestroy() {
+        if (subscriptions != null && !subscriptions.isDisposed()) {
+            subscriptions.dispose();
+        }
+    }
+
     /**
      * The user tapped on the "try again" button. We'll just invoke a refresh of the list.
      */
@@ -210,22 +222,19 @@ public abstract class RefreshableAdapter<T>
         setList(null);
         notifyDataSetChanged();
 
-        fetchData()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list -> {
-
-                    Log.v("DEBUG", "Adapter refreshed" + list);
-                    handleDataRetrieved(list);
-                }, throwable -> {
-
-                    Log.v("DEBUG", "Adapter refresh Failed", throwable);
-                    handleError(view, throwable);
-                }, () -> {
-                    Log.v("DEBUG", "Adapter refresh Finished");
-                    if (view != null)
-                        view.onRefreshFinished(null);
-                });
+        subscriptions.add(
+                fetchData()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                list -> handleDataRetrieved(list),
+                                throwable -> handleError(view, throwable),
+                                () -> {
+                                    if (view != null) {
+                                        view.onRefreshFinished(null);
+                                    }
+                                })
+        );
     }
 
     protected void handleDataRetrieved(@Nullable List<T> data) {
