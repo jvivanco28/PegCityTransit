@@ -25,7 +25,7 @@ public class BusStopRepository {
                 .map(WinnipegTransitResponse::getElement);
 
         // ^FYI method reference above is the same as this
-        // .map(busStopsList -> busStopsList.getBusStops();
+        // .map(busStopsList -> busStopsList.getElement();
         // ^FYI 2, the map() function just converts the previous return type to a new type.
         // In this case, we're converting from type BusStopList to type List<BusStop>.
 
