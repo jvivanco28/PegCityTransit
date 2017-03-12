@@ -13,19 +13,19 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.provider.BusStopsAdapterProvider;
-import jessevivanco.com.pegcitytransit.rest.models.BusStop;
+import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.ui.adapters.base.RefreshableAdapter;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusStopsAdapterPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusStopCellViewHolder;
 
 public class BusStopsAdapter extends RefreshableAdapter<BusStop> {
 
     private final int BUS_STOP_CELL_VIEW_TYPE_ID = R.layout.cell_bus_stop;
 
-    private BusStopsAdapterProvider busStopsProvider;
+    private BusStopsAdapterPresenter busStopsProvider;
 
     public BusStopsAdapter(Context context,
-                           BusStopsAdapterProvider busStopsProvider,
+                           BusStopsAdapterPresenter busStopsProvider,
                            @Nullable Bundle savedInstanceState) {
         super(context, savedInstanceState, busStopsProvider);
 

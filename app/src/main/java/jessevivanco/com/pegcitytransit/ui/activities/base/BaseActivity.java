@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v7.app.AppCompatActivity;
 
-import jessevivanco.com.pegcitytransit.PegCityTransitApp;
-import jessevivanco.com.pegcitytransit.dagger.components.AppComponent;
+import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
+import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 abstract public class BaseActivity extends AppCompatActivity {

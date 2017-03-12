@@ -17,7 +17,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.provider.base.AdapterProvider;
+import jessevivanco.com.pegcitytransit.ui.presenters.base.AdapterPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.ErrorCellViewHolder;
 
 /**
@@ -39,7 +39,7 @@ public abstract class RefreshableAdapter<T>
     private List<T> list;
 
     private Context context;
-    private AdapterProvider provider;
+    private AdapterPresenter provider;
 
     private boolean isLoading = false;
     private boolean isError = false;
@@ -48,7 +48,7 @@ public abstract class RefreshableAdapter<T>
 
     public RefreshableAdapter(Context context,
                               @Nullable Bundle savedInstanceState,
-                              @Nullable AdapterProvider provider) {
+                              @Nullable AdapterPresenter provider) {
         this.context = context;
         this.provider = provider;
 
@@ -286,11 +286,11 @@ public abstract class RefreshableAdapter<T>
         this.list = list;
     }
 
-    public AdapterProvider getProvider() {
+    public AdapterPresenter getProvider() {
         return provider;
     }
 
-    public void setProvider(AdapterProvider provider) {
+    public void setProvider(AdapterPresenter provider) {
         this.provider = provider;
     }
 

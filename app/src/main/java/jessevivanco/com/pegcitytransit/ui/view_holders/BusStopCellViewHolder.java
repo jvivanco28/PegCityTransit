@@ -6,8 +6,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import jessevivanco.com.pegcitytransit.R;
+import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.databinding.CellBusStopBinding;
-import jessevivanco.com.pegcitytransit.rest.models.BusStop;
 
 public class BusStopCellViewHolder extends RecyclerView.ViewHolder {
 

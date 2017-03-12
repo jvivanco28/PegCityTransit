@@ -21,8 +21,8 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.provider.BusStopsAdapterProvider;
-import jessevivanco.com.pegcitytransit.provider.LocationProvider;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusStopsAdapterPresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.LocationPresenter;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopsAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
@@ -35,7 +35,7 @@ import jessevivanco.com.pegcitytransit.ui.util.SnackbarUtils;
 public class MainActivity
         extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        LocationProvider.LocationProviderViewContract {
+        LocationPresenter.LocationProviderViewContract {
 
     private static final String PERMISSION_DIALOG_TAG = "dialog";
 
@@ -47,8 +47,8 @@ public class MainActivity
     protected SwipeRefreshLayout refreshLayout;
     protected RecyclerView recyclerView;
 
-    private LocationProvider locationProvider;
-    private BusStopsAdapterProvider busStopsProvider;
+    private LocationPresenter locationProvider;
+    private BusStopsAdapterPresenter busStopsProvider;
     private BusStopsAdapter busStopsAdapter;
 
     @Override
@@ -127,7 +127,7 @@ public class MainActivity
     }
 
     protected void setupAdapter(@Nullable Bundle savedInstanceState) {
-        busStopsProvider = new BusStopsAdapterProvider(this, getInjector());
+        busStopsProvider = new BusStopsAdapterPresenter(this, getInjector());
         busStopsAdapter = new BusStopsAdapter(this, busStopsProvider, savedInstanceState);
     }
 
@@ -142,7 +142,7 @@ public class MainActivity
     }
 
     protected void setupMapsProvider() {
-        locationProvider = new LocationProvider(this, busStopsProvider, this);
+        locationProvider = new LocationPresenter(this, busStopsProvider, this);
     }
 
     @Override
