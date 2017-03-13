@@ -77,23 +77,23 @@ public class BusStopsAdapter extends RefreshableAdapter<BusStop> {
     /**
      * Hooking into superclass impl. We need to load the routes for each bus stop.
      *
-     * @param data
+     * @param busStops
      */
     @Override
-    protected void handleDataRetrieved(@Nullable List<BusStop> data) {
-        super.handleDataRetrieved(data);
+    protected void handleDataRetrieved(@Nullable List<BusStop> busStops) {
+        super.handleDataRetrieved(busStops);
 
         subscriptions.add(
-                busStopsProvider.getRoutesForBusStops(data)
+                busStopsProvider.getRoutesForBusStops(busStops)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(busStop -> {
 
                             // Probably not the best way of handling this, but good enough for now.
-                            int updateIndex = data.indexOf(busStop);
+                            int updateIndex = busStops.indexOf(busStop);
 
                             // The item *should* exist, but just in case.
-                            if (updateIndex >= 0 && updateIndex < data.size()) {
+                            if (updateIndex >= 0 && updateIndex < busStops.size()) {
                                 getList().set(updateIndex, busStop);
                                 notifyItemChanged(updateIndex);
                             }

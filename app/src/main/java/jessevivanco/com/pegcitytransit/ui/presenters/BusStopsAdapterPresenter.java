@@ -80,6 +80,7 @@ public class BusStopsAdapterPresenter implements AdapterPresenter<List<BusStop>>
      */
     public Observable<BusStop> getRoutesForBusStops(List<BusStop> stops) {
         return Observable.fromIterable(stops)
+                // For each bus stop, load the bus routes for that stop.
                 .flatMap(busStop -> getRoutesForBusStop(busStop));
     }
 
