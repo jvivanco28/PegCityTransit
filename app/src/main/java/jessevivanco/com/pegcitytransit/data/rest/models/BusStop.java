@@ -3,46 +3,58 @@ package jessevivanco.com.pegcitytransit.data.rest.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
+import io.realm.annotations.PrimaryKey;
 
-import java.util.List;
+public class BusStop extends RealmObject {
 
-@Parcel
-public class BusStop {
-
+    @PrimaryKey
     @SerializedName("key")
     @Expose
     Long key;
+
     @SerializedName("name")
     @Expose
     String name;
+
     @SerializedName("number")
     @Expose
     Integer number;
+
     @SerializedName("direction")
     @Expose
     String direction;
+
     @SerializedName("side")
     @Expose
     String side;
+
+    @Ignore
     @SerializedName("street")
     @Expose
     Street street;
+
+    @Ignore
     @SerializedName("cross-street")
     @Expose
     CrossStreet crossStreet;
+
+    @Ignore
     @SerializedName("centre")
     @Expose
     Centre centre;
+
+    @Ignore
     @SerializedName("distances")
     @Expose
     Distance distances;
 
     /**
-     * A list of bus routes for this specific bus stop. NOTE: An additional query or fetch may be required in order
-     * to expose this data.
+     * A list of bus routes for this specific bus stop. NOTE: This info does not come from the API.
      */
-    List<BusRoute> busRoutes;
+    RealmList<BusRoute> busRoutes;
 
     public Long getKey() {
         return key;
@@ -84,11 +96,11 @@ public class BusStop {
         return distances;
     }
 
-    public List<BusRoute> getBusRoutes() {
+    public RealmList<BusRoute> getBusRoutes() {
         return busRoutes;
     }
 
-    public void setBusRoutes(List<BusRoute> busRoutes) {
+    public void setBusRoutes(RealmList<BusRoute> busRoutes) {
         this.busRoutes = busRoutes;
     }
 

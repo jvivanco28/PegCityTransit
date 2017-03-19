@@ -2,9 +2,6 @@ package jessevivanco.com.pegcitytransit.data.rest.models;
 
 import com.google.gson.annotations.Expose;
 
-import org.parceler.Parcel;
-
-@Parcel
 public class Status {
 
     @Expose

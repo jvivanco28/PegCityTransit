@@ -8,8 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import org.parceler.Parcels;
-
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -170,9 +168,10 @@ public abstract class RefreshableAdapter<T>
             setLoading(state.getBoolean(getClass().getSimpleName() + "_" + STATE_KEY_IS_LOADING));
             setError(state.getBoolean(getClass().getSimpleName() + "_" + STATE_KEY_IS_ERROR));
 
-            List<T> restoredList = Parcels.unwrap(state.getParcelable(getClass().getSimpleName() + "_" +
-                    STATE_KEY_LIST));
-            setList(restoredList);
+            // TODO how should we restore the list of data?
+//            List<T> restoredList = Parcels.unwrap(state.getParcelable(getClass().getSimpleName() + "_" +
+//                    STATE_KEY_LIST));
+//            setList(restoredList);
 
             if (provider != null) {
                 provider.onRestoreInstanceState(state);
@@ -190,7 +189,8 @@ public abstract class RefreshableAdapter<T>
         outState.putBoolean(getClass().getSimpleName() + "_" + STATE_KEY_IS_LOADING, isLoading());
         outState.putBoolean(getClass().getSimpleName() + "_" + STATE_KEY_IS_ERROR, isError());
 
-        outState.putParcelable(getClass().getSimpleName() + "_" + STATE_KEY_LIST, Parcels.wrap(getList()));
+        // TODO how should we save the list of data?
+//        outState.putParcelable(getClass().getSimpleName() + "_" + STATE_KEY_LIST, Parcels.wrap(getList()));
 
         if (provider != null) {
             provider.onSaveInstanceState(outState);
@@ -341,7 +341,7 @@ public abstract class RefreshableAdapter<T>
     /**
      * Signal that we need to fetch/refresh the content.
      */
-    abstract public Observable<List<T>> fetchData();
+    abstract public Observable<? extends List<T>> fetchData();
 
     /**
      * Return the unique id for the element in this position.

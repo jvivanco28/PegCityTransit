@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.util.List;
 
@@ -11,14 +12,15 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.realm.RealmResults;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
-import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
-import jessevivanco.com.pegcitytransit.ui.presenters.base.AdapterPresenter;
 import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
+import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
+import jessevivanco.com.pegcitytransit.ui.presenters.base.AdapterPresenter;
 
-public class BusStopsAdapterPresenter implements AdapterPresenter<List<BusStop>> {
+public class BusStopsAdapterPresenter implements AdapterPresenter<RealmResults<BusStop>> {
 
     private static final String STATE_KEY_LATITUDE = "STATE_KEY_LATITUDE";
     private static final String STATE_KEY_LONGITUDE = "STATE_KEY_LONGITUDE";
@@ -63,7 +65,7 @@ public class BusStopsAdapterPresenter implements AdapterPresenter<List<BusStop>>
     }
 
     @Override
-    public Observable<List<BusStop>> loadData() {
+    public Observable<RealmResults<BusStop>> loadData() {
         // NOTE: If lat, long, and radius are not supplied, then we just resort to the default values.
         return stopsRepository.getBusStopsNearLocation(
                 latitude != null ? latitude : DEFAULT_LAT,
@@ -81,7 +83,7 @@ public class BusStopsAdapterPresenter implements AdapterPresenter<List<BusStop>>
     public Observable<BusStop> getRoutesForBusStops(List<BusStop> stops) {
         return Observable.fromIterable(stops)
                 // For each bus stop, load the bus routes for that stop.
-                .flatMap(busStop -> getRoutesForBusStop(busStop));
+                .flatMapSingle(busStop -> getRoutesForBusStop(busStop));
     }
 
     /**
@@ -90,18 +92,18 @@ public class BusStopsAdapterPresenter implements AdapterPresenter<List<BusStop>>
      * @param stop
      * @return
      */
-    private Observable<BusStop> getRoutesForBusStop(BusStop stop) {
-
-        // TODO We should check the cache before sending a new API request.
+    private Single<BusStop> getRoutesForBusStop(BusStop stop) {
 
         // Fetch the routes for the provided bus stop.
         return routesRepository.getRoutesForBusStop(stop.getNumber())
                 .flatMap(busRoutes -> {
 
                     // Set the bus routes on the bus stop reference.
-                    stop.setBusRoutes(busRoutes);
+                    Log.v("DEBUG", "Stop " + stop.getKey() + ", Saving routes " + busRoutes);
+                    stopsRepository.saveBusStopWithRoutes(stop, busRoutes);
+
                     return Single.just(stop);
-                }).toObservable();
+                });
     }
 
     @Override

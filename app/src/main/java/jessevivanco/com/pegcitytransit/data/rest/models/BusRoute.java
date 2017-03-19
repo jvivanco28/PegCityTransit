@@ -4,11 +4,12 @@ package jessevivanco.com.pegcitytransit.data.rest.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
-@Parcel
-public class BusRoute {
+public class BusRoute extends RealmObject {
 
+    @PrimaryKey
     @SerializedName("key")
     @Expose
     Long key;
@@ -47,6 +48,7 @@ public class BusRoute {
 
     @Override
     public String toString() {
+
         return "BusRoute{" +
                 "key=" + key +
                 ", number=" + number +

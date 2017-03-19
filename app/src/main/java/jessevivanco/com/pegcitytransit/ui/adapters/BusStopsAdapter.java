@@ -22,14 +22,14 @@ public class BusStopsAdapter extends RefreshableAdapter<BusStop> {
 
     private final int BUS_STOP_CELL_VIEW_TYPE_ID = R.layout.cell_bus_stop;
 
-    private BusStopsAdapterPresenter busStopsProvider;
+    private BusStopsAdapterPresenter busStopsPresenter;
 
     public BusStopsAdapter(Context context,
                            BusStopsAdapterPresenter busStopsProvider,
                            @Nullable Bundle savedInstanceState) {
         super(context, savedInstanceState, busStopsProvider);
 
-        this.busStopsProvider = busStopsProvider;
+        this.busStopsPresenter = busStopsProvider;
     }
 
     @Override
@@ -70,8 +70,8 @@ public class BusStopsAdapter extends RefreshableAdapter<BusStop> {
     }
 
     @Override
-    public Observable<List<BusStop>> fetchData() {
-        return busStopsProvider.loadData();
+    public Observable<? extends List<BusStop>> fetchData() {
+        return busStopsPresenter.loadData();
     }
 
     /**
@@ -83,24 +83,29 @@ public class BusStopsAdapter extends RefreshableAdapter<BusStop> {
     protected void handleDataRetrieved(@Nullable List<BusStop> busStops) {
         super.handleDataRetrieved(busStops);
 
-        subscriptions.add(
-                busStopsProvider.getRoutesForBusStops(busStops)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(busStop -> {
-
-                            // Probably not the best way of handling this, but good enough for now.
-                            int updateIndex = busStops.indexOf(busStop);
-
-                            // The item *should* exist, but just in case.
-                            if (updateIndex >= 0 && updateIndex < busStops.size()) {
-                                getList().set(updateIndex, busStop);
-                                notifyItemChanged(updateIndex);
-                            }
-                        }, throwable -> {
-                            // TODO report error?
-                            Log.e(LOG_TAG, "Error loading bus routes.", throwable);
-                        })
-        );
+//        subscriptions.add(
+//                busStopsPresenter.getRoutesForBusStops(busStops)
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(busStop -> {
+//
+////                            Log.v("DEBUG", "busStopRoutes = " + busStop.getBusRoutes());
+////
+////                            // TODO refactor this
+////                            // Probably not the best way of handling this, but good enough for now.
+////                            int updateIndex = busStops.indexOf(busStop);
+////
+////                            // The item *should* exist, but just in case.
+////                            if (updateIndex >= 0 && updateIndex < busStops.size()) {
+////                                getList().set(updateIndex, busStop);
+////                                notifyItemChanged(updateIndex);
+////                            }
+//                        }, throwable -> {
+//                            // TODO report error?
+//                            Log.e(LOG_TAG, "Error loading bus routes.", throwable);
+//                        }, () -> {
+//                            Log.v("DEBUG", "Observable COMPLETE!");
+//                        })
+//        );
     }
 }

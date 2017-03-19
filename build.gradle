@@ -13,7 +13,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:2.3.0'
 
         // Realm, our ORM.
-        classpath "io.realm:realm-gradle-plugin:2.3.0"
+        classpath "io.realm:realm-gradle-plugin:3.0.0"
 
         // Retrolambda let's us use lambdas without using Java 8
         classpath 'me.tatarka:gradle-retrolambda:3.4.0'
