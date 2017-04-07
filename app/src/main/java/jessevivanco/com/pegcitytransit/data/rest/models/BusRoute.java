@@ -4,12 +4,8 @@ package jessevivanco.com.pegcitytransit.data.rest.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
+public class BusRoute {
 
-public class BusRoute extends RealmObject {
-
-    @PrimaryKey
     @SerializedName("key")
     @Expose
     Long key;

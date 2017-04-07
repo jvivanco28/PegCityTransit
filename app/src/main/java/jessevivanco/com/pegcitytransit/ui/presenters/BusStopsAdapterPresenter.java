@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.List;
 
@@ -12,7 +11,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.realm.RealmResults;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
@@ -20,7 +18,7 @@ import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.ui.presenters.base.AdapterPresenter;
 
-public class BusStopsAdapterPresenter implements AdapterPresenter<RealmResults<BusStop>> {
+public class BusStopsAdapterPresenter implements AdapterPresenter<List<BusStop>> {
 
     private static final String STATE_KEY_LATITUDE = "STATE_KEY_LATITUDE";
     private static final String STATE_KEY_LONGITUDE = "STATE_KEY_LONGITUDE";
@@ -65,7 +63,7 @@ public class BusStopsAdapterPresenter implements AdapterPresenter<RealmResults<B
     }
 
     @Override
-    public Observable<RealmResults<BusStop>> loadData() {
+    public Observable<List<BusStop>> loadData() {
         // NOTE: If lat, long, and radius are not supplied, then we just resort to the default values.
         return stopsRepository.getBusStopsNearLocation(
                 latitude != null ? latitude : DEFAULT_LAT,
@@ -96,14 +94,7 @@ public class BusStopsAdapterPresenter implements AdapterPresenter<RealmResults<B
 
         // Fetch the routes for the provided bus stop.
         return routesRepository.getRoutesForBusStop(stop.getNumber())
-                .flatMap(busRoutes -> {
-
-                    // Set the bus routes on the bus stop reference.
-                    Log.v("DEBUG", "Stop " + stop.getKey() + ", Saving routes " + busRoutes);
-                    stopsRepository.saveBusStopWithRoutes(stop, busRoutes);
-
-                    return Single.just(stop);
-                });
+                .flatMap(busRoutes -> Single.just(stop));
     }
 
     @Override

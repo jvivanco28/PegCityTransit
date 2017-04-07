@@ -5,7 +5,6 @@ import android.app.Application;
 import com.joanzapata.iconify.Iconify;
 import com.joanzapata.iconify.fonts.MaterialCommunityModule;
 
-import io.realm.Realm;
 import jessevivanco.com.pegcitytransit.BuildConfig;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
@@ -29,8 +28,6 @@ public class PegCityTransitApp extends Application {
 //        if (BuildConfig.REPORT_CRASHES) {
 //            Fabric.with(this, new Crashlytics());
 //        }
-
-        Realm.init(this);
 
         initDependencies();
         initIconify();

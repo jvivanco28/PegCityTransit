@@ -3,14 +3,10 @@ package jessevivanco.com.pegcitytransit.data.rest.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import io.realm.RealmList;
-import io.realm.RealmObject;
-import io.realm.annotations.Ignore;
-import io.realm.annotations.PrimaryKey;
+import java.util.List;
 
-public class BusStop extends RealmObject {
+public class BusStop {
 
-    @PrimaryKey
     @SerializedName("key")
     @Expose
     Long key;
@@ -31,22 +27,18 @@ public class BusStop extends RealmObject {
     @Expose
     String side;
 
-    @Ignore
     @SerializedName("street")
     @Expose
     Street street;
 
-    @Ignore
     @SerializedName("cross-street")
     @Expose
     CrossStreet crossStreet;
 
-    @Ignore
     @SerializedName("centre")
     @Expose
     Centre centre;
 
-    @Ignore
     @SerializedName("distances")
     @Expose
     Distance distances;
@@ -54,7 +46,7 @@ public class BusStop extends RealmObject {
     /**
      * A list of bus routes for this specific bus stop. NOTE: This info does not come from the API.
      */
-    RealmList<BusRoute> busRoutes;
+    List<BusRoute> busRoutes;
 
     public Long getKey() {
         return key;
@@ -96,11 +88,11 @@ public class BusStop extends RealmObject {
         return distances;
     }
 
-    public RealmList<BusRoute> getBusRoutes() {
+    public List<BusRoute> getBusRoutes() {
         return busRoutes;
     }
 
-    public void setBusRoutes(RealmList<BusRoute> busRoutes) {
+    public void setBusRoutes(List<BusRoute> busRoutes) {
         this.busRoutes = busRoutes;
     }
 
