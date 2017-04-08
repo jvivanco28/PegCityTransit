@@ -1,6 +1,7 @@
 package jessevivanco.com.pegcitytransit.ui.presenters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.List;
@@ -33,7 +34,9 @@ public class BusStopsPresenter {
     Context context;
 
     private ViewContract viewContract;
-    private Disposable loadDataSubscription;
+
+    private Disposable loadBusStopsSubscription;
+    private Disposable loadBusRoutesSubscription;
 
     public BusStopsPresenter(AppComponent injector, ViewContract viewContract) {
         injector.injectInto(this);
@@ -49,12 +52,10 @@ public class BusStopsPresenter {
 
     public void loadBusStops(@Nullable Double latitude, @Nullable Double longitude, @Nullable Integer radius) {
 
-        if (loadDataSubscription != null && !loadDataSubscription.isDisposed()) {
-            loadDataSubscription.dispose();
-        }
+        dispose(loadBusStopsSubscription);
 
         // NOTE: If lat, long, and radius are not supplied, then we just resort to the default values.
-        loadDataSubscription = stopsRepository.getBusStopsNearLocation(
+        loadBusStopsSubscription = stopsRepository.getBusStopsNearLocation(
                 latitude != null ? latitude : DEFAULT_LAT,
                 longitude != null ? longitude : DEFAULT_LONG,
                 radius != null ? radius : DEFAULT_RADIUS)
@@ -67,6 +68,26 @@ public class BusStopsPresenter {
                             viewContract.showMessage(context.getString(R.string.generic_error));
                         }
                 );
+    }
+
+    public void loadBusRoutes(@NonNull Long busStopKey) {
+        dispose(loadBusRoutesSubscription);
+
+        loadBusRoutesSubscription = routesRepository.getRoutesForBusStop(busStopKey)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(busRoutes -> {
+                    // TODO ??
+                }, throwable -> {
+                    // TODO handle error
+                    viewContract.showMessage(context.getString(R.string.generic_error));
+                });
+    }
+
+    private void dispose(Disposable disposable) {
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
     }
 
     public interface ViewContract {

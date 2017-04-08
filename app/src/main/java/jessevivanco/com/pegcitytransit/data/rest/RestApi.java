@@ -54,6 +54,6 @@ public interface RestApi {
      * .com/home/api/v2/services/routes</a>
      */
     @GET("routes.json")
-    Single<WinnipegTransitResponse<List<BusRoute>>> getRoutesForBusStop(@Query("stop") @NonNull Integer busStop);
+    Single<WinnipegTransitResponse<List<BusRoute>>> getRoutesForBusStop(@Query("stop") @NonNull Long busStop);
 
 }

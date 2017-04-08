@@ -16,8 +16,8 @@ public class BusRoutesRepository {
         this.restApi = restApi;
     }
 
-    public Single<List<BusRoute>> getRoutesForBusStop(Integer busStop) {
-        return restApi.getRoutesForBusStop(busStop)
+    public Single<List<BusRoute>> getRoutesForBusStop(Long busStopKey) {
+        return restApi.getRoutesForBusStop(busStopKey)
                 .subscribeOn(Schedulers.io())
                 .map(listWinnipegTransitResponse -> listWinnipegTransitResponse.getElement());
     }
