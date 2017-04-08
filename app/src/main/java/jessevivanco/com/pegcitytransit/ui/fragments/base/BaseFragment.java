@@ -8,12 +8,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
+import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
+
 abstract public class BaseFragment extends Fragment {
+
+    private AppComponent injector;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+
+        injector = ((PegCityTransitApp) getActivity().getApplication()).getInjector();
 
         return inflater.inflate(getLayoutResourceId(), container, false);
     }
@@ -21,4 +28,8 @@ abstract public class BaseFragment extends Fragment {
     abstract protected
     @LayoutRes
     int getLayoutResourceId();
+
+    public AppComponent getInjector() {
+        return injector;
+    }
 }

@@ -10,11 +10,11 @@
             type="jessevivanco.com.pegcitytransit.data.rest.models.BusStop"/>
     </data>
 
+    <!-- TODO figure out dimens -->
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_width="120dp"
+        android:layout_height="match_parent"
         card_view:cardCornerRadius="@dimen/card_corner_radius"
         card_view:contentPadding="@dimen/material_spacing_small">
 
