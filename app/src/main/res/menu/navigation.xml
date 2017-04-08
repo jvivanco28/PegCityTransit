@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--TODO icons-->
+    <item
+        android:id="@+id/stops"
+        android:title="@string/stops"/>
+
+    <item
+        android:id="@+id/timetables"
+        android:title="@string/timetables"/>
+
+    <item
+        android:id="@+id/routes"
+        android:title="@string/routes"/>
+
+</menu>

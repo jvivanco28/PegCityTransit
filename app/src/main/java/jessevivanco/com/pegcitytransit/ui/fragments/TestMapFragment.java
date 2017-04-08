@@ -1,7 +1,8 @@
-package jessevivanco.com.pegcitytransit.ui.activities;
+package jessevivanco.com.pegcitytransit.ui.fragments;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.annotation.Nullable;
+import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -10,22 +11,16 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import jessevivanco.com.pegcitytransit.R;
-
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class TestMapFragment extends SupportMapFragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_map);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.bus_stops_map);
-        mapFragment.getMapAsync(this);
-    }
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
+        getMapAsync(this);
+    }
 
     /**
      * Manipulates the map once available.

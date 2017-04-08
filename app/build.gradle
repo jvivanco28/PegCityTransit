@@ -86,4 +86,10 @@ dependencies {
     // Android string formatting
     // https://github.com/square/phrase
     compile 'com.squareup.phrase:phrase:1.1.0'
+
+    // Butterknife View Binding
+    // https://github.com/JakeWharton/butterknife
+    compile 'com.jakewharton:butterknife:8.5.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+
 }

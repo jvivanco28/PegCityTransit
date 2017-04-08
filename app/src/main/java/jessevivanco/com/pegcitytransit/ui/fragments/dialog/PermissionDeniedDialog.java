@@ -1,4 +1,4 @@
-package jessevivanco.com.pegcitytransit.ui.fragments;
+package jessevivanco.com.pegcitytransit.ui.fragments.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
