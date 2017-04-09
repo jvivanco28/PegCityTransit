@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -17,13 +16,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.WeakHashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
+import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopsAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.BusStopListItemDecoration;
@@ -42,7 +42,7 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
 
     private SupportMapFragment mapFragment;
     private GoogleMap googleMap;
-    private WeakHashMap<Marker, Long> markerToKeyHashMap = new WeakHashMap<>();
+    private BusStopInfoWindowAdapter busStopInfoWindowAdapter;
 
     public static BusStopsMapFragment newInstance() {
         return new BusStopsMapFragment();
@@ -69,31 +69,21 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
     public void onMapReady(final GoogleMap googleMap) {
 
         this.googleMap = googleMap;
-        this.markerToKeyHashMap = new WeakHashMap<>();
 
-        googleMap.setOnMarkerClickListener(marker -> {
-
-            Long busStopKey = markerToKeyHashMap.get(marker);
-            Log.v("DEBUG", "clicked marker with busStop " + busStopKey);
-
-            if (busStopKey != null) {
-                // TODO show routes in info-window
-                busStopsPresenter.loadBusRoutes(busStopKey);
-            }
-            marker.showInfoWindow();
-            return true;
-        });
-
+        // TODO get real GPS coordinates
+        // TODO display your location with a circle or something.
         // Default marker if we don't have a location
         LatLng downtownWinnipeg = new LatLng(Double.valueOf(getString(R.string.default_lat)), Double.valueOf(getString(R.string.default_long)));
-//        googleMap.addCircle(new CircleOptions().center(downtownWinnipeg));
-//        googleMap.addMarker(new MarkerOptions().position(downtownWinnipeg));
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(downtownWinnipeg, getResources().getInteger(R.integer.default_map_zoom)));
+
+        googleMap.setInfoWindowAdapter(busStopInfoWindowAdapter);
     }
 
     private void setupMap() {
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(this);
+
+        busStopInfoWindowAdapter = new BusStopInfoWindowAdapter(getActivity(), getInjector());
     }
 
     protected void setupAdapter() {
@@ -108,7 +98,15 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
         busStopsRecyclerView.setAdapter(busStopsAdapter);
     }
 
-    private void addMarkersToMap(List<BusStop> busStops) {
+    @Override
+    public void showBusStops(List<BusStop> busStops) {
+
+        // Display the list of bus stops in the RecyclerView
+        busStopsAdapter.setBusStops(busStops);
+
+        // Display each bus stop in the map with their GPS coordinates. Also keep a HashMap of
+        // markers for each bus stop so we can figure out which marker points to which bus stop.
+        HashMap<Marker, BusStop> markerToKeyHashMap = new HashMap<>();
 
         for (BusStop stop : busStops) {
             LatLng latLng = stop.getCentre().getGeographic().getLatLng();
@@ -117,15 +115,10 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
                         .title(String.valueOf(stop.getKey()))
                         .snippet(stop.getName())
                 );
-                markerToKeyHashMap.put(marker, stop.getKey());
+                markerToKeyHashMap.put(marker, stop);
             }
         }
-    }
-
-    @Override
-    public void showBusStops(List<BusStop> busStops) {
-        busStopsAdapter.setBusStops(busStops);
-        addMarkersToMap(busStops);
+        busStopInfoWindowAdapter.setMarkerToBusStopHashMap(markerToKeyHashMap);
     }
 
     @Override

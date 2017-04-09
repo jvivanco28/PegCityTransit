@@ -29,14 +29,11 @@ public class BusStopsPresenter {
     @Inject
     BusStopRepository stopsRepository;
     @Inject
-    BusRoutesRepository routesRepository;
-    @Inject
     Context context;
 
     private ViewContract viewContract;
 
     private Disposable loadBusStopsSubscription;
-    private Disposable loadBusRoutesSubscription;
 
     public BusStopsPresenter(AppComponent injector, ViewContract viewContract) {
         injector.injectInto(this);
@@ -68,20 +65,6 @@ public class BusStopsPresenter {
                             viewContract.showMessage(context.getString(R.string.generic_error));
                         }
                 );
-    }
-
-    public void loadBusRoutes(@NonNull Long busStopKey) {
-        dispose(loadBusRoutesSubscription);
-
-        loadBusRoutesSubscription = routesRepository.getRoutesForBusStop(busStopKey)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(busRoutes -> {
-                    // TODO ??
-                }, throwable -> {
-                    // TODO handle error
-                    viewContract.showMessage(context.getString(R.string.generic_error));
-                });
     }
 
     private void dispose(Disposable disposable) {

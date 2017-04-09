@@ -30,8 +30,6 @@
 
     <!--    UI Labels   -->
     <string name="generic_error">Sorry. An error occurred.</string>
-    <string name="list_load_error_message">Sorry. An error occurred.</string>
-    <string name="list_no_results_message">Sorry. We couldn\'t find any results.</string>
     <string name="try_again">Try Again</string>
 
 </resources>
