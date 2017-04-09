@@ -54,8 +54,11 @@ public class MainActivity extends BaseActivity {
                     }
                     break;
             }
-            getSupportFragmentManager().beginTransaction().replace(R.id.content, fragment).commit();
-            return true;
+            if (fragment != null) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.content, fragment).commit();
+                return true;
+            }
+            return false;
         });
 
         // Select the first tab on initial launch.

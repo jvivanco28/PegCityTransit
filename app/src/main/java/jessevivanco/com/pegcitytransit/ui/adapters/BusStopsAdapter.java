@@ -12,15 +12,18 @@ import jessevivanco.com.pegcitytransit.ui.view_holders.BusStopCellViewHolder;
 public class BusStopsAdapter extends RecyclerView.Adapter<BusStopCellViewHolder> {
 
     private BusStopsPresenter busStopsPresenter;
+    private BusStopCellViewHolder.OnBusStopCellClickedListener onCellClickedListener;
+
     private List<BusStop> busStops;
 
-    public BusStopsAdapter(BusStopsPresenter busStopsPresenter) {
+    public BusStopsAdapter(BusStopsPresenter busStopsPresenter, BusStopCellViewHolder.OnBusStopCellClickedListener onCellClickedListener) {
         this.busStopsPresenter = busStopsPresenter;
+        this.onCellClickedListener = onCellClickedListener;
     }
 
     @Override
     public BusStopCellViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new BusStopCellViewHolder(parent);
+        return new BusStopCellViewHolder(parent, onCellClickedListener);
     }
 
     @Override
@@ -40,5 +43,9 @@ public class BusStopsAdapter extends RecyclerView.Adapter<BusStopCellViewHolder>
     public void setBusStops(List<BusStop> busStops) {
         this.busStops = busStops;
         notifyDataSetChanged();
+    }
+
+    public List<BusStop> getBusStops() {
+        return busStops;
     }
 }

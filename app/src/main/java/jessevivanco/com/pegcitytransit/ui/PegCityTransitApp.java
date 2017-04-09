@@ -3,7 +3,7 @@ package jessevivanco.com.pegcitytransit.ui;
 import android.app.Application;
 
 import com.joanzapata.iconify.Iconify;
-import com.joanzapata.iconify.fonts.MaterialCommunityModule;
+import com.joanzapata.iconify.fonts.MaterialModule;
 
 import jessevivanco.com.pegcitytransit.BuildConfig;
 import jessevivanco.com.pegcitytransit.R;
@@ -48,7 +48,7 @@ public class PegCityTransitApp extends Application {
      */
     protected void initIconify() {
         // Icon font.
-        Iconify.with(new MaterialCommunityModule());
+        Iconify.with(new MaterialModule());
     }
 
     /**

@@ -77,7 +77,7 @@ dependencies {
 
     // Material design icons from https://materialdesignicons.com/.
     // https://github.com/JoanZapata/android-iconify
-    compile 'com.joanzapata.iconify:android-iconify-material-community:2.2.2' // (v1.4.57)
+    compile 'com.joanzapata.iconify:android-iconify-material:2.2.2' // (v2.0.0)
 
     // Custom fonts
     // https://github.com/chrisjenx/Calligraphy

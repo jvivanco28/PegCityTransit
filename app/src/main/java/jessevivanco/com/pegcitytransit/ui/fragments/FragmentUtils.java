@@ -4,8 +4,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 public abstract class FragmentUtils {
 
@@ -16,27 +14,22 @@ public abstract class FragmentUtils {
      * <code>DIALOG_FRAGMENT_TAG</code>,
      * then that dialog is removed before displaying <code>dialogToShow</code>.
      *
-     * @param fromActivity
+     * @param fromFragment
      * @param dialogToShow
      * @param DIALOG_FRAGMENT_TAG
      */
-    public static void showFragment(AppCompatActivity fromActivity,
+    public static void showFragment(Fragment fromFragment,
                                     DialogFragment dialogToShow,
                                     final String DIALOG_FRAGMENT_TAG) {
 
-        if (fromActivity != null && !fromActivity.isFinishing()) {
-
-            FragmentManager fragmentManager = fromActivity.getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            Fragment previousDialog = fragmentManager.findFragmentByTag(DIALOG_FRAGMENT_TAG);
-            if (previousDialog != null) {
-                fragmentTransaction.remove(previousDialog);
-            }
-            fragmentTransaction.commitAllowingStateLoss();
-
-            dialogToShow.show(fragmentManager, DIALOG_FRAGMENT_TAG);
-        } else {
-            Log.e(LOG_TAG, "Couldn\'t start DialogFragment.");
+        FragmentManager fragmentManager = fromFragment.getChildFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        Fragment previousDialog = fragmentManager.findFragmentByTag(DIALOG_FRAGMENT_TAG);
+        if (previousDialog != null) {
+            fragmentTransaction.remove(previousDialog);
         }
+        fragmentTransaction.commitAllowingStateLoss();
+
+        dialogToShow.show(fragmentManager, DIALOG_FRAGMENT_TAG);
     }
 }

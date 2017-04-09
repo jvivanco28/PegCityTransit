@@ -1,8 +1,7 @@
 package jessevivanco.com.pegcitytransit.ui.util;
 
 import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 
 import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
 import jessevivanco.com.pegcitytransit.ui.fragments.dialog.RationaleDialog;
@@ -18,7 +17,7 @@ public abstract class PermissionUtils {
      * Requests <code>permission</code>. If a rationale with an additional explanation should be shown to the user,
      * displays a dialog that triggers the request.
      */
-    public static void requestPermission(AppCompatActivity fromActivity,
+    public static void requestPermission(Fragment fromFragment,
                                          int requestId,
                                          String permissionId,
                                          String permissionDialogTitle,
@@ -26,16 +25,17 @@ public abstract class PermissionUtils {
                                          String dialogFragmentTag) {
 
         // If the user has already denied the request, we'll show a different dialog with permission rationale.
-        if (ActivityCompat.shouldShowRequestPermissionRationale(fromActivity, permissionId)) {
+        if (fromFragment.shouldShowRequestPermissionRationale(permissionId)) {
 
-            FragmentUtils.showFragment(fromActivity, RationaleDialog.newInstance(requestId,
+            FragmentUtils.showFragment(fromFragment, RationaleDialog.newInstance(requestId,
+                    fromFragment,
                     permissionId,
                     permissionDialogTitle,
                     permissionRationale),
                     dialogFragmentTag);
         } else {
             // Location permission has not been granted yet, request it.
-            ActivityCompat.requestPermissions(fromActivity, new String[]{permissionId}, requestId);
+            fromFragment.requestPermissions(new String[]{permissionId}, requestId);
         }
     }
 

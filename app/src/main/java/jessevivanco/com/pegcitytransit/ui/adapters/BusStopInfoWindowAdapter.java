@@ -1,6 +1,7 @@
 package jessevivanco.com.pegcitytransit.ui.adapters;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.view.View;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -69,6 +70,22 @@ public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
             });
         }
         return busStopInfoWindow;
+    }
+
+    public
+    @Nullable
+    Marker getMarkerForBusStop(BusStop busStop) {
+        // FYI There is no reverse hashmap lookup.
+        if (markerToBusStopHashMap != null) {
+
+            for (Marker m : markerToBusStopHashMap.keySet()) {
+
+                if (markerToBusStopHashMap.get(m).getKey().equals(busStop.getKey())) {
+                    return m;
+                }
+            }
+        }
+        return null;
     }
 
     public void setMarkerToBusStopHashMap(HashMap<Marker, BusStop> markerToBusStopHashMap) {

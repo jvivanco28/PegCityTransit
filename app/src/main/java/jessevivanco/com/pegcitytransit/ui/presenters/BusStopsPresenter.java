@@ -1,7 +1,6 @@
 package jessevivanco.com.pegcitytransit.ui.presenters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.List;
@@ -13,7 +12,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
-import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 
@@ -59,7 +57,13 @@ public class BusStopsPresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        busStops -> viewContract.showBusStops(busStops),
+                        busStops -> {
+                            if (busStops != null && busStops.size() > 0) {
+                                viewContract.showBusStops(busStops);
+                            } else {
+                                viewContract.showMessage(context.getString(R.string.no_bus_stops_in_that_area));
+                            }
+                        },
                         throwable -> {
                             // TODO handle error
                             viewContract.showMessage(context.getString(R.string.generic_error));
