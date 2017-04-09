@@ -40,6 +40,11 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key"/>
+
+        <activity
+            android:name=".ui.activities.BusStopScheduleActivity">
+        </activity>
+
     </application>
 
 </manifest>

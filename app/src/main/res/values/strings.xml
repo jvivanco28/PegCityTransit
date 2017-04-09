@@ -31,6 +31,8 @@
     <!--    UI Labels   -->
     <string name="generic_error">Sorry. An error occurred.</string>
     <string name="no_bus_stops_in_that_area">Sorry. There are no bus stops in that area.</string>
+    <string name="error_loading_bus_stops">Sorry. An error occurred while loading the bus stops in that area.</string>
+    <string name="error_loading_bus_routes">Sorry. An error occurred while loading the bus routes.</string>
     <string name="try_again">Try Again</string>
 
 </resources>

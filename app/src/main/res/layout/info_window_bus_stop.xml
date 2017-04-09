@@ -13,13 +13,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <!-- TODO CHANGE View -->
-    <!--<TextView-->
-        <!--android:id="@+id/bus_routes"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"/>-->
-
-    <!-- TODO TEST -->
     <com.nex3z.flowlayout.FlowLayout
         android:id="@+id/bus_routes"
         android:layout_width="match_parent"

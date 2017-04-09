@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -22,23 +23,33 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
+import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
+import jessevivanco.com.pegcitytransit.ui.AppRouter;
+import jessevivanco.com.pegcitytransit.ui.adapters.BusRoutesAdapter;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
-import jessevivanco.com.pegcitytransit.ui.adapters.BusStopsAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.BusStopListItemDecoration;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopsPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
-import jessevivanco.com.pegcitytransit.ui.view_holders.BusStopCellViewHolder;
+import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
 
-public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallback, BusStopsPresenter.ViewContract, BusStopCellViewHolder.OnBusStopCellClickedListener {
+public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallback,
+        BusStopsPresenter.ViewContract,
+        BusRoutesPresenter.ViewContract,
+        GoogleMap.OnInfoWindowCloseListener,
+        BusRouteCellViewHolder.OnBusRouteCellClickedListener {
 
     private static final String PERMISSION_DIALOG_TAG = "dialog";
 
@@ -48,9 +59,13 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
     @BindView(R.id.bus_stops_recycler_view)
     RecyclerView busStopsRecyclerView;
 
-    private BusStopsAdapter busStopsAdapter;
-    private BusStopsPresenter busStopsPresenter;
+    @Inject
+    AppRouter appRouter;
 
+    private BusRoutesAdapter busRoutesAdapter;
+    private BusRoutesPresenter busRoutesPresenter;
+
+    private BusStopsPresenter busStopsPresenter;
     private SupportMapFragment mapFragment;
     private GoogleMap googleMap;
     private BusStopInfoWindowAdapter busStopInfoWindowAdapter;
@@ -62,10 +77,12 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        getInjector().injectInto(this);
         ButterKnife.bind(this, view);
-        setupMap();
-        setupAdapter();
+
+        setupAdapters();
         setupRecyclerView();
+        setupMap();
     }
 
     @Override
@@ -84,6 +101,7 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
         LatLng downtownWinnipeg = new LatLng(Double.valueOf(getString(R.string.default_lat)), Double.valueOf(getString(R.string.default_long)));
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(downtownWinnipeg, getResources().getInteger(R.integer.default_map_zoom)));
         googleMap.setInfoWindowAdapter(busStopInfoWindowAdapter);
+        googleMap.setOnInfoWindowCloseListener(this);
 
         // Hide the "my location" button.
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -119,19 +137,20 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
     private void setupMap() {
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(this);
-
-        busStopInfoWindowAdapter = new BusStopInfoWindowAdapter(getActivity(), getInjector());
     }
 
-    protected void setupAdapter() {
+    protected void setupAdapters() {
+        busRoutesPresenter = new BusRoutesPresenter(getInjector(), this);
         busStopsPresenter = new BusStopsPresenter(getInjector(), this);
-        busStopsAdapter = new BusStopsAdapter(busStopsPresenter, this);
+
+        busRoutesAdapter = new BusRoutesAdapter(busRoutesPresenter, this);
+        busStopInfoWindowAdapter = new BusStopInfoWindowAdapter(getActivity(), busRoutesPresenter);
     }
 
     private void setupRecyclerView() {
         busStopsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         busStopsRecyclerView.addItemDecoration(new BusStopListItemDecoration(getActivity()));
-        busStopsRecyclerView.setAdapter(busStopsAdapter);
+        busStopsRecyclerView.setAdapter(busRoutesAdapter);
     }
 
     @Override
@@ -159,11 +178,13 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
         }
     }
 
+    /**
+     * Shows the list of bus stops as markers in the map.
+     *
+     * @param busStops
+     */
     @Override
     public void showBusStops(List<BusStop> busStops) {
-
-        // Display the list of bus stops in the RecyclerView
-        busStopsAdapter.setBusStops(busStops);
 
         // Display each bus stop in the map with their GPS coordinates. Also keep a HashMap of
         // markers for each bus stop so we can figure out which marker points to which bus stop.
@@ -179,38 +200,92 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
                 markerToKeyHashMap.put(marker, stop);
             }
         }
+        // Add our hashmap to our info window adapter. This is where we do the marker-to-bus-stop
+        // lookup, and display the bus stop information when a marker is clicked.
         busStopInfoWindowAdapter.setMarkerToBusStopHashMap(markerToKeyHashMap);
     }
 
-    @Override
-    public void showMessage(String message) {
-        Snackbar.make(rootContainer, message, Snackbar.LENGTH_LONG).show();
-    }
-
     /**
-     * We tapped on a cell within the recycler view. Look up the marker for that bus stop, then
-     * animate the camera over to those coordinates.
+     * Bus routes for the provided <code>busStop</code> have been loaded. Display the routes
+     * in the bottom recycler view, and refresh the marker's info window so that we can display the
+     * routes there as well.
      *
-     * @param adapterPosition
+     * @param busRoutes
+     * @param busStop
      */
     @Override
-    public void onBusStopCellClicked(int adapterPosition) {
-        BusStop selectedBusStop = busStopsAdapter.getBusStops().get(adapterPosition);
+    public void showBusRoutes(List<BusRoute> busRoutes, BusStop busStop) {
+        // Show the bus routes in the boom recycler view
+        busRoutesAdapter.setBusRoutes(busRoutes);
 
-        Marker selectedBusStopMarker = busStopInfoWindowAdapter.getMarkerForBusStop(selectedBusStop);
-        if (selectedBusStopMarker != null) {
-            selectedBusStopMarker.showInfoWindow();
+        // Add the routes to the bus stop POJO, then re-open the marker for that bus stop.
+        HashMap<Marker, BusStop> markerBusStopHashMap = busStopInfoWindowAdapter.getMarkerToBusStopHashMap();
 
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selectedBusStopMarker.getPosition(), getResources().getInteger(R.integer.default_map_zoom)));
+        // FYI: We have to do a reverse lookup b/c we don't currently know the marker for the bus stop.
+        for (Map.Entry<Marker, BusStop> entry : markerBusStopHashMap.entrySet()) {
+            if (busStop.getKey().equals(entry.getValue().getKey())) {
+
+                // Found the target marker-stop pair. Attach the routes to the bus stop, refresh the
+                // info window, then bust out of this loop.
+                entry.getValue().setBusRoutes(busRoutes);
+                entry.getKey().showInfoWindow();
+                break;
+            }
         }
     }
 
+    @Override
+    public void onLoadBusRoutesError(String message) {
+        Snackbar.make(rootContainer, message, Snackbar.LENGTH_LONG).show();
+
+        // TODO show error in recycler view?
+
+    }
+
+    @Override
+    public void errorLoadingBusStops(String message) {
+        Snackbar.make(rootContainer, message, Snackbar.LENGTH_LONG).show();
+
+        // TODO show error in info-window?
+    }
+
+    /**
+     * One of the bus route cells was clicked in the bottom recycler view. Open the schedule for
+     * the bus route at that bus stop.
+     *
+     * @param busRoute
+     */
+    @Override
+    public void onBusRouteCellClicked(BusRoute busRoute) {
+        Log.v("DEBUG", "tapped on bus route " + busRoute.getNumber() + ", for stop " + busRoutesPresenter.getBusStopFilter());
+        appRouter.goToStopScheduleScreen(getActivity(), busRoute);
+    }
+
+    /**
+     * Marker info window was closed. Clear out the bottom recycler view (shows the routes for the
+     * selected bus stop) since we no longer have a marker selected.
+     *
+     * @param marker
+     */
+    @Override
+    public void onInfoWindowClose(Marker marker) {
+        busRoutesAdapter.setBusRoutes(null);
+    }
+
+    /**
+     * Search the current map camera location for bus stops.
+     */
     @OnClick(R.id.refresh_bus_stops)
     public void searchForBusStops() {
         if (googleMap != null) {
 
+            // Clear markers, list, and filters.
             googleMap.clear();
+            busRoutesAdapter.setBusRoutes(null);
+            busRoutesPresenter.setBusStopFilter(null);
+            busStopInfoWindowAdapter.setMarkerToBusStopHashMap(null);
 
+            // Load the new set of markers at the current camera position
             busStopsPresenter.loadBusStops(googleMap.getCameraPosition().target.latitude,
                     googleMap.getCameraPosition().target.longitude,
                     null);

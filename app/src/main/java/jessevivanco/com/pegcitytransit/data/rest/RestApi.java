@@ -44,6 +44,14 @@ public interface RestApi {
                                                                            @Query("lon") Double longitude,
                                                                            @Nullable @Query("distance") Integer radius);
 
+    // TODO https://api.winnipegtransit.com/v2/stops.json?route=14&api-key=Y8zxUk0g73hxmlkHoDh
+    // getBusSopsForRoute
+
+    // TODO https://api.winnipegtransit.com/v2/stops/10064/features.json?api-key=Y8zxUk0g73hxmlkHoDh
+    // getBusStopFeatures
+
+    // TODO https://api.winnipegtransit.com/v2/stops/10171/schedule.json?start=2017-04-16T04:52:51&route=16&api-key=Y8zxUk0g73hxmlkHoDh
+    // getBusStopSchedule
 
     /**
      * Retrieves a list of bus routes for a given bus stop.

@@ -6,14 +6,14 @@
     <data>
 
         <variable
-            name="busStop"
-            type="jessevivanco.com.pegcitytransit.data.rest.models.BusStop"/>
+            name="busRoute"
+            type="jessevivanco.com.pegcitytransit.data.rest.models.BusRoute"/>
     </data>
 
     <!-- TODO figure out dimens -->
     <android.support.v7.widget.CardView
         android:id="@+id/cell_container"
-        android:layout_width="@dimen/bus_stop_card_width"
+        android:layout_width="@dimen/bus_route_cell_width"
         android:layout_height="match_parent"
         card_view:cardCornerRadius="@dimen/card_corner_radius"
         card_view:contentPadding="@dimen/material_spacing_small">
@@ -24,22 +24,16 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/bus_stop_name"
+                android:id="@+id/bus_route_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{busStop.name}"/>
+                android:text="@{busRoute.name}"/>
 
             <TextView
-                android:id="@+id/bus_stop_number"
+                android:id="@+id/bus_route_number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{busStop.numberFormatted}"/>
-
-            <TextView
-                android:id="@+id/distance_from_position"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{busStop.distance.direct}"/>
+                android:text="@{busRoute.numberFormatted}"/>
 
         </LinearLayout>
 

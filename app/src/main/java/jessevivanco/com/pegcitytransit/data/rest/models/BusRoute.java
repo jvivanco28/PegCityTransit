@@ -30,6 +30,10 @@ public class BusRoute {
         return number;
     }
 
+    public String getNumberFormatted() {
+        return String.valueOf(number);
+    }
+
     public String getName() {
         return name;
     }

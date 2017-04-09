@@ -2,7 +2,6 @@ package jessevivanco.com.pegcitytransit.data.repositories;
 
 import android.support.annotation.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Single;
@@ -24,20 +23,6 @@ public class BusStopRepository {
                                                          @Nullable Integer radius) {
         // Fetch the results from the API first
         return fetchBusStopsNearLocation(latitude, longitude, radius);
-    }
-
-    /**
-     * Takes a list of bus stops and returns a list of keys for each bus stop.
-     *
-     * @param busStops
-     * @return
-     */
-    private Long[] getKeysFromList(List<BusStop> busStops) {
-        List<Long> keys = new ArrayList<>();
-        for (BusStop stop : busStops) {
-            keys.add(stop.getKey());
-        }
-        return keys.toArray(new Long[keys.size()]);
     }
 
     private Single<List<BusStop>> fetchBusStopsNearLocation(Double latitude,

@@ -61,12 +61,11 @@ public class BusStopsPresenter {
                             if (busStops != null && busStops.size() > 0) {
                                 viewContract.showBusStops(busStops);
                             } else {
-                                viewContract.showMessage(context.getString(R.string.no_bus_stops_in_that_area));
+                                viewContract.errorLoadingBusStops(context.getString(R.string.no_bus_stops_in_that_area));
                             }
                         },
                         throwable -> {
-                            // TODO handle error
-                            viewContract.showMessage(context.getString(R.string.generic_error));
+                            viewContract.errorLoadingBusStops(context.getString(R.string.error_loading_bus_stops));
                         }
                 );
     }
@@ -81,6 +80,6 @@ public class BusStopsPresenter {
 
         void showBusStops(List<BusStop> busStops);
 
-        void showMessage(String message);
+        void errorLoadingBusStops(String message);
     }
 }

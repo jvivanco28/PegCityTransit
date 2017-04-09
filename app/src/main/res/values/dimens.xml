@@ -18,7 +18,7 @@
     <dimen name="material_spacing_small">8dp</dimen>
     <dimen name="material_spacing_x_small">4dp</dimen>
 
-    <dimen name="bus_stop_card_width">150dp</dimen>
+    <dimen name="bus_route_cell_width">150dp</dimen>
 
     <dimen name="card_corner_radius">2dp</dimen>
     <dimen name="text_margin">16dp</dimen>
