@@ -1,15 +1,19 @@
 package jessevivanco.com.pegcitytransit.ui.views;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.nex3z.flowlayout.FlowLayout;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jessevivanco.com.pegcitytransit.R;
+import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 
 public class BusStopInfoWindow extends LinearLayout {
@@ -22,7 +26,7 @@ public class BusStopInfoWindow extends LinearLayout {
 
     // TODO use a widget for this.
     @BindView(R.id.bus_routes)
-    TextView busRoutesTextView;
+    FlowLayout busRoutesFlowLayout;
 
     public BusStopInfoWindow(Context context) {
         super(context);
@@ -50,14 +54,28 @@ public class BusStopInfoWindow extends LinearLayout {
             busStopKeyTextView.setText(String.valueOf(busStop.getKey()));
             busStopNameTextView.setText(busStop.getName());
 
-            busRoutesTextView.setText(busStop.getBusRoutes() != null ?
-                    "# of routes " + busStop.getBusRoutes().size() :
-                    null);
+//            busRoutesTextView.setText(busStop.getBusRoutes() != null ?
+//                    "# of routes " + busStop.getBusRoutes().size() :
+//                    null);
+            busRoutesFlowLayout.removeAllViews();
+
+            if (busStop.getBusRoutes() != null) {
+                for (BusRoute busRoute : busStop.getBusRoutes()) {
+                    busRoutesFlowLayout.addView(generateTextView(busRoute.getNumber()));
+                }
+            }
 
         } else {
             busStopKeyTextView.setText(null);
             busStopNameTextView.setText(null);
-            busRoutesTextView.setText(null);
+            busRoutesFlowLayout.removeAllViews();
         }
+    }
+
+    private TextView generateTextView(int busRoute) {
+        TextView tv = new TextView(getContext());
+        tv.setText(String.valueOf(busRoute));
+//        tv.setBackgroundColor(Color.BLUE);
+        return tv;
     }
 }

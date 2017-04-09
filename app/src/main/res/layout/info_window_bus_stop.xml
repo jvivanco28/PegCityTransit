@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:id="@+id/bus_stop_key"
@@ -13,8 +14,18 @@
         android:layout_height="wrap_content"/>
 
     <!-- TODO CHANGE View -->
-    <TextView
+    <!--<TextView-->
+        <!--android:id="@+id/bus_routes"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"/>-->
+
+    <!-- TODO TEST -->
+    <com.nex3z.flowlayout.FlowLayout
         android:id="@+id/bus_routes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:childSpacing="auto"
+        app:childSpacingForLastRow="align"
+        app:rowSpacing="8dp"/>
+
 </merge>
