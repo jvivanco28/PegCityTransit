@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
         android:id="@+id/bus_stop_key"
@@ -10,15 +11,19 @@
 
     <TextView
         android:id="@+id/bus_stop_name"
+        fontPath="fonts/bariol_bold.ttf"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/material_spacing_x_small"
+        tools:ignore="MissingPrefix"/>
 
     <com.nex3z.flowlayout.FlowLayout
         android:id="@+id/bus_routes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:childSpacing="auto"
+        android:layout_marginTop="@dimen/material_spacing_x_small"
+        app:childSpacing="@dimen/material_spacing_x_small"
         app:childSpacingForLastRow="align"
-        app:rowSpacing="8dp"/>
+        app:rowSpacing="@dimen/material_spacing_x_small"/>
 
 </merge>

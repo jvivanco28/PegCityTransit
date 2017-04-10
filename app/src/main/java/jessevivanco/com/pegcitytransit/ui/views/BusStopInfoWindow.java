@@ -1,7 +1,6 @@
 package jessevivanco.com.pegcitytransit.ui.views;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -47,6 +46,9 @@ public class BusStopInfoWindow extends LinearLayout {
         setOrientation(VERTICAL);
         LayoutInflater.from(getContext()).inflate(R.layout.info_window_bus_stop, this, true);
         ButterKnife.bind(this);
+
+        int padding = getResources().getDimensionPixelSize(R.dimen.material_spacing_x_small);
+        setPadding(padding, padding, padding, padding);
     }
 
     public void showBusStopInfo(@Nullable BusStop busStop) {
@@ -54,14 +56,11 @@ public class BusStopInfoWindow extends LinearLayout {
             busStopKeyTextView.setText(String.valueOf(busStop.getKey()));
             busStopNameTextView.setText(busStop.getName());
 
-//            busRoutesTextView.setText(busStop.getBusRoutes() != null ?
-//                    "# of routes " + busStop.getBusRoutes().size() :
-//                    null);
             busRoutesFlowLayout.removeAllViews();
 
             if (busStop.getBusRoutes() != null) {
                 for (BusRoute busRoute : busStop.getBusRoutes()) {
-                    busRoutesFlowLayout.addView(generateTextView(busRoute.getNumber()));
+                    busRoutesFlowLayout.addView(generateTextView(busRoute));
                 }
             }
 
@@ -72,10 +71,9 @@ public class BusStopInfoWindow extends LinearLayout {
         }
     }
 
-    private TextView generateTextView(int busRoute) {
-        TextView tv = new TextView(getContext());
-        tv.setText(String.valueOf(busRoute));
-//        tv.setBackgroundColor(Color.BLUE);
-        return tv;
+    private BusRouteTextView generateTextView(BusRoute busRoute) {
+        BusRouteTextView busRouteTextView = new BusRouteTextView(getContext());
+        busRouteTextView.setBusRouteText(busRoute);
+        return busRouteTextView;
     }
 }

@@ -11,6 +11,11 @@
     <color name="white">#FFFFFF</color>
     <color name="white_transparent_75">#40ffffff</color>
     <color name="black_transparent_88">#20000000</color>
-    <!--<color name="grey">#555555</color>-->
+    <color name="black">#000000</color>
+
+    <color name="spirit_route">#008000</color>
+    <color name="normal_route">@color/white</color>
+    <color name="express_route">#ffff00</color>
+    <color name="rapid_transit_route">#0072b9</color>
 
 </resources>
