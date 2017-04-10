@@ -26,7 +26,8 @@ public class BusRoute {
         RAPID_TRANSIT("rapid transit", R.drawable.rapid_transit_route, R.color.white),
         // NOTE: These come back as "regular" but we know that the spirit routes are 1, 2, and 3
         // Also, the route names contain the string "spirit" in them; that might be the better indicator.
-        SPIRIT("spirit", R.drawable.spirit_route, R.color.white);
+        // NOTE: Yes, the capital 'S' is intentional.
+        SPIRIT("Spirit", R.drawable.spirit_route, R.color.white);
 
         private String apiValue;
 
