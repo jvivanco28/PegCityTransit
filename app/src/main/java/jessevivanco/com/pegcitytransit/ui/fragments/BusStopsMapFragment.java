@@ -38,7 +38,8 @@ import jessevivanco.com.pegcitytransit.ui.AppRouter;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
-import jessevivanco.com.pegcitytransit.ui.item_decorations.BusStopListItemDecoration;
+import jessevivanco.com.pegcitytransit.ui.item_decorations.HorizontalListItemDecoration;
+import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopsPresenter;
@@ -155,7 +156,8 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
 
     private void setupRecyclerView() {
         busStopsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
-        busStopsRecyclerView.addItemDecoration(new BusStopListItemDecoration(getActivity()));
+        busStopsRecyclerView.addItemDecoration(new HorizontalListItemDecoration(getResources().getDimensionPixelSize(R.dimen.material_spacing_x_small), getResources().getDimensionPixelSize(R.dimen.material_spacing_small)));
+
 //        busStopsRecyclerView.setAdapter(scheduleAdapter);
     }
 

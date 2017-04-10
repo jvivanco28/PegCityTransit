@@ -10,7 +10,6 @@
             type="jessevivanco.com.pegcitytransit.data.rest.models.BusRoute"/>
     </data>
 
-    <!-- TODO figure out dimens -->
     <android.support.v7.widget.CardView
         android:id="@+id/cell_container"
         android:layout_width="match_parent"
@@ -21,19 +20,22 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
+
+            <jessevivanco.com.pegcitytransit.ui.views.BusRouteTextView
+                android:id="@+id/bus_route_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
             <TextView
                 android:id="@+id/bus_route_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{busRoute.name}"/>
-
-            <TextView
-                android:id="@+id/bus_route_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{busRoute.numberFormatted}"/>
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/material_spacing_small"
+                android:layout_marginStart="@dimen/material_spacing_small"
+                android:text="@{busRoute.name}"
+                android:textSize="@dimen/text_title"/>
 
         </LinearLayout>
 

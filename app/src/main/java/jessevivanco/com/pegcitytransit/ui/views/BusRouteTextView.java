@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
+import android.util.TypedValue;
+import android.view.Gravity;
 
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
@@ -11,32 +13,48 @@ import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 public class BusRouteTextView extends AppCompatTextView {
 
-    public BusRouteTextView(Context context) {
+    public enum Size {
+        MINI,
+        NORMAL
+    }
+
+    public BusRouteTextView(Context context, Size size) {
         super(context);
-        init();
+        init(size);
     }
 
     public BusRouteTextView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(null);
     }
 
     public BusRouteTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(null);
     }
 
     /**
-     * Just applying style here.
+     * Just applying style here. FYI this will override styles applied by an outside source (like in an xml layout).
      */
-    private void init() {
+    private void init(Size size) {
         CalligraphyUtils.applyFontToTextView(getContext(), this, "fonts/bariol_bold.ttf");
 
-        int padding = getResources().getDimensionPixelSize(R.dimen.material_spacing_x_small);
+        setGravity(Gravity.CENTER);
+
+        int padding = size != null && size == Size.MINI ?
+                getResources().getDimensionPixelSize(R.dimen.material_spacing_x_small) :
+                getResources().getDimensionPixelSize(R.dimen.material_spacing_small);
+
         setPadding(padding, padding, padding, padding);
+
+        float textSize = size != null && size == Size.MINI ?
+                getResources().getDimension(R.dimen.text_bus_route_mini) :
+                getResources().getDimension(R.dimen.text_bus_route_large);
+
+        setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
     }
 
-    public void setBusRouteText(BusRoute busRoute) {
+    public void setBusRoute(BusRoute busRoute) {
 
         setBackgroundResource(busRoute != null ?
                 busRoute.getCoverage().getBackgroundDrawableResId() :

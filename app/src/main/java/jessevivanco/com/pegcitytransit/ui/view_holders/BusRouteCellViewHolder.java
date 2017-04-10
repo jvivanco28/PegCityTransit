@@ -5,13 +5,18 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
 import jessevivanco.com.pegcitytransit.databinding.CellBusRouteBinding;
+import jessevivanco.com.pegcitytransit.ui.views.BusRouteTextView;
 
 public class BusRouteCellViewHolder extends RecyclerView.ViewHolder {
+
+    @BindView(R.id.bus_route_number)
+    BusRouteTextView busRouteTextView;
 
     private CellBusRouteBinding binding;
     private OnBusRouteCellClickedListener onCellClickedListener;
@@ -26,6 +31,7 @@ public class BusRouteCellViewHolder extends RecyclerView.ViewHolder {
 
     public void bind(BusRoute busRoute) {
         binding.setBusRoute(busRoute);
+        busRouteTextView.setBusRoute(busRoute);
     }
 
     @OnClick

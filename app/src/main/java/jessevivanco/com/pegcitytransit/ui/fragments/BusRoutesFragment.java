@@ -18,6 +18,7 @@ import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusRoutesAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
+import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
 
@@ -61,7 +62,7 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
 
     private void setupRecyclerView() {
         routesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-//        routesRecyclerView.addItemDecoration(new BusStopListItemDecoration(getActivity()));
+        routesRecyclerView.addItemDecoration(new VerticalListItemDecoration(getResources().getDimensionPixelSize(R.dimen.material_spacing_small), getResources().getDimensionPixelSize(R.dimen.material_spacing_small)));
         routesRecyclerView.setAdapter(routesAdapter);
     }
 

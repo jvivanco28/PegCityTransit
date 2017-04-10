@@ -23,7 +23,6 @@ public class BusStopInfoWindow extends LinearLayout {
     @BindView(R.id.bus_stop_name)
     TextView busStopNameTextView;
 
-    // TODO use a widget for this.
     @BindView(R.id.bus_routes)
     FlowLayout busRoutesFlowLayout;
 
@@ -72,8 +71,8 @@ public class BusStopInfoWindow extends LinearLayout {
     }
 
     private BusRouteTextView generateTextView(BusRoute busRoute) {
-        BusRouteTextView busRouteTextView = new BusRouteTextView(getContext());
-        busRouteTextView.setBusRouteText(busRoute);
+        BusRouteTextView busRouteTextView = new BusRouteTextView(getContext(), BusRouteTextView.Size.MINI);
+        busRouteTextView.setBusRoute(busRoute);
         return busRouteTextView;
     }
 }
