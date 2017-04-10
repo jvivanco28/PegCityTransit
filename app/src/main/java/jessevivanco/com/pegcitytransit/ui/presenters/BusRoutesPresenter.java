@@ -13,8 +13,8 @@ import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
-import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
-import jessevivanco.com.pegcitytransit.ui.view_model.BusStopViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 public class BusRoutesPresenter {
 

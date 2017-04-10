@@ -1,4 +1,4 @@
-package jessevivanco.com.pegcitytransit.ui.view_model;
+package jessevivanco.com.pegcitytransit.ui.view_models;
 
 public class ScheduledStopViewModel {
 

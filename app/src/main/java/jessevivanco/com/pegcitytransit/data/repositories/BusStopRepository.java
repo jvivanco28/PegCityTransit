@@ -9,7 +9,7 @@ import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.data.rest.RestApi;
 import jessevivanco.com.pegcitytransit.data.rest.models.base.WinnipegTransitResponse;
-import jessevivanco.com.pegcitytransit.ui.view_model.BusStopViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 public class BusStopRepository {
 

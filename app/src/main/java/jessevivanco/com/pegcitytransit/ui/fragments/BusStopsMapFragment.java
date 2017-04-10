@@ -43,8 +43,8 @@ import jessevivanco.com.pegcitytransit.ui.presenters.BusStopsPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
-import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
-import jessevivanco.com.pegcitytransit.ui.view_model.BusStopViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallback,
         BusStopsPresenter.ViewContract,

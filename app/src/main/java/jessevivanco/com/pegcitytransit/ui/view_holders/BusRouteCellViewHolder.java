@@ -10,7 +10,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.databinding.CellBusRouteBinding;
-import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusRouteTextView;
 
 public class BusRouteCellViewHolder extends RecyclerView.ViewHolder {

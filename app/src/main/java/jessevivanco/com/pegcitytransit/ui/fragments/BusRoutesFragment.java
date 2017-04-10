@@ -18,7 +18,7 @@ import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
-import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
 public class BusRoutesFragment extends BaseFragment implements BusRoutesPresenter.ViewContract, BusRouteCellViewHolder.OnBusRouteCellClickedListener {
 

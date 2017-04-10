@@ -7,7 +7,7 @@ import java.util.List;
 
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
-import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
 public class BusRoutesAdapter extends RecyclerView.Adapter<BusRouteCellViewHolder> {
 

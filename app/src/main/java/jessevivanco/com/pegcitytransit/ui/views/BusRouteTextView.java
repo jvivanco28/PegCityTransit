@@ -8,7 +8,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 public class BusRouteTextView extends AppCompatTextView {

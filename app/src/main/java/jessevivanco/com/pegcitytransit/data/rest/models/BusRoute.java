@@ -1,68 +1,10 @@
 package jessevivanco.com.pegcitytransit.data.rest.models;
 
 
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import jessevivanco.com.pegcitytransit.R;
-
-import static jessevivanco.com.pegcitytransit.data.rest.models.BusRoute.Coverage.EXPRESS;
-import static jessevivanco.com.pegcitytransit.data.rest.models.BusRoute.Coverage.RAPID_TRANSIT;
-import static jessevivanco.com.pegcitytransit.data.rest.models.BusRoute.Coverage.REGULAR;
-import static jessevivanco.com.pegcitytransit.data.rest.models.BusRoute.Coverage.SPIRIT;
-import static jessevivanco.com.pegcitytransit.data.rest.models.BusRoute.Coverage.SUPER_EXPRESS;
-
 public class BusRoute {
-
-    /**
-     * Constants for bus route coverage types. This just
-     */
-    public enum Coverage {
-
-        REGULAR("regular", R.drawable.regular_route, R.color.black),
-        EXPRESS("express", R.drawable.express_route, R.color.black),
-        SUPER_EXPRESS("super express", R.drawable.express_route, R.color.black),
-        RAPID_TRANSIT("rapid transit", R.drawable.rapid_transit_route, R.color.white),
-        // NOTE: These come back as "regular" but we know that the spirit routes are 1, 2, and 3
-        // Also, the route names contain the string "spirit" in them; that might be the better indicator.
-        // NOTE: Yes, the capital 'S' is intentional.
-        SPIRIT("Spirit", R.drawable.spirit_route, R.color.white);
-
-        private String apiValue;
-
-        private
-        @DrawableRes
-        int backgroundDrawableResId;
-
-        private
-        @ColorRes
-        int textColorResId;
-
-        Coverage(String apiValue, @DrawableRes int backgroundDrawable, @ColorRes int textColorResId) {
-            this.apiValue = apiValue;
-            this.backgroundDrawableResId = backgroundDrawable;
-            this.textColorResId = textColorResId;
-        }
-
-        public String getApiValue() {
-            return apiValue;
-        }
-
-        public
-        @DrawableRes
-        int getBackgroundDrawableResId() {
-            return backgroundDrawableResId;
-        }
-
-        public
-        @ColorRes
-        int getTextColorResId() {
-            return textColorResId;
-        }
-    }
 
     @SerializedName("key")
     @Expose
@@ -100,27 +42,8 @@ public class BusRoute {
         return customerType;
     }
 
-    public String getCoverageRaw() {
+    public String getCoverage() {
         return coverage;
-    }
-
-    public Coverage getCoverage() {
-        if (coverage == null) {
-            return Coverage.REGULAR;
-        } else if (coverage.equals(EXPRESS.apiValue)) {
-            return EXPRESS;
-        } else if (coverage.equals(SUPER_EXPRESS.apiValue)) {
-            return SUPER_EXPRESS;
-        } else if (coverage.equals(RAPID_TRANSIT.apiValue)) {
-            return RAPID_TRANSIT;
-        } else if (name != null && name.contains(SPIRIT.apiValue)) {
-            // Special case: There is no "spirit" coverage; the APi still returns those routes as
-            // "regular" routes, but the route's name contains the string "spirit" so we'll just go
-            // by that.
-            return SPIRIT;
-        } else {
-            return REGULAR;
-        }
     }
 
     @Override

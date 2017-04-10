@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import jessevivanco.com.pegcitytransit.ui.activities.BusStopScheduleActivity;
-import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
 public class AppRouter {
 

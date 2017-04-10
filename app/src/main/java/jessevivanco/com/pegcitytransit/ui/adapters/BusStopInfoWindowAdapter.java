@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
-import jessevivanco.com.pegcitytransit.ui.view_model.BusStopViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusStopInfoWindow;
 
 public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {

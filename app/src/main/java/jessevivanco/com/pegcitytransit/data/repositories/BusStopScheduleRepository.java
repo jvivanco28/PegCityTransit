@@ -4,6 +4,7 @@ import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.data.rest.RestApi;
 import jessevivanco.com.pegcitytransit.data.rest.models.StopSchedule;
+import jessevivanco.com.pegcitytransit.data.rest.models.base.WinnipegTransitResponse;
 
 public class BusStopScheduleRepository {
 
@@ -16,6 +17,6 @@ public class BusStopScheduleRepository {
     public Single<StopSchedule> getBusStopSchedule(Long busStopKey) {
         return restApi.getBusStopSchedule(busStopKey)
                 .subscribeOn(Schedulers.io())
-                .map(listWinnipegTransitResponse -> listWinnipegTransitResponse.getElement());
+                .map(WinnipegTransitResponse::getElement);
     }
 }

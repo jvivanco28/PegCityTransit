@@ -12,9 +12,8 @@ import com.nex3z.flowlayout.FlowLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
-import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
-import jessevivanco.com.pegcitytransit.ui.view_model.BusStopViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 public class BusStopInfoWindow extends LinearLayout {
 
