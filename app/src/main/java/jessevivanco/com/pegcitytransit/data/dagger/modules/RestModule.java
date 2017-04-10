@@ -20,6 +20,7 @@ import jessevivanco.com.pegcitytransit.data.rest.deserializers.WinnipegTransitRe
 import jessevivanco.com.pegcitytransit.data.rest.interceptors.ApiKeySignatureInterceptor;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
+import jessevivanco.com.pegcitytransit.data.rest.models.StopSchedule;
 import jessevivanco.com.pegcitytransit.data.rest.models.base.WinnipegTransitResponse;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -61,13 +62,20 @@ public class RestModule {
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
                 .setDateFormat(context.getString(R.string.date_format))
 
+                // TODO Make a util method for this ugliness.
                 // This is sorta nasty.
                 .registerTypeAdapter(new TypeToken<WinnipegTransitResponse<List<BusStop>>>() {
                 }.getType(), new WinnipegTransitResponseDeserializer<List<BusStop>>("stops", new TypeToken<List<BusStop>>() {
                 }.getType(), gsonForTypeAdapters))
+
                 .registerTypeAdapter(new TypeToken<WinnipegTransitResponse<List<BusRoute>>>() {
                 }.getType(), new WinnipegTransitResponseDeserializer<List<BusRoute>>("routes", new TypeToken<List<BusRoute>>() {
                 }.getType(), gsonForTypeAdapters))
+
+                .registerTypeAdapter(new TypeToken<WinnipegTransitResponse<StopSchedule>>() {
+                }.getType(), new WinnipegTransitResponseDeserializer<StopSchedule>("stop-schedule", new TypeToken<StopSchedule>() {
+                }.getType(), gsonForTypeAdapters))
+
                 .create();
     }
 

@@ -65,7 +65,8 @@ public class BusStopsPresenter {
                             }
                         },
                         throwable -> {
-                            viewContract.errorLoadingBusStops(context.getString(R.string.error_loading_bus_stops));
+                            // TODO handle error
+                            viewContract.errorLoadingBusStops(context.getString(R.string.generic_error));
                         }
                 );
     }

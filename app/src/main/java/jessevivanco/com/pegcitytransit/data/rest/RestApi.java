@@ -10,6 +10,7 @@ import io.reactivex.Single;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.data.rest.models.ScheduleStatus;
+import jessevivanco.com.pegcitytransit.data.rest.models.StopSchedule;
 import jessevivanco.com.pegcitytransit.data.rest.models.base.WinnipegTransitResponse;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -45,13 +46,20 @@ public interface RestApi {
                                                                            @Nullable @Query("distance") Integer radius);
 
     // TODO https://api.winnipegtransit.com/v2/stops.json?route=14&api-key=Y8zxUk0g73hxmlkHoDh
-    // getBusSopsForRoute
+    // getBusStopsForRoute (so we can show the entire route)
 
     // TODO https://api.winnipegtransit.com/v2/stops/10064/features.json?api-key=Y8zxUk0g73hxmlkHoDh
     // getBusStopFeatures
 
-    // TODO https://api.winnipegtransit.com/v2/stops/10171/schedule.json?start=2017-04-16T04:52:51&route=16&api-key=Y8zxUk0g73hxmlkHoDh
-    // getBusStopSchedule
+    /**
+     * Retrieves the but stop schedule for the given <code>busStopKey</code>. Each entry in the schedule
+     * is an upcoming scheduled stop which is sorted by soonest to latest.
+     *
+     * @param busStopKey
+     * @return
+     */
+    @GET("stops/{bus_stop}/schedule.json")
+    Single<WinnipegTransitResponse<StopSchedule>> getBusStopSchedule(@Path("bus_stop") Long busStopKey);
 
     /**
      * Retrieves a list of bus routes for a given bus stop.

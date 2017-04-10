@@ -33,6 +33,7 @@ import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
+import jessevivanco.com.pegcitytransit.data.rest.models.StopSchedule;
 import jessevivanco.com.pegcitytransit.ui.AppRouter;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusRoutesAdapter;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
@@ -40,6 +41,7 @@ import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.BusStopListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopsPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
@@ -48,6 +50,7 @@ import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
 public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallback,
         BusStopsPresenter.ViewContract,
         BusRoutesPresenter.ViewContract,
+        BusStopSchedulePresenter.ViewContract,
         GoogleMap.OnInfoWindowCloseListener,
         BusRouteCellViewHolder.OnBusRouteCellClickedListener {
 
@@ -62,10 +65,12 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
     @Inject
     AppRouter appRouter;
 
-    private BusRoutesAdapter busRoutesAdapter;
-    private BusRoutesPresenter busRoutesPresenter;
+    private BusRoutesAdapter routesAdapter;// TODO marked for deletion
+    private BusRoutesPresenter routesPresenter;
 
-    private BusStopsPresenter busStopsPresenter;
+    private BusStopSchedulePresenter schedulePresenter;
+
+    private BusStopsPresenter stopsPresenter;
     private SupportMapFragment mapFragment;
     private GoogleMap googleMap;
     private BusStopInfoWindowAdapter busStopInfoWindowAdapter;
@@ -109,7 +114,7 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
         showUserLocation();
 
         // TODO use your coordinates
-        busStopsPresenter.loadBusStops(null, null, null);
+        stopsPresenter.loadBusStops(null, null, null);
     }
 
     /**
@@ -140,17 +145,19 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
     }
 
     protected void setupAdapters() {
-        busRoutesPresenter = new BusRoutesPresenter(getInjector(), this);
-        busStopsPresenter = new BusStopsPresenter(getInjector(), this);
+        schedulePresenter = new BusStopSchedulePresenter(getInjector(), this);
 
-        busRoutesAdapter = new BusRoutesAdapter(busRoutesPresenter, this);
-        busStopInfoWindowAdapter = new BusStopInfoWindowAdapter(getActivity(), busRoutesPresenter);
+        routesPresenter = new BusRoutesPresenter(getInjector(), this);
+        stopsPresenter = new BusStopsPresenter(getInjector(), this);
+
+        routesAdapter = new BusRoutesAdapter(routesPresenter, this);
+        busStopInfoWindowAdapter = new BusStopInfoWindowAdapter(getActivity(), routesPresenter);
     }
 
     private void setupRecyclerView() {
         busStopsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         busStopsRecyclerView.addItemDecoration(new BusStopListItemDecoration(getActivity()));
-        busStopsRecyclerView.setAdapter(busRoutesAdapter);
+        busStopsRecyclerView.setAdapter(routesAdapter);
     }
 
     @Override
@@ -214,9 +221,12 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
      * @param busStop
      */
     @Override
-    public void showBusRoutes(List<BusRoute> busRoutes, BusStop busStop) {
+    public void showBusRoutes(List<BusRoute> busRoutes, @NonNull BusStop busStop) {
+        // TODO test
+        schedulePresenter.loadScheduleForBusStop(busStop.getKey());
+
         // Show the bus routes in the boom recycler view
-        busRoutesAdapter.setBusRoutes(busRoutes);
+        routesAdapter.setBusRoutes(busRoutes);
 
         // Add the routes to the bus stop POJO, then re-open the marker for that bus stop.
         HashMap<Marker, BusStop> markerBusStopHashMap = busStopInfoWindowAdapter.getMarkerToBusStopHashMap();
@@ -257,7 +267,7 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
      */
     @Override
     public void onBusRouteCellClicked(BusRoute busRoute) {
-        Log.v("DEBUG", "tapped on bus route " + busRoute.getNumber() + ", for stop " + busRoutesPresenter.getBusStopFilter());
+        Log.v("DEBUG", "tapped on bus route " + busRoute.getNumber() + ", for stop " + routesPresenter.getBusStopFilter());
         appRouter.goToStopScheduleScreen(getActivity(), busRoute);
     }
 
@@ -269,7 +279,17 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
      */
     @Override
     public void onInfoWindowClose(Marker marker) {
-        busRoutesAdapter.setBusRoutes(null);
+        routesAdapter.setBusRoutes(null);
+    }
+
+    @Override
+    public void showSchedule(StopSchedule busStopSchedule) {
+        Log.v("DEBUG", "Yooooo " + busStopSchedule);
+    }
+
+    @Override
+    public void showErrorLoadingScheduleMessage(String message) {
+        Log.v("DEBUG", "Awwwww " + message);
     }
 
     /**
@@ -281,12 +301,12 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
 
             // Clear markers, list, and filters.
             googleMap.clear();
-            busRoutesAdapter.setBusRoutes(null);
-            busRoutesPresenter.setBusStopFilter(null);
+            routesAdapter.setBusRoutes(null);
+            routesPresenter.setBusStopFilter(null);
             busStopInfoWindowAdapter.setMarkerToBusStopHashMap(null);
 
             // Load the new set of markers at the current camera position
-            busStopsPresenter.loadBusStops(googleMap.getCameraPosition().target.latitude,
+            stopsPresenter.loadBusStops(googleMap.getCameraPosition().target.latitude,
                     googleMap.getCameraPosition().target.longitude,
                     null);
         }

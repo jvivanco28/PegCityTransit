@@ -7,6 +7,7 @@ import dagger.Module;
 import dagger.Provides;
 import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
+import jessevivanco.com.pegcitytransit.data.repositories.BusStopScheduleRepository;
 import jessevivanco.com.pegcitytransit.data.rest.RestApi;
 
 @Module
@@ -24,5 +25,12 @@ public class RepositoriesModule {
     @Inject
     BusStopRepository provideBusStopRepository(RestApi restApi) {
         return new BusStopRepository(restApi);
+    }
+
+    @Provides
+    @Singleton
+    @Inject
+    BusStopScheduleRepository provideBusStopScheduleRepository(RestApi restApi) {
+        return new BusStopScheduleRepository(restApi);
     }
 }
