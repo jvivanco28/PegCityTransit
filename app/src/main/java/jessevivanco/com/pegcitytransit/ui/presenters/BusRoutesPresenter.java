@@ -3,7 +3,6 @@ package jessevivanco.com.pegcitytransit.ui.presenters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.List;
 
@@ -51,19 +50,13 @@ public class BusRoutesPresenter {
     public void loadBusRoutes() {
         dispose(loadBusRoutesSubscription);
 
-        if (busStopFilter != null) {
-            loadBusRoutesSubscription = routesRepository.getRoutesForBusStop(busStopFilter.getKey())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            busRoutes -> viewContract.showBusRoutes(busRoutes, busStopFilter),
-                            throwable -> viewContract.onLoadBusRoutesError(context.getString(R.string.error_loading_bus_routes))
-                    );
-        } else {
-            // We don't have a bus stop filter!
-            Log.e(TAG, "No bus stop filter attached!");
-            viewContract.onLoadBusRoutesError(context.getString(R.string.error_loading_bus_routes));
-        }
+        loadBusRoutesSubscription = routesRepository.getRoutesForBusStop(busStopFilter != null ? busStopFilter.getKey() : null)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        busRoutes -> viewContract.showBusRoutes(busRoutes, busStopFilter),
+                        throwable -> viewContract.onLoadBusRoutesError(context.getString(R.string.error_loading_bus_routes))
+                );
     }
 
     private void dispose(Disposable disposable) {
@@ -74,7 +67,8 @@ public class BusRoutesPresenter {
 
     public interface ViewContract {
 
-        void showBusRoutes(List<BusRoute> busRoutes, @NonNull BusStop busStop);
+        // TODO prob remove the second arg
+        void showBusRoutes(List<BusRoute> busRoutes, @Nullable BusStop busStop);
 
         void onLoadBusRoutesError(String message);
     }

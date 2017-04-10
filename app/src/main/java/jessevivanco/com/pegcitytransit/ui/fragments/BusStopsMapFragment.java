@@ -35,7 +35,6 @@ import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.data.rest.models.StopSchedule;
 import jessevivanco.com.pegcitytransit.ui.AppRouter;
-import jessevivanco.com.pegcitytransit.ui.adapters.BusRoutesAdapter;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
@@ -59,15 +58,15 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
     @BindView(R.id.root_container)
     ViewGroup rootContainer;
 
-    @BindView(R.id.bus_stops_recycler_view)
+    @BindView(R.id.bus_stop_schedule_recycler_view)
     RecyclerView busStopsRecyclerView;
 
     @Inject
     AppRouter appRouter;
 
-    private BusRoutesAdapter routesAdapter;// TODO marked for deletion
     private BusRoutesPresenter routesPresenter;
 
+    //    private BusScheduleAdapter scheduleAdapter;
     private BusStopSchedulePresenter schedulePresenter;
 
     private BusStopsPresenter stopsPresenter;
@@ -150,14 +149,14 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
         routesPresenter = new BusRoutesPresenter(getInjector(), this);
         stopsPresenter = new BusStopsPresenter(getInjector(), this);
 
-        routesAdapter = new BusRoutesAdapter(routesPresenter, this);
+//        scheduleAdapter = new BusRoutesAdapter(routesPresenter, this);
         busStopInfoWindowAdapter = new BusStopInfoWindowAdapter(getActivity(), routesPresenter);
     }
 
     private void setupRecyclerView() {
         busStopsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         busStopsRecyclerView.addItemDecoration(new BusStopListItemDecoration(getActivity()));
-        busStopsRecyclerView.setAdapter(routesAdapter);
+//        busStopsRecyclerView.setAdapter(scheduleAdapter);
     }
 
     @Override
@@ -213,20 +212,17 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
     }
 
     /**
-     * Bus routes for the provided <code>busStop</code> have been loaded. Display the routes
-     * in the bottom recycler view, and refresh the marker's info window so that we can display the
-     * routes there as well.
+     * Bus routes for the provided <code>busStop</code> have been loaded. Find the bus stop in
+     * our Marker-BusStop HashMap, plug the routes into that BusStop, then refresh the info window
+     * for the bus stop marker. This will end up displaying the bus routes in the info window.
      *
      * @param busRoutes
      * @param busStop
      */
     @Override
-    public void showBusRoutes(List<BusRoute> busRoutes, @NonNull BusStop busStop) {
-        // TODO test
-        schedulePresenter.loadScheduleForBusStop(busStop.getKey());
+    public void showBusRoutes(List<BusRoute> busRoutes, @Nullable BusStop busStop) {
 
-        // Show the bus routes in the boom recycler view
-        routesAdapter.setBusRoutes(busRoutes);
+        // TODO null check busstop?
 
         // Add the routes to the bus stop POJO, then re-open the marker for that bus stop.
         HashMap<Marker, BusStop> markerBusStopHashMap = busStopInfoWindowAdapter.getMarkerToBusStopHashMap();
@@ -279,12 +275,13 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
      */
     @Override
     public void onInfoWindowClose(Marker marker) {
-        routesAdapter.setBusRoutes(null);
+//        scheduleAdapter.setSchedule(null);
     }
 
     @Override
     public void showSchedule(StopSchedule busStopSchedule) {
         Log.v("DEBUG", "Yooooo " + busStopSchedule);
+//        scheduleAdapter.setSchedule(null);
     }
 
     @Override
@@ -301,7 +298,7 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
 
             // Clear markers, list, and filters.
             googleMap.clear();
-            routesAdapter.setBusRoutes(null);
+//            scheduleAdapter.setSchedule(null);
             routesPresenter.setBusStopFilter(null);
             busStopInfoWindowAdapter.setMarkerToBusStopHashMap(null);
 
