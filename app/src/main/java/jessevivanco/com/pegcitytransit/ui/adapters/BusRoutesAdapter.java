@@ -5,16 +5,16 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
+import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
 
 public class BusRoutesAdapter extends RecyclerView.Adapter<BusRouteCellViewHolder> {
 
     private BusRoutesPresenter busRoutesPresenter;
     private BusRouteCellViewHolder.OnBusRouteCellClickedListener onBusRouteCellClickedListener;
 
-    private List<BusRoute> busRoutes;
+    private List<BusRouteViewModel> busRoutes;
 
     public BusRoutesAdapter(BusRoutesPresenter busRoutesPresenter, BusRouteCellViewHolder.OnBusRouteCellClickedListener onBusRouteCellClickedListener) {
         this.busRoutesPresenter = busRoutesPresenter;
@@ -40,12 +40,12 @@ public class BusRoutesAdapter extends RecyclerView.Adapter<BusRouteCellViewHolde
         return busRoutesPresenter;
     }
 
-    public void setBusRoutes(List<BusRoute> busRoutes) {
-        this.busRoutes = busRoutes;
+    public void setBusRoutes(List<BusRouteViewModel> routes) {
+        this.busRoutes = routes;
         notifyDataSetChanged();
     }
 
-    public List<BusRoute> getBusRoutes() {
+    public List<BusRouteViewModel> getBusRoutes() {
         return busRoutes;
     }
 }

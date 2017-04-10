@@ -31,21 +31,20 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
-import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.data.rest.models.StopSchedule;
 import jessevivanco.com.pegcitytransit.ui.AppRouter;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.HorizontalListItemDecoration;
-import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopsPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
+import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_model.BusStopViewModel;
 
 public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallback,
         BusStopsPresenter.ViewContract,
@@ -192,14 +191,14 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
      * @param busStops
      */
     @Override
-    public void showBusStops(List<BusStop> busStops) {
+    public void showBusStops(List<BusStopViewModel> busStops) {
 
         // Display each bus stop in the map with their GPS coordinates. Also keep a HashMap of
         // markers for each bus stop so we can figure out which marker points to which bus stop.
-        HashMap<Marker, BusStop> markerToKeyHashMap = new HashMap<>();
+        HashMap<Marker, BusStopViewModel> markerToKeyHashMap = new HashMap<>();
 
-        for (BusStop stop : busStops) {
-            LatLng latLng = stop.getCentre().getGeographic().getLatLng();
+        for (BusStopViewModel stop : busStops) {
+            LatLng latLng = stop.getLatLng();
             if (latLng != null) {
                 Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng)
                         .title(String.valueOf(stop.getKey()))
@@ -219,23 +218,23 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
      * for the bus stop marker. This will end up displaying the bus routes in the info window.
      *
      * @param busRoutes
-     * @param busStop
      */
     @Override
-    public void showBusRoutes(List<BusRoute> busRoutes, @Nullable BusStop busStop) {
+    public void showBusRoutes(List<BusRouteViewModel> busRoutes) {
 
         // TODO null check busstop?
+        BusStopViewModel busStop = routesPresenter.getBusStopFilter();
 
         // Add the routes to the bus stop POJO, then re-open the marker for that bus stop.
-        HashMap<Marker, BusStop> markerBusStopHashMap = busStopInfoWindowAdapter.getMarkerToBusStopHashMap();
+        HashMap<Marker, BusStopViewModel> markerBusStopHashMap = busStopInfoWindowAdapter.getMarkerToBusStopHashMap();
 
         // FYI: We have to do a reverse lookup b/c we don't currently know the marker for the bus stop.
-        for (Map.Entry<Marker, BusStop> entry : markerBusStopHashMap.entrySet()) {
+        for (Map.Entry<Marker, BusStopViewModel> entry : markerBusStopHashMap.entrySet()) {
             if (busStop.getKey().equals(entry.getValue().getKey())) {
 
                 // Found the target marker-stop pair. Attach the routes to the bus stop, refresh the
                 // info window, then bust out of this loop.
-                entry.getValue().setBusRoutes(busRoutes);
+                entry.getValue().setRoutes(busRoutes);
                 entry.getKey().showInfoWindow();
                 break;
             }
@@ -264,7 +263,7 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
      * @param busRoute
      */
     @Override
-    public void onBusRouteCellClicked(BusRoute busRoute) {
+    public void onBusRouteCellClicked(BusRouteViewModel busRoute) {
         Log.v("DEBUG", "tapped on bus route " + busRoute.getNumber() + ", for stop " + routesPresenter.getBusStopFilter());
         appRouter.goToStopScheduleScreen(getActivity(), busRoute);
     }

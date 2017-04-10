@@ -13,7 +13,7 @@ import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
-import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
+import jessevivanco.com.pegcitytransit.ui.view_model.BusStopViewModel;
 
 public class BusStopsPresenter {
 
@@ -79,7 +79,7 @@ public class BusStopsPresenter {
 
     public interface ViewContract {
 
-        void showBusStops(List<BusStop> busStops);
+        void showBusStops(List<BusStopViewModel> busStops);
 
         void errorLoadingBusStops(String message);
     }

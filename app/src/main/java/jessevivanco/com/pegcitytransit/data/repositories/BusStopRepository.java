@@ -4,11 +4,12 @@ import android.support.annotation.Nullable;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.data.rest.RestApi;
-import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.data.rest.models.base.WinnipegTransitResponse;
+import jessevivanco.com.pegcitytransit.ui.view_model.BusStopViewModel;
 
 public class BusStopRepository {
 
@@ -18,22 +19,20 @@ public class BusStopRepository {
         this.restApi = restApi;
     }
 
-    public Single<List<BusStop>> getBusStopsNearLocation(Double latitude,
-                                                         Double longitude,
-                                                         @Nullable Integer radius) {
-        // Fetch the results from the API first
-        return fetchBusStopsNearLocation(latitude, longitude, radius);
-    }
+    public Single<List<BusStopViewModel>> getBusStopsNearLocation(Double latitude,
+                                                                  Double longitude,
+                                                                  @Nullable Integer radius) {
 
-    private Single<List<BusStop>> fetchBusStopsNearLocation(Double latitude,
-                                                            Double longitude,
-                                                            @Nullable Integer radius) {
         return restApi.getBusStopsNearLocation(latitude, longitude, radius)
                 .subscribeOn(Schedulers.io())
-                .map(WinnipegTransitResponse::getElement);
-        // ^FYI method reference above is the same as this
+                .map(WinnipegTransitResponse::getElement)
+                .flatMapObservable(Observable::fromIterable)
+                .map(BusStopViewModel::createFromBusStop)
+                .toList();
+
+        // Notes for myself:
+        // - Method references are the same as this:
         // .map(busStopsList -> busStopsList.getElement();
-        // ^FYI 2, the map() function just converts the previous return type to a new type.
-        // In this case, we're converting from type BusStopList to type List<BusStop>.
+        // - the map() function just converts the previous return type to a new type.
     }
 }

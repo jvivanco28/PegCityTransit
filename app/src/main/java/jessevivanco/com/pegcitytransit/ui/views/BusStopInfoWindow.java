@@ -13,7 +13,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
-import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
+import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_model.BusStopViewModel;
 
 public class BusStopInfoWindow extends LinearLayout {
 
@@ -50,16 +51,16 @@ public class BusStopInfoWindow extends LinearLayout {
         setPadding(padding, padding, padding, padding);
     }
 
-    public void showBusStopInfo(@Nullable BusStop busStop) {
+    public void showBusStopInfo(@Nullable BusStopViewModel busStop) {
         if (busStop != null) {
             busStopKeyTextView.setText(String.valueOf(busStop.getKey()));
             busStopNameTextView.setText(busStop.getName());
 
             busRoutesFlowLayout.removeAllViews();
 
-            if (busStop.getBusRoutes() != null) {
-                for (BusRoute busRoute : busStop.getBusRoutes()) {
-                    busRoutesFlowLayout.addView(generateTextView(busRoute));
+            if (busStop.getRoutes() != null) {
+                for (BusRouteViewModel route : busStop.getRoutes()) {
+                    busRoutesFlowLayout.addView(generateTextView(route));
                 }
             }
 
@@ -70,9 +71,9 @@ public class BusStopInfoWindow extends LinearLayout {
         }
     }
 
-    private BusRouteTextView generateTextView(BusRoute busRoute) {
+    private BusRouteTextView generateTextView(BusRouteViewModel route) {
         BusRouteTextView busRouteTextView = new BusRouteTextView(getContext(), BusRouteTextView.Size.MINI);
-        busRouteTextView.setBusRoute(busRoute);
+        busRouteTextView.setBusRoute(route);
         return busRouteTextView;
     }
 }

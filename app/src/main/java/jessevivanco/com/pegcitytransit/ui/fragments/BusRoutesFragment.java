@@ -1,7 +1,6 @@
 package jessevivanco.com.pegcitytransit.ui.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,13 +13,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
-import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusRoutesAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
+import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
 
 public class BusRoutesFragment extends BaseFragment implements BusRoutesPresenter.ViewContract, BusRouteCellViewHolder.OnBusRouteCellClickedListener {
 
@@ -67,19 +65,18 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
     }
 
     @Override
-    public void onBusRouteCellClicked(BusRoute busRoute) {
+    public void onBusRouteCellClicked(BusRouteViewModel busRoute) {
         // todo
     }
 
     /**
      * Bus Routes were loaded. Display them.
      *
-     * @param busRoutes
-     * @param busStop
+     * @param routes
      */
     @Override
-    public void showBusRoutes(List<BusRoute> busRoutes, @NonNull BusStop busStop) {
-        routesAdapter.setBusRoutes(busRoutes);
+    public void showBusRoutes(List<BusRouteViewModel> routes) {
+        routesAdapter.setBusRoutes(routes);
     }
 
     @Override

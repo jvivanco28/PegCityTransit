@@ -1,7 +1,6 @@
 package jessevivanco.com.pegcitytransit.ui.presenters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.List;
@@ -14,8 +13,8 @@ import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
-import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
-import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
+import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_model.BusStopViewModel;
 
 public class BusRoutesPresenter {
 
@@ -31,7 +30,7 @@ public class BusRoutesPresenter {
 
     private
     @Nullable
-    BusStop busStopFilter;
+    BusStopViewModel busStopFilter;
 
     public BusRoutesPresenter(AppComponent injector, ViewContract viewContract) {
         injector.injectInto(this);
@@ -39,11 +38,11 @@ public class BusRoutesPresenter {
     }
 
     @Nullable
-    public BusStop getBusStopFilter() {
+    public BusStopViewModel getBusStopFilter() {
         return busStopFilter;
     }
 
-    public void setBusStopFilter(@Nullable BusStop busStopFilter) {
+    public void setBusStopFilter(@Nullable BusStopViewModel busStopFilter) {
         this.busStopFilter = busStopFilter;
     }
 
@@ -54,7 +53,7 @@ public class BusRoutesPresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        busRoutes -> viewContract.showBusRoutes(busRoutes, busStopFilter),
+                        busRoutes -> viewContract.showBusRoutes(busRoutes),
                         throwable -> viewContract.onLoadBusRoutesError(context.getString(R.string.error_loading_bus_routes))
                 );
     }
@@ -67,8 +66,7 @@ public class BusRoutesPresenter {
 
     public interface ViewContract {
 
-        // TODO prob remove the second arg
-        void showBusRoutes(List<BusRoute> busRoutes, @Nullable BusStop busStop);
+        void showBusRoutes(List<BusRouteViewModel> busRoutes);
 
         void onLoadBusRoutesError(String message);
     }

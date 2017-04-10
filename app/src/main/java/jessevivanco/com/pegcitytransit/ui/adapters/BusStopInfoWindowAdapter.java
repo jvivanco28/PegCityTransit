@@ -10,6 +10,7 @@ import java.util.HashMap;
 
 import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
+import jessevivanco.com.pegcitytransit.ui.view_model.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusStopInfoWindow;
 
 public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
@@ -19,7 +20,7 @@ public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     private BusRoutesPresenter busRoutesPresenter;
 
-    private HashMap<Marker, BusStop> markerToBusStopHashMap = new HashMap<>();
+    private HashMap<Marker, BusStopViewModel> markerToBusStopHashMap = new HashMap<>();
 
     public BusStopInfoWindowAdapter(Context context, BusRoutesPresenter busRoutesPresenter) {
         this.busStopInfoWindow = new BusStopInfoWindow(context);
@@ -44,24 +45,24 @@ public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     public BusStopInfoWindow getInfoContents(Marker marker) {
 
         // Lookup the bus stop.
-        BusStop busStop = markerToBusStopHashMap.get(marker);
+        BusStopViewModel busStop = markerToBusStopHashMap.get(marker);
 
         // Display the bus stop info
         busStopInfoWindow.showBusStopInfo(busStop);
 
         // If we don't have the routes loaded for this bus stop, then load and display them.
-        if (busStop != null && busStop.getBusRoutes() == null) {
+        if (busStop != null && busStop.getRoutes() == null) {
             busRoutesPresenter.setBusStopFilter(busStop);
             busRoutesPresenter.loadBusRoutes();
         }
         return busStopInfoWindow;
     }
 
-    public void setMarkerToBusStopHashMap(HashMap<Marker, BusStop> markerToBusStopHashMap) {
+    public void setMarkerToBusStopHashMap(HashMap<Marker, BusStopViewModel> markerToBusStopHashMap) {
         this.markerToBusStopHashMap = markerToBusStopHashMap;
     }
 
-    public HashMap<Marker, BusStop> getMarkerToBusStopHashMap() {
+    public HashMap<Marker, BusStopViewModel> getMarkerToBusStopHashMap() {
         return markerToBusStopHashMap;
     }
 }

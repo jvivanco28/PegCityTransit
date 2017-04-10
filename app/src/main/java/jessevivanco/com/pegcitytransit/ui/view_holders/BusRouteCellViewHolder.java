@@ -9,8 +9,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
 import jessevivanco.com.pegcitytransit.databinding.CellBusRouteBinding;
+import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusRouteTextView;
 
 public class BusRouteCellViewHolder extends RecyclerView.ViewHolder {
@@ -29,7 +29,7 @@ public class BusRouteCellViewHolder extends RecyclerView.ViewHolder {
         this.onCellClickedListener = onCellClickedListener;
     }
 
-    public void bind(BusRoute busRoute) {
+    public void bind(BusRouteViewModel busRoute) {
         binding.setBusRoute(busRoute);
         busRouteTextView.setBusRoute(busRoute);
     }
@@ -41,6 +41,6 @@ public class BusRouteCellViewHolder extends RecyclerView.ViewHolder {
 
     public interface OnBusRouteCellClickedListener {
 
-        void onBusRouteCellClicked(BusRoute busRoute);
+        void onBusRouteCellClicked(BusRouteViewModel busRoute);
     }
 }

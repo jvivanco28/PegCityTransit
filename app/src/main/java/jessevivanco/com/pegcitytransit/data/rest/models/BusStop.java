@@ -96,18 +96,6 @@ public class BusStop {
         this.busRoutes = busRoutes;
     }
 
-    // TODO delete this. Only for testing purposes.
-    public String getRoutesFormatted() {
-        String routes = "";
-        for (int i = 0; busRoutes != null && i < busRoutes.size(); i++) {
-            if (i == busRoutes.size() - 1)
-                routes += busRoutes.get(i).getNumber();
-            else
-                routes += busRoutes.get(i).getNumber() + ", ";
-        }
-        return routes;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof BusStop) {

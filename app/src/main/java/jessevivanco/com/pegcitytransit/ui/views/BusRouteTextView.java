@@ -8,7 +8,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
+import jessevivanco.com.pegcitytransit.ui.view_model.BusRouteViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 public class BusRouteTextView extends AppCompatTextView {
@@ -54,20 +54,20 @@ public class BusRouteTextView extends AppCompatTextView {
         setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
     }
 
-    public void setBusRoute(BusRoute busRoute) {
+    public void setBusRoute(BusRouteViewModel route) {
 
-        setBackgroundResource(busRoute != null ?
-                busRoute.getCoverage().getBackgroundDrawableResId() :
+        setBackgroundResource(route != null ?
+                route.getCoverage().getBackgroundDrawableResId() :
                 R.drawable.regular_route);
 
-        int colorRes = busRoute != null ?
-                busRoute.getCoverage().getTextColorResId() :
+        int colorRes = route != null ?
+                route.getCoverage().getTextColorResId() :
                 R.color.black;
 
         setTextColor(getResources().getColor(colorRes));
 
-        setText(busRoute != null && busRoute.getNumber() != null ?
-                String.valueOf(busRoute.getNumber()) :
+        setText(route != null && route.getNumber() != null ?
+                String.valueOf(route.getNumber()) :
                 null);
     }
 }

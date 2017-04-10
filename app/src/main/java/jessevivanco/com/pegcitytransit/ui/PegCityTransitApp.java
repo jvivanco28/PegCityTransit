@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.joanzapata.iconify.Iconify;
 import com.joanzapata.iconify.fonts.MaterialModule;
+import com.tspoon.traceur.Traceur;
 
 import jessevivanco.com.pegcitytransit.BuildConfig;
 import jessevivanco.com.pegcitytransit.R;
@@ -28,6 +29,11 @@ public class PegCityTransitApp extends Application {
 //        if (BuildConfig.REPORT_CRASHES) {
 //            Fabric.with(this, new Crashlytics());
 //        }
+
+        // Helpful tool for debugging Rx-related exceptions.
+        if (BuildConfig.DEBUG) {
+            Traceur.enableLogging();
+        }
 
         initDependencies();
         initIconify();
