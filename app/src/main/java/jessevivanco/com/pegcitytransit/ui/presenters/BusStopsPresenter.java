@@ -1,6 +1,7 @@
 package jessevivanco.com.pegcitytransit.ui.presenters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 public class BusStopsPresenter {
@@ -39,13 +41,13 @@ public class BusStopsPresenter {
         this.viewContract = viewContract;
 
         // Load out default lat and long values.
-        DEFAULT_LAT = Double.parseDouble(context.getString(R.string.default_lat));
-        DEFAULT_LONG = Double.parseDouble(context.getString(R.string.default_long));
+        DEFAULT_LAT = Double.parseDouble(context.getString(R.string.downtown_winnipeg_latitude));
+        DEFAULT_LONG = Double.parseDouble(context.getString(R.string.downtown_winnipeg_longitude));
         DEFAULT_RADIUS = context.getResources().getInteger(R.integer
                 .default_max_bus_stop_distance);
     }
 
-    public void loadBusStops(@Nullable Double latitude, @Nullable Double longitude, @Nullable Integer radius) {
+    public void loadBusStopsAroundCoordinates(@Nullable Double latitude, @Nullable Double longitude, @Nullable Integer radius) {
 
         dispose(loadBusStopsSubscription);
 
@@ -54,6 +56,27 @@ public class BusStopsPresenter {
                 latitude != null ? latitude : DEFAULT_LAT,
                 longitude != null ? longitude : DEFAULT_LONG,
                 radius != null ? radius : DEFAULT_RADIUS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        busStops -> {
+                            if (busStops != null && busStops.size() > 0) {
+                                viewContract.showBusStops(busStops);
+                            } else {
+                                viewContract.errorLoadingBusStops(context.getString(R.string.no_bus_stops_in_that_area));
+                            }
+                        },
+                        throwable -> {
+                            // TODO handle error
+                            viewContract.errorLoadingBusStops(context.getString(R.string.generic_error));
+                        }
+                );
+    }
+
+    public void loadBusStopsForBusRoute(@NonNull BusRouteViewModel route) {
+        dispose(loadBusStopsSubscription);
+
+        loadBusStopsSubscription = stopsRepository.getBusStopsForRoute(route.getKey())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

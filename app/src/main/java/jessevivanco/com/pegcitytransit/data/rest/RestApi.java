@@ -45,8 +45,15 @@ public interface RestApi {
                                                                            @Query("lon") Double longitude,
                                                                            @Nullable @Query("distance") Integer radius);
 
-    // TODO https://api.winnipegtransit.com/v2/stops.json?route=14&api-key=Y8zxUk0g73hxmlkHoDh
-    // getBusStopsForRoute (so we can show the entire route)
+    /**
+     * Gets all bus stop for the provided bus route. We can use this info to display the entire
+     * route on a map.
+     *
+     * @param busRouteKey
+     * @return
+     */
+    @GET("stops.json")
+    Single<WinnipegTransitResponse<List<BusStop>>> getBusStopsForRoute(@Query("route") Long busRouteKey);
 
     // TODO https://api.winnipegtransit.com/v2/stops/10064/features.json?api-key=Y8zxUk0g73hxmlkHoDh
     // getBusStopFeatures

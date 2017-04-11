@@ -3,6 +3,8 @@ package jessevivanco.com.pegcitytransit.ui.view_models;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 
+import org.parceler.Parcel;
+
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.rest.models.BusRoute;
 
@@ -12,6 +14,7 @@ import static jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel.C
 import static jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel.Coverage.SPIRIT;
 import static jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel.Coverage.SUPER_EXPRESS;
 
+@Parcel
 public class BusRouteViewModel {
 
     public static BusRouteViewModel createFromBusRoute(BusRoute route) {
@@ -28,11 +31,14 @@ public class BusRouteViewModel {
         }
     }
 
-    private Long key;
-    private Integer number;
-    private String name;
-    private String customerType;
-    private Coverage coverage;
+    Long key;
+    Integer number;
+    String name;
+    String customerType;
+    Coverage coverage;
+
+    public BusRouteViewModel() {
+    }
 
     private BusRouteViewModel(Builder builder) {
         key = builder.key;

@@ -2,19 +2,21 @@ package jessevivanco.com.pegcitytransit.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 
-import jessevivanco.com.pegcitytransit.ui.activities.BusStopScheduleActivity;
+import org.parceler.Parcels;
+
+import jessevivanco.com.pegcitytransit.ui.activities.BusRouteMapActivity;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
 public class AppRouter {
 
-    public void goToStopScheduleScreen(Context context, BusRouteViewModel busRoute) {
-        Bundle bundle = new Bundle();
+    public void goToStopScheduleScreen(Context context, BusRouteViewModel route) {
+        // TODO
+    }
 
-        // todo add bus route to bundle
-
-        Intent intent = new Intent(context, BusStopScheduleActivity.class);
+    public void goToBusRouteMapScreen(Context context, BusRouteViewModel route) {
+        Intent intent = new Intent(context, BusRouteMapActivity.class);
+        intent.putExtra(BusRouteMapActivity.ARG_KEY_BUS_ROUTE, Parcels.wrap(route));
         context.startActivity(intent);
     }
 }

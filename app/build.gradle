@@ -100,4 +100,10 @@ dependencies {
     // Easier RxJava2 debugging with better stacktraces
     // https://github.com/T-Spoon/Traceur
     compile 'com.tspoon.traceur:traceur:1.0.1'
+
+    //
+    // https://github.com/johncarl81/parceler
+    compile 'org.parceler:parceler-api:1.1.6'
+    annotationProcessor 'org.parceler:parceler:1.1.6'
+
 }

@@ -10,9 +10,12 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jessevivanco.com.pegcitytransit.R;
+import jessevivanco.com.pegcitytransit.ui.AppRouter;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusRoutesAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
@@ -21,6 +24,9 @@ import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
 public class BusRoutesFragment extends BaseFragment implements BusRoutesPresenter.ViewContract, BusRouteCellViewHolder.OnBusRouteCellClickedListener {
+
+    @Inject
+    AppRouter appRouter;
 
     @BindView(R.id.root_container)
     ViewGroup rootContainer;
@@ -43,6 +49,7 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        getInjector().injectInto(this);
         ButterKnife.bind(this, view);
 
         setupAdapter();
@@ -64,9 +71,14 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
         routesRecyclerView.setAdapter(routesAdapter);
     }
 
+    /**
+     * We clicked on a bus route. Go to the bus route map screen.
+     *
+     * @param busRoute
+     */
     @Override
     public void onBusRouteCellClicked(BusRouteViewModel busRoute) {
-        // todo
+        appRouter.goToBusRouteMapScreen(getActivity(), busRoute);
     }
 
     /**

@@ -5,8 +5,8 @@
     <string name="api_base_url">https://api.winnipegtransit.com/v2/</string>
 
     <!--    There are no doubles/float resource files that we can use, so we'll hack around that with this. -->
-    <string name="default_lat">49.895157</string>
-    <string name="default_long">-97.139280</string>
+    <string name="downtown_winnipeg_latitude">49.895157</string>
+    <string name="downtown_winnipeg_longitude">-97.139280</string>
 
     <!--    Date format used "yyyy-MM-dd'T'HH:mm:ss" Example: "2016-12-19T16:37:35" -->
     <string name="date_format">yyyy-MM-dd\'T\'HH:mm:ss</string>

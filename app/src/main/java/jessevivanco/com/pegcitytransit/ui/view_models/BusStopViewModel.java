@@ -4,10 +4,13 @@ import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.parceler.Parcel;
+
 import java.util.List;
 
 import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 
+@Parcel
 public class BusStopViewModel {
 
     public static BusStopViewModel createFromBusStop(BusStop busStop) {
@@ -24,14 +27,17 @@ public class BusStopViewModel {
         }
     }
 
-    private Long key;
-    private String name;
-    private Integer number;
-    private LatLng latLng;
-    private String distance;
-    private
+    Long key;
+    String name;
+    Integer number;
+    LatLng latLng;
+    String distance;
+
     @Nullable
     List<BusRouteViewModel> routes;
+
+    public BusStopViewModel() {
+    }
 
     private BusStopViewModel(Builder builder) {
         key = builder.key;

@@ -65,8 +65,6 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
     AppRouter appRouter;
 
     private BusRoutesPresenter routesPresenter;
-
-    //    private BusScheduleAdapter scheduleAdapter;
     private BusStopSchedulePresenter schedulePresenter;
 
     private BusStopsPresenter stopsPresenter;
@@ -84,6 +82,7 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
         getInjector().injectInto(this);
         ButterKnife.bind(this, view);
 
+        setupPresenters();
         setupAdapters();
         setupRecyclerView();
         setupMap();
@@ -102,7 +101,7 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
         // TODO get real GPS coordinates
         // TODO display your location with a circle or something.
         // Default coordinates if we don't have user's location permission.
-        LatLng downtownWinnipeg = new LatLng(Double.valueOf(getString(R.string.default_lat)), Double.valueOf(getString(R.string.default_long)));
+        LatLng downtownWinnipeg = new LatLng(Double.valueOf(getString(R.string.downtown_winnipeg_latitude)), Double.valueOf(getString(R.string.downtown_winnipeg_longitude)));
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(downtownWinnipeg, getResources().getInteger(R.integer.default_map_zoom)));
         googleMap.setInfoWindowAdapter(busStopInfoWindowAdapter);
         googleMap.setOnInfoWindowCloseListener(this);
@@ -113,7 +112,7 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
         showUserLocation();
 
         // TODO use your coordinates
-        stopsPresenter.loadBusStops(null, null, null);
+        stopsPresenter.loadBusStopsAroundCoordinates(null, null, null);
     }
 
     /**
@@ -143,21 +142,20 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
     }
 
-    protected void setupAdapters() {
+    private void setupPresenters() {
         schedulePresenter = new BusStopSchedulePresenter(getInjector(), this);
 
         routesPresenter = new BusRoutesPresenter(getInjector(), this);
         stopsPresenter = new BusStopsPresenter(getInjector(), this);
+    }
 
-//        scheduleAdapter = new BusRoutesAdapter(routesPresenter, this);
+    private void setupAdapters() {
         busStopInfoWindowAdapter = new BusStopInfoWindowAdapter(getActivity(), routesPresenter);
     }
 
     private void setupRecyclerView() {
         busStopsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         busStopsRecyclerView.addItemDecoration(new HorizontalListItemDecoration(getResources().getDimensionPixelSize(R.dimen.material_spacing_x_small), getResources().getDimensionPixelSize(R.dimen.material_spacing_small)));
-
-//        busStopsRecyclerView.setAdapter(scheduleAdapter);
     }
 
     @Override
@@ -186,7 +184,7 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
     }
 
     /**
-     * Shows the list of bus stops as markers in the map.
+     * Show the list of bus stops as markers in the map.
      *
      * @param busStops
      */
@@ -304,7 +302,7 @@ public class BusStopsMapFragment extends BaseFragment implements OnMapReadyCallb
             busStopInfoWindowAdapter.setMarkerToBusStopHashMap(null);
 
             // Load the new set of markers at the current camera position
-            stopsPresenter.loadBusStops(googleMap.getCameraPosition().target.latitude,
+            stopsPresenter.loadBusStopsAroundCoordinates(googleMap.getCameraPosition().target.latitude,
                     googleMap.getCameraPosition().target.longitude,
                     null);
         }

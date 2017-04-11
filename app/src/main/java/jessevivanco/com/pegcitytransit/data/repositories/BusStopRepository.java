@@ -35,4 +35,13 @@ public class BusStopRepository {
         // .map(busStopsList -> busStopsList.getElement();
         // - the map() function just converts the previous return type to a new type.
     }
+
+    public Single<List<BusStopViewModel>> getBusStopsForRoute(Long routeKey) {
+
+        return restApi.getBusStopsForRoute(routeKey)
+                .map(WinnipegTransitResponse::getElement)
+                .flatMapObservable(Observable::fromIterable)
+                .map(BusStopViewModel::createFromBusStop)
+                .toList();
+    }
 }

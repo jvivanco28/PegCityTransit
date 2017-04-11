@@ -45,6 +45,10 @@
             android:name=".ui.activities.BusStopScheduleActivity">
         </activity>
 
+        <activity
+            android:name=".ui.activities.BusRouteMapActivity">
+        </activity>
+
     </application>
 
 </manifest>

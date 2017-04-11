@@ -7,6 +7,8 @@ import jessevivanco.com.pegcitytransit.data.dagger.modules.AppModule;
 import jessevivanco.com.pegcitytransit.data.dagger.modules.AppRouterModule;
 import jessevivanco.com.pegcitytransit.data.dagger.modules.RepositoriesModule;
 import jessevivanco.com.pegcitytransit.data.dagger.modules.RestModule;
+import jessevivanco.com.pegcitytransit.ui.activities.BusRouteMapActivity;
+import jessevivanco.com.pegcitytransit.ui.fragments.BusRoutesFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.BusStopsMapFragment;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
@@ -26,11 +28,16 @@ public interface AppComponent {
 
     // Add injection targets here.
 
+    void injectInto(BusRouteMapActivity target);
+
     void injectInto(BusStopsMapFragment target);
+
+    void injectInto(BusRoutesFragment target);
 
     void injectInto(BusStopsPresenter target);
 
     void injectInto(BusRoutesPresenter target);
 
     void injectInto(BusStopSchedulePresenter target);
+
 }
