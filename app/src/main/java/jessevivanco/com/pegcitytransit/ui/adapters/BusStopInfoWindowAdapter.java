@@ -1,6 +1,7 @@
 package jessevivanco.com.pegcitytransit.ui.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -14,6 +15,8 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusStopInfoWindow;
 
 public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+
+    private static final String TAG = BusStopInfoWindowAdapter.class.getSimpleName();
 
     // Just re-use the same view and change its contents.
     private BusStopInfoWindow busStopInfoWindow;
@@ -44,6 +47,8 @@ public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     @Override
     public BusStopInfoWindow getInfoContents(Marker marker) {
 
+        Log.v("DEBUG", "tapped marker");
+
         // Lookup the bus stop.
         BusStopViewModel busStop = markerToBusStopHashMap.get(marker);
 
@@ -54,6 +59,9 @@ public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         if (busStop != null && busStop.getRoutes() == null) {
             busRoutesPresenter.setBusStopFilter(busStop);
             busRoutesPresenter.loadBusRoutes();
+        } else {
+            // TODO report this
+            Log.e(TAG, "Error. No bus stop for selected marker!");
         }
         return busStopInfoWindow;
     }

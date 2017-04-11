@@ -26,8 +26,11 @@ public interface RestApi {
     @GET("statuses/schedule.json")
     Single<ScheduleStatus> getScheduleStatus();
 
-    @GET("stops/{id}.json")
-    Single<BusStop> getStopInfo(@Path("id") long id);
+    // TODO service-advisories.json?api-key=Y8zxUk0g73hxmlkHoDh
+    // getServiceAdvisories
+
+    // TODO https://api.winnipegtransit.com/v2/locations:quincy.json?api-key=Y8zxUk0g73hxmlkHoDh
+    // Search street name or landmark
 
     /**
      * Retrieves a list of bus stops at a location (given <code>longitude</code> and <code>latitude</code>) within
@@ -54,9 +57,6 @@ public interface RestApi {
      */
     @GET("stops.json")
     Single<WinnipegTransitResponse<List<BusStop>>> getBusStopsForRoute(@Query("route") Long busRouteKey);
-
-    // TODO https://api.winnipegtransit.com/v2/stops/10064/features.json?api-key=Y8zxUk0g73hxmlkHoDh
-    // getBusStopFeatures
 
     /**
      * Retrieves the but stop schedule for the given <code>busStopKey</code>. Each entry in the schedule

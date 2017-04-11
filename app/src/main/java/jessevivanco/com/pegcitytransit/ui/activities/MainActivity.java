@@ -10,7 +10,7 @@ import butterknife.ButterKnife;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
 import jessevivanco.com.pegcitytransit.ui.fragments.BusRoutesFragment;
-import jessevivanco.com.pegcitytransit.ui.fragments.BusStopTimetablesFragment;
+import jessevivanco.com.pegcitytransit.ui.fragments.MyStopsListFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.BusStopsMapFragment;
 
 public class MainActivity extends BaseActivity {
@@ -24,6 +24,8 @@ public class MainActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         setupBottomNav(savedInstanceState);
+
+        // TODO check service advisories on startup
     }
 
     @Override
@@ -38,14 +40,14 @@ public class MainActivity extends BaseActivity {
             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.content);
 
             switch (item.getItemId()) {
-                case R.id.stops:
+                case R.id.map:
                     if (!(currentFragment instanceof BusStopsMapFragment)) {
                         fragment = BusStopsMapFragment.newInstance();
                     }
                     break;
-                case R.id.timetables:
-                    if (!(currentFragment instanceof BusStopTimetablesFragment)) {
-                        fragment = BusStopTimetablesFragment.newInstance();
+                case R.id.my_stops:
+                    if (!(currentFragment instanceof MyStopsListFragment)) {
+                        fragment = MyStopsListFragment.newInstance();
                     }
                     break;
                 case R.id.routes:
@@ -63,7 +65,7 @@ public class MainActivity extends BaseActivity {
 
         // Select the first tab on initial launch.
         if (savedInstanceState == null) {
-            bottomNavigation.setSelectedItemId(R.id.stops);
+            bottomNavigation.setSelectedItemId(R.id.map);
         }
     }
 }

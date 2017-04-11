@@ -3,12 +3,12 @@
 
     <!--TODO icons-->
     <item
-        android:id="@+id/stops"
-        android:title="@string/stops"/>
+        android:id="@+id/map"
+        android:title="@string/map"/>
 
     <item
-        android:id="@+id/timetables"
-        android:title="@string/timetables"/>
+        android:id="@+id/my_stops"
+        android:title="@string/my_stops"/>
 
     <item
         android:id="@+id/routes"

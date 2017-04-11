@@ -37,6 +37,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
 
     private TransitMapFragment transitMapFragment;
 
+    // TODO REMOVE THIS!
     private BusStopSchedulePresenter schedulePresenter;
     private ScheduledStopAdapter scheduleAdapter;
 
@@ -79,6 +80,8 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     }
 
     private void setupRecyclerView() {
+        busStopsRecyclerView.setVisibility(View.GONE);
+
         busStopsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         busStopsRecyclerView.addItemDecoration(new HorizontalListItemDecoration(getResources().getDimensionPixelSize(R.dimen.material_spacing_x_small), getResources().getDimensionPixelSize(R.dimen.material_spacing_small)));
         busStopsRecyclerView.setAdapter(scheduleAdapter);
@@ -88,6 +91,8 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     public void showScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
         Log.v("DEBUG", "GOT RESPONSE! " + scheduledStops.size());
         scheduleAdapter.setScheduledStops(scheduledStops);
+
+        busStopsRecyclerView.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -100,6 +105,8 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
      */
     @OnClick(R.id.refresh_bus_stops)
     public void searchForBusStops() {
+
+        busStopsRecyclerView.setVisibility(View.GONE);
 
         // TODO TEST
         schedulePresenter.loadScheduleForBusStop(10643L);
