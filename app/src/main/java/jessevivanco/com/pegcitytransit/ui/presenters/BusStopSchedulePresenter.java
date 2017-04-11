@@ -1,6 +1,9 @@
 package jessevivanco.com.pegcitytransit.ui.presenters;
 
 import android.content.Context;
+import android.util.Log;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -10,7 +13,7 @@ import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopScheduleRepository;
-import jessevivanco.com.pegcitytransit.data.rest.models.StopSchedule;
+import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
 public class BusStopSchedulePresenter {
 
@@ -37,10 +40,14 @@ public class BusStopSchedulePresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        stopSchedule -> {
+                        scheduledStops -> {
                             // TODO handle nothing in schedule
-                            viewContract.showSchedule(stopSchedule);
-                        }, throwable -> viewContract.showErrorLoadingScheduleMessage(context.getString(R.string.error_loading_schedule))
+                            viewContract.showScheduledStops(scheduledStops);
+                        }, throwable -> {
+                            // TODO handle error
+                            Log.e("DEBUG", "wtf!", throwable);
+                            viewContract.showErrorLoadingScheduleMessage(context.getString(R.string.error_loading_schedule));
+                        }
                 );
     }
 
@@ -53,7 +60,7 @@ public class BusStopSchedulePresenter {
 
     public interface ViewContract {
 
-        void showSchedule(StopSchedule busStopSchedule);
+        void showScheduledStops(List<ScheduledStopViewModel> scheduledStops);
 
         void showErrorLoadingScheduleMessage(String message);
     }

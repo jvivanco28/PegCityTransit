@@ -1,10 +1,12 @@
 package jessevivanco.com.pegcitytransit.data.repositories;
 
+import java.util.List;
+
+import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.data.rest.RestApi;
-import jessevivanco.com.pegcitytransit.data.rest.models.StopSchedule;
 import jessevivanco.com.pegcitytransit.data.rest.models.base.WinnipegTransitResponse;
+import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
 public class BusStopScheduleRepository {
 
@@ -14,9 +16,18 @@ public class BusStopScheduleRepository {
         this.restApi = restApi;
     }
 
-    public Single<StopSchedule> getBusStopSchedule(Long busStopKey) {
+    public Single<List<ScheduledStopViewModel>> getBusStopSchedule(Long busStopKey) {
+
         return restApi.getBusStopSchedule(busStopKey)
-                .subscribeOn(Schedulers.io())
-                .map(WinnipegTransitResponse::getElement);
+                .map(WinnipegTransitResponse::getElement)
+
+                // Iterate all routes...
+                .flatMapObservable(stopSchedule -> Observable.fromIterable(stopSchedule.getRouteSchedules()))
+                // ... and each scheduled stop...
+                .flatMap(routeSchedule -> Observable.fromIterable(routeSchedule.getScheduledStops())
+                        // ... and convert the scheduled stop into a view model.
+                        .map(scheduledStop -> ScheduledStopViewModel.createFromRouteSchedule(routeSchedule.getRoute().getNumber(), scheduledStop)))
+                // Assemble into a list of view models.
+                .toList();
     }
 }

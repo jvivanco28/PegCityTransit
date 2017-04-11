@@ -4,7 +4,6 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.data.rest.RestApi;
 import jessevivanco.com.pegcitytransit.data.rest.models.base.WinnipegTransitResponse;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
@@ -21,7 +20,6 @@ public class BusRoutesRepository {
     // TODO We for sure need a way to cache these results
     public Single<List<BusRouteViewModel>> getRoutesForBusStop(Long busStopKey) {
         return restApi.getRoutesForBusStop(busStopKey)
-                .subscribeOn(Schedulers.io())
                 .map(WinnipegTransitResponse::getElement)
                 .flatMapObservable(Observable::fromIterable)
                 .map(BusRouteViewModel::createFromBusRoute)

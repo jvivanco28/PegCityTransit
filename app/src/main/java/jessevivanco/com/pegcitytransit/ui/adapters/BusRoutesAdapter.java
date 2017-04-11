@@ -9,6 +9,7 @@ import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
+// TODO generify this!
 public class BusRoutesAdapter extends RecyclerView.Adapter<BusRouteCellViewHolder> {
 
     private BusRoutesPresenter busRoutesPresenter;

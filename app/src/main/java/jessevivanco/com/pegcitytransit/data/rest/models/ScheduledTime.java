@@ -3,21 +3,23 @@ package jessevivanco.com.pegcitytransit.data.rest.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
 public class ScheduledTime {
 
     @SerializedName("scheduled")
     @Expose
-    String scheduled;
+    Date scheduled;
 
     @SerializedName("estimated")
     @Expose
-    String estimated;
+    Date estimated;
 
-    public String getScheduled() {
+    public Date getScheduled() {
         return scheduled;
     }
 
-    public String getEstimated() {
+    public Date getEstimated() {
         return estimated;
     }
 
