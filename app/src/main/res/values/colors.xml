@@ -10,7 +10,7 @@
 
     <color name="white">#FFFFFF</color>
     <color name="white_transparent_75">#40ffffff</color>
-    <color name="black_transparent_88">#20000000</color>
+    <color name="black_translucent">#40000000</color>
     <color name="black">#000000</color>
 
     <color name="spirit_route">#008000</color>

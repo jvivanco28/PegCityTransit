@@ -6,12 +6,16 @@ import android.content.Intent;
 import org.parceler.Parcels;
 
 import jessevivanco.com.pegcitytransit.ui.activities.BusRouteMapActivity;
+import jessevivanco.com.pegcitytransit.ui.activities.BusStopScheduleActivity;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 public class AppRouter {
 
-    public void goToStopScheduleScreen(Context context, BusRouteViewModel route) {
-        // TODO
+    public void goToStopScheduleScreen(Context context, BusStopViewModel stop) {
+        Intent intent = new Intent(context, BusStopScheduleActivity.class);
+        intent.putExtra(BusStopScheduleActivity.ARG_KEY_BUS_STOP, Parcels.wrap(stop));
+        context.startActivity(intent);
     }
 
     public void goToBusRouteMapScreen(Context context, BusRouteViewModel route) {

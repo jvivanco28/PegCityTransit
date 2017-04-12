@@ -1,7 +1,11 @@
 package jessevivanco.com.pegcitytransit.ui.adapters;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
+
+import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -12,14 +16,27 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 // TODO generify this!
 public class BusRoutesAdapter extends RecyclerView.Adapter<BusRouteCellViewHolder> {
 
+    private static final String ARG_KEY_LIST = "list";
+
     private BusRoutesPresenter busRoutesPresenter;
     private BusRouteCellViewHolder.OnBusRouteCellClickedListener onBusRouteCellClickedListener;
 
     private List<BusRouteViewModel> busRoutes;
 
-    public BusRoutesAdapter(BusRoutesPresenter busRoutesPresenter, BusRouteCellViewHolder.OnBusRouteCellClickedListener onBusRouteCellClickedListener) {
+    public BusRoutesAdapter(BusRoutesPresenter busRoutesPresenter,
+                            @Nullable Bundle savedInstanceState,
+                            BusRouteCellViewHolder.OnBusRouteCellClickedListener onBusRouteCellClickedListener) {
+
         this.busRoutesPresenter = busRoutesPresenter;
         this.onBusRouteCellClickedListener = onBusRouteCellClickedListener;
+
+        if (savedInstanceState != null) {
+            busRoutes = Parcels.unwrap(savedInstanceState.getParcelable(ARG_KEY_LIST));
+        }
+    }
+
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(ARG_KEY_LIST, Parcels.wrap(busRoutes));
     }
 
     @Override

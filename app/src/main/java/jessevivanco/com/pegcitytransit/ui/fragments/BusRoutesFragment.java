@@ -52,7 +52,7 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
         getInjector().injectInto(this);
         ButterKnife.bind(this, view);
 
-        setupAdapter();
+        setupAdapter(savedInstanceState);
         setupRecyclerView();
 
         if (routesAdapter.getBusRoutes() == null || routesAdapter.getBusRoutes().size() == 0) {
@@ -60,9 +60,15 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
         }
     }
 
-    protected void setupAdapter() {
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        routesAdapter.onSaveInstanceState(outState);
+    }
+
+    protected void setupAdapter(Bundle savedInstanceState) {
         routesPresenter = new BusRoutesPresenter(getInjector(), this);
-        routesAdapter = new BusRoutesAdapter(routesPresenter, this);
+        routesAdapter = new BusRoutesAdapter(routesPresenter, savedInstanceState, this);
     }
 
     private void setupRecyclerView() {

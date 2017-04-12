@@ -4,4 +4,6 @@
     <integer name="default_max_bus_stop_distance">200</integer>
 
     <integer name="default_city_wide_map_zoom">11</integer>
+    <integer name="map_cover_image_zoom">18</integer>
+
 </resources>

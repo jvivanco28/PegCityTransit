@@ -23,8 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
+import jessevivanco.com.pegcitytransit.ui.AppRouter;
 import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
@@ -37,23 +40,26 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 // TODO Need to handle orientation changes
 public class TransitMapFragment extends SupportMapFragment implements OnMapReadyCallback,
+        GoogleMap.OnInfoWindowClickListener,
         BusStopsPresenter.ViewContract,
         BusRoutesPresenter.ViewContract {
 
     private static final String PERMISSION_DIALOG_TAG = "dialog";
 
+    @Inject
+    AppRouter appRouter;
+
     private View rootContainer;
 
     private AppComponent injector;
-
-    private boolean isMapReady;
-    private OnMapReadyListener onMapReadyListener;
 
     private BusStopsPresenter stopsPresenter;
     private BusRoutesPresenter routesPresenter;
 
     private GoogleMap googleMap;
     private BusStopInfoWindowAdapter busStopInfoWindowAdapter;
+    private OnMapReadyListener onMapReadyListener;
+    private boolean isMapReady;
 
     public static TransitMapFragment newInstance(OnMapReadyListener onMapReadyListener) {
 
@@ -140,7 +146,7 @@ public class TransitMapFragment extends SupportMapFragment implements OnMapReady
         LatLng downtownWinnipeg = new LatLng(Double.valueOf(getString(R.string.downtown_winnipeg_latitude)), Double.valueOf(getString(R.string.downtown_winnipeg_longitude)));
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(downtownWinnipeg, getResources().getInteger(R.integer.default_city_wide_map_zoom)));
         googleMap.setInfoWindowAdapter(busStopInfoWindowAdapter);
-
+        googleMap.setOnInfoWindowClickListener(this);
         // Hide the "my location" button.
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
@@ -157,6 +163,21 @@ public class TransitMapFragment extends SupportMapFragment implements OnMapReady
         if (onMapReadyListener != null) {
             onMapReadyListener.onMapReady();
         }
+    }
+
+    /**
+     * The user tapped on an info window for a stop/marker. Route the user to the schedule for that stop.
+     *
+     * @param marker
+     */
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+
+        // TODO
+        // Lookup the bus stop.
+        BusStopViewModel busStop = busStopInfoWindowAdapter.getMarkerToBusStopHashMap().get(marker);
+
+        appRouter.goToStopScheduleScreen(getActivity(), busStop);
     }
 
     /**

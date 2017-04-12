@@ -16,10 +16,10 @@ public class ScheduledStopViewModel {
             return new Builder()
                     .routeNumber(routeNumber)
                     .routeName(scheduledStop.getVariant() != null ? scheduledStop.getVariant().getName() : null)
-                    .scheduledArrival(scheduledStop.getTimes() != null ? scheduledStop.getTimes().getArrival().getScheduled() : null)
-                    .estimatedArrival(scheduledStop.getTimes() != null ? scheduledStop.getTimes().getArrival().getEstimated() : null)
-                    .scheduledDeparture(scheduledStop.getTimes() != null ? scheduledStop.getTimes().getDeparture().getScheduled() : null)
-                    .scheduledDeparture(scheduledStop.getTimes() != null ? scheduledStop.getTimes().getDeparture().getEstimated() : null)
+                    .scheduledArrival(scheduledStop.getTimes() != null && scheduledStop.getTimes().getArrival() != null ? scheduledStop.getTimes().getArrival().getScheduled() : null)
+                    .estimatedArrival(scheduledStop.getTimes() != null && scheduledStop.getTimes().getArrival() != null ? scheduledStop.getTimes().getArrival().getEstimated() : null)
+                    .scheduledDeparture(scheduledStop.getTimes() != null && scheduledStop.getTimes().getDeparture() != null ? scheduledStop.getTimes().getDeparture().getScheduled() : null)
+                    .estimatedDeparture(scheduledStop.getTimes() != null && scheduledStop.getTimes().getDeparture() != null ? scheduledStop.getTimes().getDeparture().getEstimated() : null)
                     .build();
         }
     }
