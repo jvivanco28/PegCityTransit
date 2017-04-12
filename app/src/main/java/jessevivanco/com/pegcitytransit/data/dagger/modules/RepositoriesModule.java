@@ -1,5 +1,7 @@
 package jessevivanco.com.pegcitytransit.data.dagger.modules;
 
+import android.content.Context;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -30,7 +32,7 @@ public class RepositoriesModule {
     @Provides
     @Singleton
     @Inject
-    BusStopScheduleRepository provideBusStopScheduleRepository(RestApi restApi) {
-        return new BusStopScheduleRepository(restApi);
+    BusStopScheduleRepository provideBusStopScheduleRepository(Context context, RestApi restApi) {
+        return new BusStopScheduleRepository(context, restApi);
     }
 }

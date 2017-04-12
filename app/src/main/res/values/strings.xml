@@ -29,9 +29,17 @@
     <string name="routes">Routes</string>
 
     <!--    UI Labels   -->
-    <string name="arriving_in">Arriving in {time}</string>
-    <string name="departing_in">Departing in {time}</string>
+    <string name="departs_in">Departs in {time} {time_unit}</string>
+    <string name="ok">OK</string>
+    <string name="late">LATE</string>
+    <string name="early">EARLY</string>
 
+    <plurals name="minutes">
+        <item quantity="one">minute</item>
+        <item quantity="other">minutes</item>
+    </plurals>
+
+    <!-- Error states -->
     <string name="generic_error">Sorry. An error occurred.</string>
     <string name="no_bus_stops_in_that_area">Sorry. There are no bus stops in that area.</string>
     <string name="error_loading_bus_stops">Sorry. An error occurred while loading the bus stops in that area.</string>

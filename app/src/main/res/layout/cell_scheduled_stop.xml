@@ -2,16 +2,18 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cell_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     card_view:cardCornerRadius="@dimen/card_corner_radius"
     card_view:contentPadding="@dimen/material_spacing_small">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="@dimen/material_spacing_small">
 
         <jessevivanco.com.pegcitytransit.ui.views.BusRouteTextView
             android:id="@+id/route_number"
@@ -20,22 +22,41 @@
 
         <TextView
             android:id="@+id/route_name"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_marginLeft="@dimen/material_spacing_small"
             android:layout_marginStart="@dimen/material_spacing_small"
+            android:layout_toEndOf="@id/route_number"
+            android:layout_toRightOf="@id/route_number"
             android:textSize="@dimen/text_title"/>
 
         <TextView
-            android:id="@+id/arrival_time"
-            android:layout_width="match_parent"
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_below="@id/route_name"
             android:layout_marginLeft="@dimen/material_spacing_small"
             android:layout_marginStart="@dimen/material_spacing_small"
-            android:textSize="@dimen/text_title"/>
+            android:layout_marginTop="@dimen/material_spacing_small"
+            android:layout_toEndOf="@id/route_number"
+            android:layout_toRightOf="@id/route_number"
+            android:textSize="@dimen/text_title"
+            tools:ignore="MissingPrefix"/>
 
-    </LinearLayout>
+        <com.joanzapata.iconify.widget.IconTextView
+            android:id="@+id/departure_time"
+            fontPath="fonts/bariol_bold.ttf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/status"
+            android:layout_marginLeft="@dimen/material_spacing_small"
+            android:layout_marginStart="@dimen/material_spacing_small"
+            android:layout_marginTop="@dimen/material_spacing_small"
+            android:layout_toEndOf="@id/route_number"
+            android:layout_toRightOf="@id/route_number"
+            android:textSize="@dimen/text_title"
+            tools:ignore="MissingPrefix"/>
+
+    </RelativeLayout>
 
 </android.support.v7.widget.CardView>
