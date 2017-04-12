@@ -13,6 +13,9 @@
     <color name="black_translucent">#40000000</color>
     <color name="black">#000000</color>
 
+    <color name="grey_light">#F7F7F6</color>
+    <color name="grey">#C9CBCE</color>
+
     <color name="spirit_route">#008000</color>
     <color name="normal_route">@color/white</color>
     <color name="express_route">#ffff00</color>
