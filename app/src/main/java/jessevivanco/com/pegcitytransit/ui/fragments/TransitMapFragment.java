@@ -98,7 +98,7 @@ public class TransitMapFragment extends SupportMapFragment implements OnMapReady
     /**
      * Clear markers, routes, and filters, etc.
      */
-    private void cleanMap() {
+    private void clearMap() {
         // Clear markers, list, and filters.
         googleMap.clear();
         routesPresenter.setBusStopFilter(null);
@@ -108,8 +108,6 @@ public class TransitMapFragment extends SupportMapFragment implements OnMapReady
     public void loadBusStopsAroundCameraCoordinates() {
 
         Log.v("DEBUG", "Called loadBusStopsAroundCameraCoordinates");
-
-        cleanMap();
 
         // Load the new set of markers at the current camera position
         stopsPresenter.loadBusStopsAroundCoordinates(googleMap.getCameraPosition().target.latitude,
@@ -121,7 +119,7 @@ public class TransitMapFragment extends SupportMapFragment implements OnMapReady
     public void loadBusStopsForBusRoute(BusRouteViewModel route) {
 
         Log.v("DEBUG", "Called loadBusStopsForBusRoute");
-        cleanMap();
+        clearMap();
 
         stopsPresenter.loadBusStopsForBusRoute(route);
     }
@@ -147,8 +145,13 @@ public class TransitMapFragment extends SupportMapFragment implements OnMapReady
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(downtownWinnipeg, getResources().getInteger(R.integer.default_city_wide_map_zoom)));
         googleMap.setInfoWindowAdapter(busStopInfoWindowAdapter);
         googleMap.setOnInfoWindowClickListener(this);
+
         // Hide the "my location" button.
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        // Hide the "toolbar" buttons
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
+        // Hide zoom controls.
+        googleMap.getUiSettings().setZoomControlsEnabled(false);
 
         showUserLocation();
 
@@ -234,6 +237,8 @@ public class TransitMapFragment extends SupportMapFragment implements OnMapReady
      */
     @Override
     public void showBusStops(List<BusStopViewModel> busStops) {
+
+        clearMap();
 
         // Display each bus stop in the map with their GPS coordinates. Also keep a HashMap of
         // markers for each bus stop so we can figure out which marker points to which bus stop.
