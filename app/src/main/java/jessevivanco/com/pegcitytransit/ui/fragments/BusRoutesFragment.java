@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -25,6 +26,8 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
 public class BusRoutesFragment extends BaseFragment implements BusRoutesPresenter.ViewContract, BusRouteCellViewHolder.OnBusRouteCellClickedListener {
 
+    private static final String STATE_KEY_VIEW_STATE = "view_state";
+
     @Inject
     AppRouter appRouter;
 
@@ -34,7 +37,13 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
     @BindView(R.id.bus_routes_recycler_view)
     RecyclerView routesRecyclerView;
 
-    private BusRoutesAdapter routesAdapter;// TODO marked for deletion
+    @BindView(R.id.loading_view_container)
+    ViewGroup loadingViewContainer;
+
+    @BindView(R.id.loading_text)
+    TextView loadingText;
+
+    private BusRoutesAdapter routesAdapter;
     private BusRoutesPresenter routesPresenter;
 
     public static BusRoutesFragment newInstance() {
@@ -54,8 +63,18 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
 
         setupAdapter(savedInstanceState);
         setupRecyclerView();
+        setupLoadingView();
+
+        // TODO
+//        if (savedInstanceState != null) {
+//            showLoadingState(savedInstanceState.getBoolean(STATE_KEY_VIEW_STATE, false));
+//        }
 
         if (routesAdapter.getBusRoutes() == null || routesAdapter.getBusRoutes().size() == 0) {
+
+            routesRecyclerView.setVisibility(View.GONE);
+            loadingViewContainer.setVisibility(View.VISIBLE);
+
             routesPresenter.loadBusRoutes();
         }
     }
@@ -63,6 +82,8 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        // TODO
+//        outState.putBoolean(STATE_KEY_SHOW_LOADING_VIEW, loadingViewContainer.getVisibility() == View.VISIBLE);
         routesAdapter.onSaveInstanceState(outState);
     }
 
@@ -75,6 +96,10 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
         routesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         routesRecyclerView.addItemDecoration(new VerticalListItemDecoration(getResources().getDimensionPixelSize(R.dimen.material_spacing_small), getResources().getDimensionPixelSize(R.dimen.material_spacing_small)));
         routesRecyclerView.setAdapter(routesAdapter);
+    }
+
+    private void setupLoadingView() {
+        loadingText.setText(getString(R.string.loading_message_finding_routes));
     }
 
     /**
@@ -94,11 +119,17 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
      */
     @Override
     public void showBusRoutes(List<BusRouteViewModel> routes) {
+        routesRecyclerView.setVisibility(View.VISIBLE);
+        loadingViewContainer.setVisibility(View.GONE);
+
         routesAdapter.setBusRoutes(routes);
     }
 
     @Override
     public void onLoadBusRoutesError(String message) {
+        routesRecyclerView.setVisibility(View.VISIBLE);
+        loadingViewContainer.setVisibility(View.GONE);
+
         Snackbar.make(rootContainer, message, Snackbar.LENGTH_LONG).show();
     }
 }

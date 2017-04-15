@@ -46,20 +46,23 @@ public class ScheduledStopViewModel {
                     long timeDiffInMillis = scheduledStop.getTimes().getDeparture().getEstimated().getTime() - System.currentTimeMillis();
                     long minutes = TimeUnit.MILLISECONDS.toMinutes(timeDiffInMillis);
 
-                    departureTimeFormatted = minutes < MAX_RELATIVE_MINUTES ?
-                            Phrase.from(context, R.string.departs_in)
-                            .put("time", String.valueOf(minutes))
-                            .put("time_unit", context.getResources().getQuantityString(R.plurals.minutes, (int) minutes))
-                            .format()
-                            .toString() :
-                            getTimeFormatted(scheduledStop.getTimes().getDeparture().getEstimated());
+                    departureTimeFormatted =
+                            minutes == 0 ?
+                                    context.getString(R.string.due) :
+                                    minutes < MAX_RELATIVE_MINUTES ?
+                                            Phrase.from(context, R.string.departs_in)
+                                                    .put("time", String.valueOf(minutes))
+                                                    .put("time_unit", context.getResources().getQuantityString(R.plurals.minutes, (int) minutes))
+                                                    .format()
+                                                    .toString() :
+                                            getTimeFormatted(scheduledStop.getTimes().getDeparture().getEstimated());
 
                     if (scheduledStop.getTimes().getDeparture().getEstimated().getTime() > scheduledStop.getTimes().getDeparture().getScheduled().getTime()) {
                         status = context.getString(R.string.late);
                     } else if (scheduledStop.getTimes().getDeparture().getEstimated().getTime() < scheduledStop.getTimes().getDeparture().getScheduled().getTime()) {
                         status = context.getString(R.string.early);
                     } else {
-                        status = context.getString(R.string.ok);
+                        status = context.getString(R.string.on_time);
                     }
                 }
             }

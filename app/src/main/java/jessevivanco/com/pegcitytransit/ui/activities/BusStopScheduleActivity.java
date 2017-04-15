@@ -120,6 +120,8 @@ public class BusStopScheduleActivity extends BaseActivity implements BusStopSche
 
     @Override
     public void showScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
+
+
         scheduledStopAdapter.setScheduledStops(scheduledStops);
         swipeRefreshLayout.setRefreshing(false);
     }

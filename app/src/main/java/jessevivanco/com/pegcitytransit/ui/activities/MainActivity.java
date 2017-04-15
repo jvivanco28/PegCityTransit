@@ -26,6 +26,10 @@ public class MainActivity extends BaseActivity {
         setupBottomNav(savedInstanceState);
 
         // TODO check service advisories on startup
+
+        // TODO "The bottom navigation bar remains in view when navigating through the app’s hierarchy." So we should only have one activity
+
+        // TODO pre-load mapfragment to avoid chuggy frame-rate http://stackoverflow.com/questions/26265526/what-makes-my-map-fragment-loading-slow
     }
 
     @Override

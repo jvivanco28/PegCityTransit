@@ -15,7 +15,7 @@ import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
 public class ScheduledStopAdapter extends RecyclerView.Adapter<ScheduledStopViewHolder> {
 
-    private static final String ARG_KEY_LIST = "list";
+    private static final String STATE_KEY_LIST = "list";
 
     private BusStopSchedulePresenter schedulePresenter;
     private List<ScheduledStopViewModel> scheduledStops;
@@ -24,13 +24,13 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<ScheduledStopView
         this.schedulePresenter = schedulePresenter;
 
         if (savedInstanceState != null) {
-            scheduledStops = Parcels.unwrap(savedInstanceState.getParcelable(ARG_KEY_LIST));
+            scheduledStops = Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_LIST));
         }
     }
 
     public void onSaveInstanceState(Bundle outState) {
         if (scheduledStops != null) {
-            outState.putParcelable(ARG_KEY_LIST, Parcels.wrap(scheduledStops));
+            outState.putParcelable(STATE_KEY_LIST, Parcels.wrap(scheduledStops));
         }
     }
 

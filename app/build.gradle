@@ -106,4 +106,7 @@ dependencies {
     compile 'org.parceler:parceler-api:1.1.6'
     annotationProcessor 'org.parceler:parceler:1.1.6'
 
+    // https://github.com/airbnb/lottie-android
+    // Render After Effects animations natively on Android and iOS
+    compile 'com.airbnb.android:lottie:2.0.0-beta4'
 }

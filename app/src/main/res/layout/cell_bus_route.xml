@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -29,13 +30,15 @@
 
             <TextView
                 android:id="@+id/bus_route_name"
+                fontPath="fonts/bariol_bold.ttf"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="@dimen/material_spacing_small"
                 android:layout_marginStart="@dimen/material_spacing_small"
                 android:text="@{busRoute.name}"
-                android:textSize="@dimen/text_title"/>
+                android:textSize="@dimen/text_title"
+                tools:ignore="MissingPrefix"/>
 
         </LinearLayout>
 

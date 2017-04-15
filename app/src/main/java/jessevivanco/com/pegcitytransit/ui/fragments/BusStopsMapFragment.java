@@ -2,7 +2,6 @@ package jessevivanco.com.pegcitytransit.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -22,9 +21,6 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
 
     @BindView(R.id.root_container)
     ViewGroup rootContainer;
-
-    @BindView(R.id.bus_stop_schedule_recycler_view)
-    RecyclerView busStopsRecyclerView;
 
     private TransitMapFragment transitMapFragment;
 
@@ -62,8 +58,6 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
      */
     @OnClick(R.id.refresh_bus_stops)
     public void searchForBusStops() {
-
-        busStopsRecyclerView.setVisibility(View.GONE);
 
         if (transitMapFragment.isMapReady()) {
             transitMapFragment.loadBusStopsAroundCameraCoordinates();

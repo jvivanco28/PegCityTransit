@@ -30,14 +30,19 @@
 
     <!--    UI Labels   -->
     <string name="departs_in">Departs in {time} {time_unit}</string>
-    <string name="ok">OK</string>
-    <string name="late">LATE</string>
-    <string name="early">EARLY</string>
+    <string name="due">Due</string>
+
+    <string name="on_time">On Time</string>
+    <string name="late">Late</string>
+    <string name="early">Early</string>
 
     <plurals name="minutes">
         <item quantity="one">minute</item>
         <item quantity="other">minutes</item>
     </plurals>
+
+    <string name="loading_message_finding_routes">Finding Routes&#8230;</string>
+    <string name="loading_message_finding_schedule">Finding Schedule&#8230;</string>
 
     <!-- Error states -->
     <string name="generic_error">Sorry. An error occurred.</string>

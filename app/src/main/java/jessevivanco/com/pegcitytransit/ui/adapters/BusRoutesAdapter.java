@@ -16,7 +16,7 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 // TODO generify this!
 public class BusRoutesAdapter extends RecyclerView.Adapter<BusRouteCellViewHolder> {
 
-    private static final String ARG_KEY_LIST = "list";
+    private static final String STATE_KEY_LIST = "list";
 
     private BusRoutesPresenter busRoutesPresenter;
     private BusRouteCellViewHolder.OnBusRouteCellClickedListener onBusRouteCellClickedListener;
@@ -31,12 +31,12 @@ public class BusRoutesAdapter extends RecyclerView.Adapter<BusRouteCellViewHolde
         this.onBusRouteCellClickedListener = onBusRouteCellClickedListener;
 
         if (savedInstanceState != null) {
-            busRoutes = Parcels.unwrap(savedInstanceState.getParcelable(ARG_KEY_LIST));
+            busRoutes = Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_LIST));
         }
     }
 
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(ARG_KEY_LIST, Parcels.wrap(busRoutes));
+        outState.putParcelable(STATE_KEY_LIST, Parcels.wrap(busRoutes));
     }
 
     @Override
