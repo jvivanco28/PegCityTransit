@@ -67,7 +67,6 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     private GoogleMap googleMap;
     private BusStopInfoWindowAdapter busStopInfoWindowAdapter;
     private OnMapReadyListener onMapReadyListener;
-    private boolean isMapReady;
 
     private
     @Nullable
@@ -160,10 +159,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     }
 
     public boolean isMapReady() {
-
-        Log.v("DEBUG", "isMapReady ? " + isMapReady);
-
-        return isMapReady;
+        return googleMap != null;
     }
 
     @Override
@@ -192,11 +188,8 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
 
         // We're ready to do work.
         Log.v("DEBUG", "mapReady");
-        isMapReady = true;
 
-        if (onMapReadyListener != null) {
-            onMapReadyListener.onMapReady();
-        }
+        onMapReadyListener.onMapReady();
     }
 
     /**
@@ -207,7 +200,6 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     @Override
     public void onInfoWindowClick(Marker marker) {
 
-        // TODO
         // Lookup the bus stop.
         BusStopViewModel busStop = busStopInfoWindowAdapter.getMarkerToBusStopHashMap().get(marker);
 

@@ -2,6 +2,7 @@ package jessevivanco.com.pegcitytransit.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -15,6 +16,8 @@ import jessevivanco.com.pegcitytransit.ui.AppRouter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 
 public class BusStopsMapFragment extends BaseFragment implements TransitMapFragment.OnMapReadyListener {
+
+    private static final String TAG = BusStopsMapFragment.class.getSimpleName();
 
     @Inject
     AppRouter appRouter;
@@ -62,7 +65,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
         if (transitMapFragment.isMapReady()) {
             transitMapFragment.loadBusStopsAroundCameraCoordinates(getResources().getInteger(R.integer.default_map_search_radius));
         } else {
-            // TODO show msg
+            Log.e(TAG, "Map not ready!");
         }
     }
 }
