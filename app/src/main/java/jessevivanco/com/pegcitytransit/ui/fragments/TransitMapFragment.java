@@ -9,11 +9,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -25,11 +28,14 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.ui.AppRouter;
 import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
+import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopsPresenter;
@@ -39,7 +45,7 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 // TODO Need to handle orientation changes
-public class TransitMapFragment extends SupportMapFragment implements OnMapReadyCallback,
+public class TransitMapFragment extends BaseFragment implements OnMapReadyCallback,
         GoogleMap.OnInfoWindowClickListener,
         BusStopsPresenter.ViewContract,
         BusRoutesPresenter.ViewContract {
@@ -49,17 +55,23 @@ public class TransitMapFragment extends SupportMapFragment implements OnMapReady
     @Inject
     AppRouter appRouter;
 
-    private View rootContainer;
+    @BindView(R.id.root_container)
+    ViewGroup rootContainer;
 
     private AppComponent injector;
 
     private BusStopsPresenter stopsPresenter;
     private BusRoutesPresenter routesPresenter;
 
+    private SupportMapFragment mapFragment;
     private GoogleMap googleMap;
     private BusStopInfoWindowAdapter busStopInfoWindowAdapter;
     private OnMapReadyListener onMapReadyListener;
     private boolean isMapReady;
+
+    private
+    @Nullable
+    Circle searchArea;
 
     public static TransitMapFragment newInstance(OnMapReadyListener onMapReadyListener) {
 
@@ -73,7 +85,9 @@ public class TransitMapFragment extends SupportMapFragment implements OnMapReady
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        rootContainer = view;
+        ButterKnife.bind(this, view);
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
+
         injector = ((PegCityTransitApp) getActivity().getApplication()).getInjector();
         injector.injectInto(this);
 
@@ -82,8 +96,13 @@ public class TransitMapFragment extends SupportMapFragment implements OnMapReady
         setupAdapters();
     }
 
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.fragment_transit_map;
+    }
+
     private void setupMap() {
-        getMapAsync(this);
+        mapFragment.getMapAsync(this);
     }
 
     private void setupPresenters() {
@@ -100,27 +119,39 @@ public class TransitMapFragment extends SupportMapFragment implements OnMapReady
      */
     private void clearMap() {
         // Clear markers, list, and filters.
-        googleMap.clear();
         routesPresenter.setBusStopFilter(null);
+        busStopInfoWindowAdapter.clearMarkers();
         busStopInfoWindowAdapter.setMarkerToBusStopHashMap(null);
     }
 
-    public void loadBusStopsAroundCameraCoordinates() {
+    public void loadBusStopsAroundCameraCoordinates(int radius) {
 
         Log.v("DEBUG", "Called loadBusStopsAroundCameraCoordinates");
+
+        // Remove previous search area circle
+        if (searchArea != null) {
+            searchArea.remove();
+        }
+
+        // Display the area that we're searching for bus stops.
+        CircleOptions circleOptions = new CircleOptions()
+                .center(new LatLng(googleMap.getCameraPosition().target.latitude, googleMap.getCameraPosition().target.longitude))
+                .radius(radius)
+                .strokeColor(getResources().getColor(R.color.map_search_border))
+                .strokeWidth(getResources().getDimensionPixelSize(R.dimen.map_search_border_width));
+
+        searchArea = googleMap.addCircle(circleOptions);
 
         // Load the new set of markers at the current camera position
         stopsPresenter.loadBusStopsAroundCoordinates(googleMap.getCameraPosition().target.latitude,
                 googleMap.getCameraPosition().target.longitude,
-                null);
+                radius);
     }
 
 
     public void loadBusStopsForBusRoute(BusRouteViewModel route) {
 
         Log.v("DEBUG", "Called loadBusStopsForBusRoute");
-        clearMap();
-
         stopsPresenter.loadBusStopsForBusRoute(route);
     }
 

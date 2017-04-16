@@ -50,7 +50,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     @Override
     public void onMapReady() {
         // TODO need to handle orientation changes
-        transitMapFragment.loadBusStopsAroundCameraCoordinates();
+        transitMapFragment.loadBusStopsAroundCameraCoordinates(getResources().getInteger(R.integer.default_map_search_radius));
     }
 
     /**
@@ -60,7 +60,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     public void searchForBusStops() {
 
         if (transitMapFragment.isMapReady()) {
-            transitMapFragment.loadBusStopsAroundCameraCoordinates();
+            transitMapFragment.loadBusStopsAroundCameraCoordinates(getResources().getInteger(R.integer.default_map_search_radius));
         } else {
             // TODO show msg
         }

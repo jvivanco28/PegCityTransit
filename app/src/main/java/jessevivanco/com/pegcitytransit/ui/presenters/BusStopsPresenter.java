@@ -44,7 +44,7 @@ public class BusStopsPresenter {
         DEFAULT_LAT = Double.parseDouble(context.getString(R.string.downtown_winnipeg_latitude));
         DEFAULT_LONG = Double.parseDouble(context.getString(R.string.downtown_winnipeg_longitude));
         DEFAULT_RADIUS = context.getResources().getInteger(R.integer
-                .default_max_bus_stop_distance);
+                .default_map_search_radius);
     }
 
     public void loadBusStopsAroundCoordinates(@Nullable Double latitude, @Nullable Double longitude, @Nullable Integer radius) {

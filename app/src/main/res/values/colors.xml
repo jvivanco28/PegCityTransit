@@ -21,5 +21,6 @@
     <color name="normal_route">@color/white</color>
     <color name="express_route">#ffff00</color>
     <color name="rapid_transit_route">#0072b9</color>
+    <color name="map_search_border">#553F51B5</color>
 
 </resources>

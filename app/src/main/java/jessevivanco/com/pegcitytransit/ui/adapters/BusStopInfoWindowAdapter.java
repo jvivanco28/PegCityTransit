@@ -73,4 +73,14 @@ public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     public HashMap<Marker, BusStopViewModel> getMarkerToBusStopHashMap() {
         return markerToBusStopHashMap;
     }
+
+    public void clearMarkers() {
+        if ( markerToBusStopHashMap != null ) {
+            markerToBusStopHashMap.forEach((marker, busStopViewModel) -> {
+                marker.remove();
+            });
+            markerToBusStopHashMap.clear();
+            markerToBusStopHashMap = null;
+        }
+    }
 }
