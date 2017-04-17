@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -123,18 +124,42 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         busStopInfoWindowAdapter.setMarkerToBusStopHashMap(null);
     }
 
-    public void loadBusStopsAroundCameraCoordinates(int radius) {
+    /**
+     * Loads bus stops around the current camrea coordinates.
+     *
+     * @param radius
+     */
+    public void loadBusStopsAtCameraCoordinates(int radius) {
+        loadBusStopsAtCoordinates(null, null, radius);
+    }
 
-        Log.v("DEBUG", "Called loadBusStopsAroundCameraCoordinates");
+    /**
+     * Loads the bus stops at the provided coordinates. If no coordinates are provided, then uses
+     * the current camera coordiantes.
+     *
+     * @param latitude
+     * @param longitude
+     * @param radius
+     */
+    public void loadBusStopsAtCoordinates(@Nullable Double latitude, @Nullable Double longitude, int radius) {
+
+        Log.v("DEBUG", "Called loadBusStopsAtCoordinates");
 
         // Remove previous search area circle
         if (searchArea != null) {
             searchArea.remove();
         }
 
+        if (latitude == null) {
+            latitude = googleMap.getCameraPosition().target.latitude;
+        }
+        if (longitude == null) {
+            longitude = googleMap.getCameraPosition().target.longitude;
+        }
+
         // Display the area that we're searching for bus stops.
         CircleOptions circleOptions = new CircleOptions()
-                .center(new LatLng(googleMap.getCameraPosition().target.latitude, googleMap.getCameraPosition().target.longitude))
+                .center(new LatLng(latitude, longitude))
                 .radius(radius)
                 .strokeColor(getResources().getColor(R.color.map_search_border))
                 .strokeWidth(getResources().getDimensionPixelSize(R.dimen.map_search_border_width));
@@ -142,9 +167,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         searchArea = googleMap.addCircle(circleOptions);
 
         // Load the new set of markers at the current camera position
-        stopsPresenter.loadBusStopsAroundCoordinates(googleMap.getCameraPosition().target.latitude,
-                googleMap.getCameraPosition().target.longitude,
-                radius);
+        stopsPresenter.loadBusStopsAroundCoordinates(latitude, longitude, radius);
     }
 
 
@@ -288,13 +311,36 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         // lookup, and display the bus stop information when a marker is clicked.
         busStopInfoWindowAdapter.setMarkerToBusStopHashMap(markerToKeyHashMap);
 
-        // Change the Camera zoom scale so that we can fit all markers within the view bounds.
-        LatLngBounds bounds = latLngBoundsBuilder.build();
+        LatLngBounds bounds;
+
+        // If we've drawn a circular "search" area, then zoom in on the map such that we fit the
+        // entire circal within the view bounds.
+        if (searchArea != null) {
+            bounds = getLatLngBoundsOfCircle(searchArea.getCenter(), searchArea.getRadius());
+        } else {
+            // Else zoom to fit all of the markers within the view bounds.
+            // Change the Camera zoom scale so that we can fit all markers within the view bounds.
+            bounds = latLngBoundsBuilder.build();
+        }
         int width = getResources().getDisplayMetrics().widthPixels;
         int height = getResources().getDisplayMetrics().heightPixels;
         int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
 
         googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding));
+    }
+
+    /**
+     * gets the LatLngBounds of a circle given the center and radius of the circle.
+     * See <a href="http://stackoverflow.com/questions/15319431/how-to-convert-a-latlng-and-a-radius-to-a-latlngbounds-in-android-google-maps-ap">this</a> Stack Overflow post.
+     *
+     * @param center
+     * @param radius
+     * @return
+     */
+    private LatLngBounds getLatLngBoundsOfCircle(LatLng center, double radius) {
+        LatLng southwest = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 225);
+        LatLng northeast = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 45);
+        return new LatLngBounds(southwest, northeast);
     }
 
     @Override
@@ -330,7 +376,6 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
             }
         }
     }
-
 
     @Override
     public void onLoadBusRoutesError(String message) {

@@ -29,7 +29,7 @@ public class BusRouteMapActivity extends BaseActivity implements TransitMapFragm
             Log.v("DEBUG", "222");
 
             transitMapFragment = (TransitMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-//            transitMapFragment.setMapReadyListener(this);
+            transitMapFragment.setMapReadyListener(this);
         }
     }
 
