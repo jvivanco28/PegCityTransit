@@ -6,11 +6,13 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -34,6 +36,9 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
 
     @BindView(R.id.root_container)
     ViewGroup rootContainer;
+
+    @BindView(R.id.my_location_button)
+    FloatingActionButton myLocationButton;
 
     private GoogleApiClient googleApiClient;
     private TransitMapFragment transitMapFragment;
@@ -160,12 +165,32 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
             // defaults to downtown Winnipeg.
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+                // Since we have access to the user's location, show the "my location" button.
+                if (myLocationButton.getVisibility() != View.VISIBLE) {
+                    showMyLocationButton();
+                }
             }
             Log.v("DEBUG", "YOLO loading bus stops.");
             transitMapFragment.loadBusStopsAtCoordinates(lastKnownLocation != null ? lastKnownLocation.getLatitude() : null,
                     lastKnownLocation != null ? lastKnownLocation.getLongitude() : null,
                     getResources().getInteger(R.integer.default_map_search_radius));
         }
+    }
+
+    private void showMyLocationButton() {
+        AlphaAnimation fadeInAnimation = new AlphaAnimation(0, 1);
+        fadeInAnimation.setDuration(1000);
+        fadeInAnimation.setStartOffset(1000);
+        fadeInAnimation.setFillAfter(true);
+
+        myLocationButton.startAnimation(fadeInAnimation);
+        myLocationButton.setVisibility(View.VISIBLE);
+    }
+
+    @OnClick(R.id.my_location_button)
+    public void goToMyLocation() {
+        loadBusStopsIfReady();
     }
 
     /**

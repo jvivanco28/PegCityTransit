@@ -15,14 +15,31 @@
         android:layout_height="match_parent"
         tools:context="jessevivanco.com.pegcitytransit.ui.activities.MainActivity"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/refresh_bus_stops"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="@dimen/material_spacing_medium"
         android:layout_marginEnd="@dimen/material_spacing_medium"
         android:layout_marginRight="@dimen/material_spacing_medium"
-        app:srcCompat="@drawable/ic_search_white_24dp"/>
+        android:orientation="vertical">
+
+        <!-- This button is hidden until we have access to the user's location. -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/my_location_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:backgroundTint="@color/white"
+            app:srcCompat="@drawable/ic_my_location_grey_800_24dp"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/refresh_bus_stops"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/material_spacing_medium"
+            app:srcCompat="@drawable/ic_refresh_white_24dp"/>
+
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
