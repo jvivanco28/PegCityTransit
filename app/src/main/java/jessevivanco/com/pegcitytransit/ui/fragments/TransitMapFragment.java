@@ -3,7 +3,6 @@ package jessevivanco.com.pegcitytransit.ui.fragments;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -37,11 +36,8 @@ import jessevivanco.com.pegcitytransit.ui.AppRouter;
 import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
-import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopsPresenter;
-import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
-import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
@@ -50,8 +46,6 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         GoogleMap.OnInfoWindowClickListener,
         BusStopsPresenter.ViewContract,
         BusRoutesPresenter.ViewContract {
-
-    private static final String PERMISSION_DIALOG_TAG = "dialog";
 
     @Inject
     AppRouter appRouter;
@@ -235,46 +229,10 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     private void showUserLocation() {
 
         // If permission has not yet been granted, then ask the user.
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            PermissionUtils.requestPermission(this,
-                    IntentRequestCodes.LOCATION_PERMISSION_REQUEST_CODE.ordinal(),
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    getString(R.string.location_permission_dialog_title),
-                    getString(R.string.location_permission_rational),
-                    PERMISSION_DIALOG_TAG);
-
-        } else if (googleMap != null) {
-
-            // Access to the location has been granted to the app.
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
         }
     }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
-        // We're only interested in location services
-        if (requestCode != IntentRequestCodes.LOCATION_PERMISSION_REQUEST_CODE.ordinal()) {
-            return;
-        }
-
-        // If the permission was granted, then let's get the user's location.
-        if (PermissionUtils.isPermissionGranted(permissions, grantResults,
-                Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-            // Enable the my location layer if the permission has been granted.
-            showUserLocation();
-
-        } else {
-            // Permission was denied. Let's display a dialog explaining why we need location services, and how to grant
-            // the permission if it's permanently denied.
-            FragmentUtils.showFragment(this,
-                    PermissionDeniedDialog.newInstance(getString(R.string.location_permission_denied)),
-                    PERMISSION_DIALOG_TAG);
-        }
-    }
-
 
     /**
      * Show the list of bus stops as markers in the map.
@@ -338,6 +296,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
      * @return
      */
     private LatLngBounds getLatLngBoundsOfCircle(LatLng center, double radius) {
+        // See the stackoverflow post in te javadoc to understand what these constants really mean.
         LatLng southwest = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 225);
         LatLng northeast = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 45);
         return new LatLngBounds(southwest, northeast);

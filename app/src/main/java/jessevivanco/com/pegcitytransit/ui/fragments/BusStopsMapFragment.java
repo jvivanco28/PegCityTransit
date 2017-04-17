@@ -1,10 +1,13 @@
 package jessevivanco.com.pegcitytransit.ui.fragments;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +21,16 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
+import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
+import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
+import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
 
 public class BusStopsMapFragment extends BaseFragment implements TransitMapFragment.OnMapReadyListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = BusStopsMapFragment.class.getSimpleName();
+    private static final String PERMISSION_DIALOG_TAG = "dialog";
 
     @BindView(R.id.root_container)
     ViewGroup rootContainer;
@@ -31,7 +38,6 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     private GoogleApiClient googleApiClient;
     private TransitMapFragment transitMapFragment;
 
-    private Location lastKnownLocation;
     private boolean lastKnownLocationLoaded;
 
     public static BusStopsMapFragment newInstance() {
@@ -84,10 +90,18 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        // TODO CHECK premission
-        this.lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-        this.lastKnownLocationLoaded = true;
+        // If permission to get user's location has not yet been granted, then ask the user.
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
+            PermissionUtils.requestPermission(this,
+                    IntentRequestCodes.LOCATION_PERMISSION_REQUEST_CODE.ordinal(),
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    getString(R.string.location_permission_dialog_title),
+                    getString(R.string.location_permission_rational),
+                    PERMISSION_DIALOG_TAG);
+
+        }
+        this.lastKnownLocationLoaded = true;
         loadBusStopsIfReady();
     }
 
@@ -98,6 +112,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // If this failed, then still raise the flag and let's continue on without the user's location.
         this.lastKnownLocationLoaded = true;
 
         Snackbar.make(rootContainer, getString(R.string.error_finding_location), Snackbar.LENGTH_LONG).show();
@@ -110,12 +125,42 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
         loadBusStopsIfReady();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        // We're only interested in location services
+        if (requestCode != IntentRequestCodes.LOCATION_PERMISSION_REQUEST_CODE.ordinal()) {
+            return;
+        }
+
+        // If the permission was granted, then load the bus stops around the user's location.
+        if (PermissionUtils.isPermissionGranted(permissions, grantResults,
+                Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+            loadBusStopsIfReady();
+        } else {
+            // Permission was denied. Let's display a dialog explaining why we need location services, and how to grant
+            // the permission if it's permanently denied.
+            FragmentUtils.showFragment(this,
+                    PermissionDeniedDialog.newInstance(getString(R.string.location_permission_denied)),
+                    PERMISSION_DIALOG_TAG);
+        }
+    }
+
     /**
      * Once the map has loaded AND we've received the user's location, then searches for bus stops
      * around the user's location.
      */
     private void loadBusStopsIfReady() {
         if (transitMapFragment.isMapReady() && lastKnownLocationLoaded) {
+
+            Location lastKnownLocation = null;
+
+            // Use the user's last known location if we have access to that information. Else just
+            // defaults to downtown Winnipeg.
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            }
             Log.v("DEBUG", "YOLO loading bus stops.");
             transitMapFragment.loadBusStopsAtCoordinates(lastKnownLocation != null ? lastKnownLocation.getLatitude() : null,
                     lastKnownLocation != null ? lastKnownLocation.getLongitude() : null,
