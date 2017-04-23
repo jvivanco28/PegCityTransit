@@ -14,17 +14,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.SphericalUtil;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -47,6 +45,9 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         BusStopsPresenter.ViewContract,
         BusRoutesPresenter.ViewContract {
 
+    private static final String STATE_KEY_MAP_CAMERA = "camera_position";
+    private static final String STATE_KEY_SEARCH_AREA = "search_area_circle";
+
     @Inject
     AppRouter appRouter;
 
@@ -67,9 +68,15 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     @Nullable
     Circle searchArea;
 
-    public static TransitMapFragment newInstance(OnMapReadyListener onMapReadyListener) {
+    private
+    @Nullable
+    LatLng restoredSearchAreaCoordinates;
 
-        Log.v("DEBUG", "Creating new instance");
+    private
+    @Nullable
+    CameraPosition restoredCameraPosition;
+
+    public static TransitMapFragment newInstance(OnMapReadyListener onMapReadyListener) {
 
         TransitMapFragment fragment = new TransitMapFragment();
         fragment.setMapReadyListener(onMapReadyListener);
@@ -85,9 +92,9 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         injector = ((PegCityTransitApp) getActivity().getApplication()).getInjector();
         injector.injectInto(this);
 
-        setupMap();
+        setupMap(savedInstanceState);
         setupPresenters();
-        setupAdapters();
+        setupAdapters(savedInstanceState);
     }
 
     @Override
@@ -95,8 +102,27 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         return R.layout.fragment_transit_map;
     }
 
-    private void setupMap() {
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        busStopInfoWindowAdapter.onSaveInstanceState(outState);
+
+        if (searchArea != null) {
+            outState.putParcelable(STATE_KEY_SEARCH_AREA, searchArea.getCenter());
+        }
+        if (googleMap != null) {
+            outState.putParcelable(STATE_KEY_MAP_CAMERA, googleMap.getCameraPosition());
+        }
+    }
+
+    private void setupMap(Bundle savedInstanceState) {
         mapFragment.getMapAsync(this);
+
+        if (savedInstanceState != null) {
+            restoredCameraPosition = savedInstanceState.getParcelable(STATE_KEY_MAP_CAMERA);
+            restoredSearchAreaCoordinates = savedInstanceState.getParcelable(STATE_KEY_SEARCH_AREA);
+        }
     }
 
     private void setupPresenters() {
@@ -104,18 +130,17 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         routesPresenter = new BusRoutesPresenter(injector, this);
     }
 
-    private void setupAdapters() {
-        busStopInfoWindowAdapter = new BusStopInfoWindowAdapter(getActivity(), routesPresenter);
+    private void setupAdapters(Bundle savedInstanceState) {
+        busStopInfoWindowAdapter = new BusStopInfoWindowAdapter(getActivity(), routesPresenter, savedInstanceState);
     }
 
     /**
-     * Clear markers, routes, and filters, etc.
+     * Clears all markers on the map.
      */
-    private void clearMap() {
+    private void clearMarkers() {
         // Clear markers, list, and filters.
         routesPresenter.setBusStopFilter(null);
         busStopInfoWindowAdapter.clearMarkers();
-        busStopInfoWindowAdapter.setMarkerToBusStopHashMap(null);
     }
 
     /**
@@ -152,6 +177,22 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         }
 
         // Display the area that we're searching for bus stops.
+        showSearchAreaAtCoordinates(latitude, longitude, radius);
+
+        // Load the new set of markers at the current camera position
+        stopsPresenter.loadBusStopsAroundCoordinates(latitude, longitude, radius);
+    }
+
+    /**
+     * Draws a circle on the map which represents the searched area for bus stops.
+     *
+     * @param latitude
+     * @param longitude
+     * @param radius
+     */
+    private void showSearchAreaAtCoordinates(Double latitude, Double longitude, int radius) {
+
+        // Display the area that we're searching for bus stops.
         CircleOptions circleOptions = new CircleOptions()
                 .center(new LatLng(latitude, longitude))
                 .radius(radius)
@@ -159,15 +200,10 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
                 .strokeWidth(getResources().getDimensionPixelSize(R.dimen.map_search_border_width));
 
         searchArea = googleMap.addCircle(circleOptions);
-
-        // Load the new set of markers at the current camera position
-        stopsPresenter.loadBusStopsAroundCoordinates(latitude, longitude, radius);
     }
-
 
     public void loadBusStopsForBusRoute(BusRouteViewModel route) {
 
-        Log.v("DEBUG", "Called loadBusStopsForBusRoute");
         stopsPresenter.loadBusStopsForBusRoute(route);
     }
 
@@ -184,9 +220,29 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
 
         this.googleMap = googleMap;
 
-        // Default coordinates if we don't have user's location permission.
-        LatLng downtownWinnipeg = new LatLng(Double.valueOf(getString(R.string.downtown_winnipeg_latitude)), Double.valueOf(getString(R.string.downtown_winnipeg_longitude)));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(downtownWinnipeg, getResources().getInteger(R.integer.default_city_wide_map_zoom)));
+        // Restore the camera position if we just changed orientation.
+        if (restoredCameraPosition != null) {
+            Log.v("DEBUG", "restoring camera! ");
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(restoredCameraPosition));
+        } else {
+            Log.v("DEBUG", "default camera");
+            // Default coordinates if we don't have user's location permission.
+            LatLng downtownWinnipeg = new LatLng(Double.valueOf(getString(R.string.downtown_winnipeg_latitude)), Double.valueOf(getString(R.string.downtown_winnipeg_longitude)));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(downtownWinnipeg, getResources().getInteger(R.integer.default_city_wide_map_zoom)));
+        }
+
+        // Redraw the searched bus stop area if we just changed orientation
+        if (restoredSearchAreaCoordinates != null) {
+            showSearchAreaAtCoordinates(restoredSearchAreaCoordinates.latitude,
+                    restoredSearchAreaCoordinates.longitude,
+                    getResources().getInteger(R.integer.default_map_search_radius));
+        }
+
+        // Redraw bus stop markers if we changed orientation.
+        if (busStopInfoWindowAdapter.getBusStops() != null) {
+            showBusStops(busStopInfoWindowAdapter.getBusStops(), false);
+        }
+
         googleMap.setInfoWindowAdapter(busStopInfoWindowAdapter);
         googleMap.setOnInfoWindowClickListener(this);
 
@@ -197,15 +253,10 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         // Hide zoom controls.
         googleMap.getUiSettings().setZoomControlsEnabled(false);
 
-        showUserLocation();
-
-        // TODO use your coordinates
-        // Just load downtown winnipeg until we get a location update.
-//        stopsPresenter.loadBusStopsAroundCoordinates(null, null, null);
-
-        // We're ready to do work.
-        Log.v("DEBUG", "mapReady");
-
+        // Show the user's location on the map if we have permission.
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
+        }
         onMapReadyListener.onMapReady();
     }
 
@@ -218,20 +269,9 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     public void onInfoWindowClick(Marker marker) {
 
         // Lookup the bus stop.
-        BusStopViewModel busStop = busStopInfoWindowAdapter.getMarkerToBusStopHashMap().get(marker);
+        BusStopViewModel busStop = busStopInfoWindowAdapter.getBusStopForMarker(marker);
 
         appRouter.goToStopScheduleScreen(getActivity(), busStop);
-    }
-
-    /**
-     * Enables the My Location layer if the fine location permission has been granted.
-     */
-    private void showUserLocation() {
-
-        // If permission has not yet been granted, then ask the user.
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            googleMap.setMyLocationEnabled(true);
-        }
     }
 
     /**
@@ -240,51 +280,27 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
      * @param busStops
      */
     @Override
-    public void showBusStops(List<BusStopViewModel> busStops) {
+    public void showBusStops(List<BusStopViewModel> busStops, boolean animateCamera) {
 
-        clearMap();
+        clearMarkers();
 
-        // Display each bus stop in the map with their GPS coordinates. Also keep a HashMap of
-        // markers for each bus stop so we can figure out which marker points to which bus stop.
-        HashMap<Marker, BusStopViewModel> markerToKeyHashMap = new HashMap<>();
+        // Add the bus stops as markers to the map. We're given the bounding box of all of the
+        // markers such that we can zoom to fit all markers on the map.
+        LatLngBounds bounds = busStopInfoWindowAdapter.showBusStopsAsMarkers(googleMap, busStops);
 
-        // NOTE: while we're doing this, we're also calculating the bounds of all of our markers
-        // so that we can figure out our zoom scale to fit all of the markers on screen.
-        LatLngBounds.Builder latLngBoundsBuilder = new LatLngBounds.Builder();
+        if (animateCamera) {
 
-        for (BusStopViewModel stop : busStops) {
-            LatLng latLng = stop.getLatLng();
-
-            if (latLng != null) {
-                Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng)
-                        .title(String.valueOf(stop.getKey()))
-                        .snippet(stop.getName())
-                );
-                markerToKeyHashMap.put(marker, stop);
-
-                latLngBoundsBuilder.include(marker.getPosition());
+            // If we've drawn a circular "search" area, then zoom in on the map such that we fit the
+            // entire circle within the view bounds.
+            if (searchArea != null) {
+                bounds = getLatLngBoundsOfCircle(searchArea.getCenter(), searchArea.getRadius());
             }
+            int width = getResources().getDisplayMetrics().widthPixels;
+            int height = getResources().getDisplayMetrics().heightPixels;
+            int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
+
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding));
         }
-        // Add our hashmap to our info window adapter. This is where we do the marker-to-bus-stop
-        // lookup, and display the bus stop information when a marker is clicked.
-        busStopInfoWindowAdapter.setMarkerToBusStopHashMap(markerToKeyHashMap);
-
-        LatLngBounds bounds;
-
-        // If we've drawn a circular "search" area, then zoom in on the map such that we fit the
-        // entire circal within the view bounds.
-        if (searchArea != null) {
-            bounds = getLatLngBoundsOfCircle(searchArea.getCenter(), searchArea.getRadius());
-        } else {
-            // Else zoom to fit all of the markers within the view bounds.
-            // Change the Camera zoom scale so that we can fit all markers within the view bounds.
-            bounds = latLngBoundsBuilder.build();
-        }
-        int width = getResources().getDisplayMetrics().widthPixels;
-        int height = getResources().getDisplayMetrics().heightPixels;
-        int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
-
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding));
     }
 
     /**
@@ -317,23 +333,10 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     @Override
     public void showBusRoutes(List<BusRouteViewModel> busRoutes) {
 
+        // TODO get this working again.
         // TODO null check busstop?
         BusStopViewModel busStop = routesPresenter.getBusStopFilter();
-
-        // Add the routes to the bus stop POJO, then re-open the marker for that bus stop.
-        HashMap<Marker, BusStopViewModel> markerBusStopHashMap = busStopInfoWindowAdapter.getMarkerToBusStopHashMap();
-
-        // FYI: We have to do a reverse lookup b/c we don't currently know the marker for the bus stop.
-        for (Map.Entry<Marker, BusStopViewModel> entry : markerBusStopHashMap.entrySet()) {
-            if (busStop.getKey().equals(entry.getValue().getKey())) {
-
-                // Found the target marker-stop pair. Attach the routes to the bus stop, refresh the
-                // info window, then bust out of this loop.
-                entry.getValue().setRoutes(busRoutes);
-                entry.getKey().showInfoWindow();
-                break;
-            }
-        }
+        busStopInfoWindowAdapter.showRoutesAtBusStopInfoWindow(busStop, busRoutes);
     }
 
     @Override

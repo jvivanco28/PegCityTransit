@@ -33,6 +33,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
 
     private static final String TAG = BusStopsMapFragment.class.getSimpleName();
     private static final String PERMISSION_DIALOG_TAG = "dialog";
+    private static final String STATE_KEY_INITIAL_LOAD_FINISHED = "initial_load_finished";
 
     @BindView(R.id.root_container)
     ViewGroup rootContainer;
@@ -44,6 +45,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     private TransitMapFragment transitMapFragment;
 
     private boolean lastKnownLocationLoaded;
+    private boolean initialLoadFinished;
 
     public static BusStopsMapFragment newInstance() {
         return new BusStopsMapFragment();
@@ -55,15 +57,16 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
         getInjector().injectInto(this);
         ButterKnife.bind(this, view);
 
-        setupGoogleApiClient();
-
         if (savedInstanceState == null) {
             transitMapFragment = TransitMapFragment.newInstance(this);
             getChildFragmentManager().beginTransaction().add(R.id.map_fragment_container, transitMapFragment).commit();
         } else {
+            initialLoadFinished = savedInstanceState.getBoolean(STATE_KEY_INITIAL_LOAD_FINISHED, false);
+
             transitMapFragment = (TransitMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment_container);
             transitMapFragment.setMapReadyListener(this);
         }
+        setupGoogleApiClient();
     }
 
     @Override
@@ -91,6 +94,12 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     public void onStop() {
         googleApiClient.disconnect();
         super.onStop();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(STATE_KEY_INITIAL_LOAD_FINISHED, initialLoadFinished);
     }
 
     @Override
@@ -157,7 +166,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
      * around the user's location.
      */
     private void loadBusStopsIfReady() {
-        if (transitMapFragment.isMapReady() && lastKnownLocationLoaded) {
+        if (transitMapFragment.isMapReady() && lastKnownLocationLoaded && !initialLoadFinished) {
 
             Location lastKnownLocation = null;
 
@@ -175,6 +184,9 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
             transitMapFragment.loadBusStopsAtCoordinates(lastKnownLocation != null ? lastKnownLocation.getLatitude() : null,
                     lastKnownLocation != null ? lastKnownLocation.getLongitude() : null,
                     getResources().getInteger(R.integer.default_map_search_radius));
+
+            // Raise this flag. We don't need to search for bus stops on every orientation change.
+            initialLoadFinished = true;
         }
     }
 

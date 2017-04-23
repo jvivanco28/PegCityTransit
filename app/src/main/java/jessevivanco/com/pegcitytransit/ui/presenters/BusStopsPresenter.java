@@ -3,6 +3,7 @@ package jessevivanco.com.pegcitytransit.ui.presenters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.util.List;
 
@@ -61,7 +62,7 @@ public class BusStopsPresenter {
                 .subscribe(
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
-                                viewContract.showBusStops(busStops);
+                                viewContract.showBusStops(busStops, true);
                             } else {
                                 viewContract.errorLoadingBusStops(context.getString(R.string.no_bus_stops_in_that_area));
                             }
@@ -76,13 +77,14 @@ public class BusStopsPresenter {
     public void loadBusStopsForBusRoute(@NonNull BusRouteViewModel route) {
         dispose(loadBusStopsSubscription);
 
+        Log.v("DEBUG", "**** Called loadBusStops");
         loadBusStopsSubscription = stopsRepository.getBusStopsForRoute(route.getKey())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
-                                viewContract.showBusStops(busStops);
+                                viewContract.showBusStops(busStops, true);
                             } else {
                                 viewContract.errorLoadingBusStops(context.getString(R.string.no_bus_stops_in_that_area));
                             }
@@ -102,7 +104,7 @@ public class BusStopsPresenter {
 
     public interface ViewContract {
 
-        void showBusStops(List<BusStopViewModel> busStops);
+        void showBusStops(List<BusStopViewModel> busStops, boolean animateCamera);
 
         void errorLoadingBusStops(String message);
     }
