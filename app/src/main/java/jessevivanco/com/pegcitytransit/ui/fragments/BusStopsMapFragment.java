@@ -34,6 +34,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     private static final String TAG = BusStopsMapFragment.class.getSimpleName();
     private static final String PERMISSION_DIALOG_TAG = "dialog";
     private static final String STATE_KEY_INITIAL_LOAD_FINISHED = "initial_load_finished";
+    private static final String STATE_KEY_GOOGLE_API_CLIENT_INITIALIZED = "client_initialized";
 
     @BindView(R.id.root_container)
     ViewGroup rootContainer;
@@ -44,8 +45,9 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     private GoogleApiClient googleApiClient;
     private TransitMapFragment transitMapFragment;
 
-    private boolean lastKnownLocationLoaded;
     private boolean initialLoadFinished;
+
+    private boolean googleApiClientInitialized;
 
     public static BusStopsMapFragment newInstance() {
         return new BusStopsMapFragment();
@@ -62,11 +64,13 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
             getChildFragmentManager().beginTransaction().add(R.id.map_fragment_container, transitMapFragment).commit();
         } else {
             initialLoadFinished = savedInstanceState.getBoolean(STATE_KEY_INITIAL_LOAD_FINISHED, false);
+            googleApiClientInitialized = savedInstanceState.getBoolean(STATE_KEY_GOOGLE_API_CLIENT_INITIALIZED, false);
 
             transitMapFragment = (TransitMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment_container);
             transitMapFragment.setMapReadyListener(this);
         }
         setupGoogleApiClient();
+        setupMyLocationButton(savedInstanceState);
     }
 
     @Override
@@ -76,11 +80,24 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
 
     private void setupGoogleApiClient() {
         if (googleApiClient == null) {
+
             googleApiClient = new GoogleApiClient.Builder(getActivity())
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
+        }
+    }
+
+    /**
+     * Shows the "my location" button if we have location privileges.
+     *
+     * @param savedInstanceState
+     */
+    private void setupMyLocationButton(@Nullable Bundle savedInstanceState) {
+        // If we have access to the user's location, then show the "my location" button.
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && myLocationButton.getVisibility() != View.VISIBLE) {
+            showMyLocationButton(savedInstanceState == null);
         }
     }
 
@@ -104,6 +121,8 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        googleApiClientInitialized = true;
+
         // If permission to get user's location has not yet been granted, then ask the user.
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
@@ -115,8 +134,9 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
                     PERMISSION_DIALOG_TAG);
 
         }
-        this.lastKnownLocationLoaded = true;
-        loadBusStopsIfReady();
+
+
+        loadBusStopsAtUserLocationIfReady(false);
     }
 
     @Override
@@ -127,16 +147,16 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         // If this failed, then still raise the flag and let's continue on without the user's location.
-        this.lastKnownLocationLoaded = true;
+        googleApiClientInitialized = true;
 
         Snackbar.make(rootContainer, getString(R.string.error_finding_location), Snackbar.LENGTH_LONG).show();
 
-        loadBusStopsIfReady();
+        loadBusStopsAtUserLocationIfReady(false);
     }
 
     @Override
     public void onMapReady() {
-        loadBusStopsIfReady();
+        loadBusStopsAtUserLocationIfReady(false);
     }
 
     @Override
@@ -147,11 +167,12 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
             return;
         }
 
-        // If the permission was granted, then load the bus stops around the user's location.
+        // If the permission was granted, then show the "my location" button, and load the bus stops around the user's location.
         if (PermissionUtils.isPermissionGranted(permissions, grantResults,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-            loadBusStopsIfReady();
+            showMyLocationButton(true);
+            loadBusStopsAtUserLocationIfReady(false);
         } else {
             // Permission was denied. Let's display a dialog explaining why we need location services, and how to grant
             // the permission if it's permanently denied.
@@ -162,11 +183,15 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     }
 
     /**
-     * Once the map has loaded AND we've received the user's location, then searches for bus stops
-     * around the user's location.
+     * Once the map has loaded AND google API client has been setup, then searches for bus stops
+     * around the user's location. If {@code forceLoad} is set to {@code false}, then we only execute the
+     * load once (additional calls will be ignored). Else, we execute the load as long as the map is
+     * ready and we have the user's last known location.
+     *
+     * @param forceLoad
      */
-    private void loadBusStopsIfReady() {
-        if (transitMapFragment.isMapReady() && lastKnownLocationLoaded && !initialLoadFinished) {
+    private void loadBusStopsAtUserLocationIfReady(boolean forceLoad) {
+        if (transitMapFragment.isMapReady() && googleApiClientInitialized && (!initialLoadFinished || forceLoad)) {
 
             Location lastKnownLocation = null;
 
@@ -174,13 +199,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
             // defaults to downtown Winnipeg.
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-
-                // Since we have access to the user's location, show the "my location" button.
-                if (myLocationButton.getVisibility() != View.VISIBLE) {
-                    showMyLocationButton();
-                }
             }
-            Log.v("DEBUG", "YOLO loading bus stops.");
             transitMapFragment.loadBusStopsAtCoordinates(lastKnownLocation != null ? lastKnownLocation.getLatitude() : null,
                     lastKnownLocation != null ? lastKnownLocation.getLongitude() : null,
                     getResources().getInteger(R.integer.default_map_search_radius));
@@ -190,19 +209,24 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
         }
     }
 
-    private void showMyLocationButton() {
-        AlphaAnimation fadeInAnimation = new AlphaAnimation(0, 1);
-        fadeInAnimation.setDuration(1000);
-        fadeInAnimation.setStartOffset(1000);
-        fadeInAnimation.setFillAfter(true);
+    private void showMyLocationButton(boolean fadeIn) {
+        if (fadeIn) {
+            AlphaAnimation fadeInAnimation = new AlphaAnimation(0, 1);
+            fadeInAnimation.setDuration(1000);
+            fadeInAnimation.setStartOffset(1000);
+            fadeInAnimation.setFillAfter(true);
 
-        myLocationButton.startAnimation(fadeInAnimation);
-        myLocationButton.setVisibility(View.VISIBLE);
+            myLocationButton.startAnimation(fadeInAnimation);
+            myLocationButton.setVisibility(View.VISIBLE);
+        } else {
+            myLocationButton.setVisibility(View.VISIBLE);
+        }
     }
 
     @OnClick(R.id.my_location_button)
     public void goToMyLocation() {
-        loadBusStopsIfReady();
+
+        loadBusStopsAtUserLocationIfReady(true);
     }
 
     /**
@@ -214,7 +238,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
         if (transitMapFragment.isMapReady()) {
             transitMapFragment.loadBusStopsAtCameraCoordinates(getResources().getInteger(R.integer.default_map_search_radius));
         } else {
-            Log.e(TAG, "Map not ready!");
+            Log.w(TAG, "Map not ready!");
         }
     }
 }

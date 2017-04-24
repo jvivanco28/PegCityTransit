@@ -222,10 +222,8 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
 
         // Restore the camera position if we just changed orientation.
         if (restoredCameraPosition != null) {
-            Log.v("DEBUG", "restoring camera! ");
             googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(restoredCameraPosition));
         } else {
-            Log.v("DEBUG", "default camera");
             // Default coordinates if we don't have user's location permission.
             LatLng downtownWinnipeg = new LatLng(Double.valueOf(getString(R.string.downtown_winnipeg_latitude)), Double.valueOf(getString(R.string.downtown_winnipeg_longitude)));
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(downtownWinnipeg, getResources().getInteger(R.integer.default_city_wide_map_zoom)));
