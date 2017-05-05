@@ -6,9 +6,12 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,18 +21,26 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
+import jessevivanco.com.pegcitytransit.ui.adapters.ScheduledStopAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
+import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
-public class BusStopsMapFragment extends BaseFragment implements TransitMapFragment.OnMapReadyListener,
+public class BusStopsMapFragment extends BaseFragment implements TransitMapFragment.TransitMapCallbacks,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        BusStopSchedulePresenter.ViewContract {
 
     private static final String TAG = BusStopsMapFragment.class.getSimpleName();
     private static final String PERMISSION_DIALOG_TAG = "dialog";
@@ -41,6 +52,15 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
 
     @BindView(R.id.my_location_button)
     FloatingActionButton myLocationButton;
+
+    @BindView(R.id.stop_schedule_container)
+    ViewGroup stopScheduleBottomSheetContainer;
+    BottomSheetBehavior stopScheduleBottomSheetBehaviour;
+
+    @BindView(R.id.stop_schedule_recycler_view)
+    RecyclerView stopScheduleRecyclerView;
+    ScheduledStopAdapter scheduledStopAdapter;
+    BusStopSchedulePresenter stopSchedulePresenter;
 
     private GoogleApiClient googleApiClient;
     private TransitMapFragment transitMapFragment;
@@ -67,8 +87,9 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
             googleApiClientInitialized = savedInstanceState.getBoolean(STATE_KEY_GOOGLE_API_CLIENT_INITIALIZED, false);
 
             transitMapFragment = (TransitMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment_container);
-            transitMapFragment.setMapReadyListener(this);
+            transitMapFragment.setTransitMapCallbacks(this);
         }
+        setupBottomSheet(savedInstanceState);
         setupGoogleApiClient();
         setupMyLocationButton(savedInstanceState);
     }
@@ -76,6 +97,18 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     @Override
     protected int getLayoutResourceId() {
         return R.layout.fragment_bus_stops_map;
+    }
+
+    private void setupBottomSheet(@Nullable Bundle savedInstanceState) {
+        stopScheduleBottomSheetBehaviour = BottomSheetBehavior.from(stopScheduleBottomSheetContainer);
+        stopScheduleBottomSheetBehaviour.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+        stopSchedulePresenter = new BusStopSchedulePresenter(getInjector(), this);
+        scheduledStopAdapter = new ScheduledStopAdapter(stopSchedulePresenter, savedInstanceState);
+
+        stopScheduleRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        stopScheduleRecyclerView.addItemDecoration(new VerticalListItemDecoration(getResources().getDimensionPixelSize(R.dimen.material_spacing_small), getResources().getDimensionPixelSize(R.dimen.material_spacing_small)));
+        stopScheduleRecyclerView.setAdapter(scheduledStopAdapter);
     }
 
     private void setupGoogleApiClient() {
@@ -132,10 +165,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
                     getString(R.string.location_permission_dialog_title),
                     getString(R.string.location_permission_rational),
                     PERMISSION_DIALOG_TAG);
-
         }
-
-
         loadBusStopsAtUserLocationIfReady(false);
     }
 
@@ -160,6 +190,12 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     }
 
     @Override
+    public void showStopSchedule(BusStopViewModel busStopViewModel) {
+        stopSchedulePresenter.loadScheduleForBusStop(busStopViewModel.getKey());
+        stopScheduleBottomSheetBehaviour.setState(BottomSheetBehavior.STATE_COLLAPSED);
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
         // We're only interested in location services
@@ -180,6 +216,16 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
                     PermissionDeniedDialog.newInstance(getString(R.string.location_permission_denied)),
                     PERMISSION_DIALOG_TAG);
         }
+    }
+
+    @Override
+    public void showScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
+        scheduledStopAdapter.setScheduledStops(scheduledStops);
+    }
+
+    @Override
+    public void showErrorLoadingScheduleMessage(String message) {
+        Snackbar.make(rootContainer, message, Snackbar.LENGTH_LONG).show();
     }
 
     /**

@@ -3,6 +3,7 @@ package jessevivanco.com.pegcitytransit.ui.fragments;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -24,13 +25,10 @@ import com.google.maps.android.SphericalUtil;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
-import jessevivanco.com.pegcitytransit.ui.AppRouter;
 import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
@@ -48,9 +46,6 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     private static final String STATE_KEY_MAP_CAMERA = "camera_position";
     private static final String STATE_KEY_SEARCH_AREA = "search_area_circle";
 
-    @Inject
-    AppRouter appRouter;
-
     @BindView(R.id.root_container)
     ViewGroup rootContainer;
 
@@ -62,7 +57,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     private SupportMapFragment mapFragment;
     private GoogleMap googleMap;
     private BusStopInfoWindowAdapter busStopInfoWindowAdapter;
-    private OnMapReadyListener onMapReadyListener;
+    private TransitMapCallbacks transitMapCallbacks;
 
     private
     @Nullable
@@ -76,10 +71,10 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     @Nullable
     CameraPosition restoredCameraPosition;
 
-    public static TransitMapFragment newInstance(OnMapReadyListener onMapReadyListener) {
+    public static TransitMapFragment newInstance(@NonNull TransitMapCallbacks transitMapCallbacks) {
 
         TransitMapFragment fragment = new TransitMapFragment();
-        fragment.setMapReadyListener(onMapReadyListener);
+        fragment.setTransitMapCallbacks(transitMapCallbacks);
         return fragment;
     }
 
@@ -207,8 +202,8 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         stopsPresenter.loadBusStopsForBusRoute(route);
     }
 
-    public void setMapReadyListener(OnMapReadyListener onMapReadyListener) {
-        this.onMapReadyListener = onMapReadyListener;
+    public void setTransitMapCallbacks(TransitMapCallbacks transitMapCallbacks) {
+        this.transitMapCallbacks = transitMapCallbacks;
     }
 
     public boolean isMapReady() {
@@ -255,7 +250,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
         }
-        onMapReadyListener.onMapReady();
+        transitMapCallbacks.onMapReady();
     }
 
     /**
@@ -269,7 +264,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         // Lookup the bus stop.
         BusStopViewModel busStop = busStopInfoWindowAdapter.getBusStopForMarker(marker);
 
-        appRouter.goToStopScheduleScreen(getActivity(), busStop);
+        transitMapCallbacks.showStopSchedule(busStop);
     }
 
     /**
@@ -342,8 +337,10 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         Snackbar.make(rootContainer, message, Snackbar.LENGTH_LONG).show();
     }
 
-    public interface OnMapReadyListener {
+    public interface TransitMapCallbacks {
 
         void onMapReady();
+
+        void showStopSchedule(BusStopViewModel busStopViewModel);
     }
 }

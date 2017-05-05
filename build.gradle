@@ -10,7 +10,7 @@ buildscript {
         // in the individual module build.gradle files
 
         // Gradle
-        classpath 'com.android.tools.build:gradle:2.4.0-alpha6'
+        classpath 'com.android.tools.build:gradle:2.4.0-alpha7'
     }
 }
 

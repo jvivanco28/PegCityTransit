@@ -9,8 +9,10 @@ import org.parceler.Parcels;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
 import jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
-public class BusRouteMapActivity extends BaseActivity implements TransitMapFragment.OnMapReadyListener {
+@Deprecated
+public class BusRouteMapActivity extends BaseActivity implements TransitMapFragment.TransitMapCallbacks {
 
     public static final String ARG_KEY_BUS_ROUTE = "route";
 
@@ -29,7 +31,7 @@ public class BusRouteMapActivity extends BaseActivity implements TransitMapFragm
             Log.v("DEBUG", "222");
 
             transitMapFragment = (TransitMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-            transitMapFragment.setMapReadyListener(this);
+            transitMapFragment.setTransitMapCallbacks(this);
         }
     }
 
@@ -43,5 +45,10 @@ public class BusRouteMapActivity extends BaseActivity implements TransitMapFragm
     public void onMapReady() {
         // TODO need to handle orientation changes
         transitMapFragment.loadBusStopsForBusRoute(Parcels.unwrap(getIntent().getParcelableExtra(ARG_KEY_BUS_ROUTE)));
+    }
+
+    @Override
+    public void showStopSchedule(BusStopViewModel busStopViewModel) {
+        // TODO
     }
 }
