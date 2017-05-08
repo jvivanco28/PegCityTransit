@@ -1,6 +1,7 @@
 package jessevivanco.com.pegcitytransit.data.dagger.modules;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.iainconnor.objectcache.CacheManager;
@@ -19,15 +20,16 @@ import jessevivanco.com.pegcitytransit.BuildConfig;
 @Module
 public class DiskLruModule {
 
-    private final String TAG = getClass().getSimpleName();
+    private static final String TAG = DiskLruModule.class.getSimpleName();
+    private static final int CACHE_SIZE_KB = 1024 * 1024 * 10;
 
     /**
-     * TODO check why we can't annotate this with @Nullable
      * NOTE: This <b>>might</b return {@code null} if {@link DiskCache} throws an IOException.
      */
     @Provides
     @Singleton
     @Inject
+    @Nullable
     CacheManager provideCacheManager(Context context) {
         String cachePath = context.getCacheDir().getPath();
         File cacheFile = new File(cachePath + File.separator + BuildConfig.APPLICATION_ID);
@@ -35,7 +37,7 @@ public class DiskLruModule {
         DiskCache diskCache = null;
         try {
             // TODO test if this fails
-            diskCache = new DiskCache(cacheFile, BuildConfig.VERSION_CODE, 1024 * 1024 * 10);
+            diskCache = new DiskCache(cacheFile, BuildConfig.VERSION_CODE, CACHE_SIZE_KB);
         } catch (IOException e) {
             // TODO REPORT THE ERROR TO CRASHLYTICS
             Log.e(TAG, "Error initializing Disk LRU Cache.", e);

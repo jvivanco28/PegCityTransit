@@ -1,6 +1,7 @@
 package jessevivanco.com.pegcitytransit.data.dagger.modules;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import com.iainconnor.objectcache.CacheManager;
 
@@ -20,7 +21,7 @@ public class RepositoriesModule {
     @Provides
     @Singleton
     @Inject
-    BusRoutesRepository provideBusRoutesRepository(RestApi restApi, CacheManager cacheManager) {
+    BusRoutesRepository provideBusRoutesRepository(RestApi restApi, @Nullable CacheManager cacheManager) {
         return new BusRoutesRepository(restApi, cacheManager);
     }
 

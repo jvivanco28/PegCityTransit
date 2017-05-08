@@ -15,6 +15,9 @@ public class CacheHelper {
     private CacheHelper() {
     }
 
+    /**
+     * Convenience method for retrieving cached data.
+     */
     @SuppressWarnings("unchecked")
     public static @Nullable
     <T> T getFromCache(@Nullable CacheManager cacheManager, String cacheKey, Type typeToken) {
