@@ -3,7 +3,6 @@ package jessevivanco.com.pegcitytransit.ui.presenters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.List;
 
@@ -77,7 +76,6 @@ public class BusStopsPresenter {
     public void loadBusStopsForBusRoute(@NonNull BusRouteViewModel route) {
         dispose(loadBusStopsSubscription);
 
-        Log.v("DEBUG", "**** Called loadBusStops");
         loadBusStopsSubscription = stopsRepository.getBusStopsForRoute(route.getKey())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -24,6 +24,7 @@ import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
+@Deprecated
 public class BusStopScheduleActivity extends BaseActivity implements BusStopSchedulePresenter.ViewContract, SwipeRefreshLayout.OnRefreshListener {
 
     public static final String ARG_KEY_BUS_STOP = "bus_stop";
