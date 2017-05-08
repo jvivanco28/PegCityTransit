@@ -18,10 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
-import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
-import jessevivanco.com.pegcitytransit.ui.AppRouter;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
@@ -92,10 +88,10 @@ public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Go
 
     public void clearMarkers() {
         if (markerToBusStopHashMap != null) {
-            // TODO
-            markerToBusStopHashMap.forEach((marker, busStopViewModel) -> {
+            for (Marker marker : markerToBusStopHashMap.keySet()) {
+                // Remove the marker from the map.
                 marker.remove();
-            });
+            }
             markerToBusStopHashMap.clear();
             markerToBusStopHashMap = null;
         }
