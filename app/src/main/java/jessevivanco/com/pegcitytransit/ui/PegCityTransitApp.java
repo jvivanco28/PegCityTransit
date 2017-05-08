@@ -35,12 +35,12 @@ public class PegCityTransitApp extends Application {
             Traceur.enableLogging();
         }
 
-        initDependencies();
+        initDaggerModules();
         initIconify();
         initFonts();
     }
 
-    private void initDependencies() {
+    private void initDaggerModules() {
         injector = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
                 .restModule(new RestModule(getApplicationContext(),

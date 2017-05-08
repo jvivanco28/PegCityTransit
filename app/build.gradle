@@ -112,4 +112,15 @@ dependencies {
     // Handy extensions to the Google Maps Android API.
     // https://github.com/googlemaps/android-maps-utils
     compile 'com.google.maps.android:android-maps-utils:0.5'
+
+    // A simple cache for Objects in Android (Thanks Iain!).
+    // https://github.com/iainconnor/ObjectCache
+    compile 'com.iainconnor:objectcache:0.0.19-SNAPSHOT'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://raw.github.com/iainconnor/ObjectCache/master/maven/'
+    }
 }

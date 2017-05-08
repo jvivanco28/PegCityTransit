@@ -2,6 +2,8 @@ package jessevivanco.com.pegcitytransit.data.dagger.modules;
 
 import android.content.Context;
 
+import com.iainconnor.objectcache.CacheManager;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -18,8 +20,8 @@ public class RepositoriesModule {
     @Provides
     @Singleton
     @Inject
-    BusRoutesRepository provideBusRoutesRepository(RestApi restApi) {
-        return new BusRoutesRepository(restApi);
+    BusRoutesRepository provideBusRoutesRepository(RestApi restApi, CacheManager cacheManager) {
+        return new BusRoutesRepository(restApi, cacheManager);
     }
 
     @Provides

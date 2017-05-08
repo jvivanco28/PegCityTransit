@@ -5,6 +5,7 @@ import javax.inject.Singleton;
 import dagger.Component;
 import jessevivanco.com.pegcitytransit.data.dagger.modules.AppModule;
 import jessevivanco.com.pegcitytransit.data.dagger.modules.AppRouterModule;
+import jessevivanco.com.pegcitytransit.data.dagger.modules.DiskLruModule;
 import jessevivanco.com.pegcitytransit.data.dagger.modules.RepositoriesModule;
 import jessevivanco.com.pegcitytransit.data.dagger.modules.RestModule;
 import jessevivanco.com.pegcitytransit.ui.activities.BusRouteMapActivity;
@@ -23,7 +24,8 @@ import jessevivanco.com.pegcitytransit.ui.presenters.BusStopsPresenter;
         AppModule.class,
         AppRouterModule.class,
         RestModule.class,
-        RepositoriesModule.class
+        RepositoriesModule.class,
+        DiskLruModule.class
 })
 public interface AppComponent {
 
