@@ -6,7 +6,7 @@ import android.support.annotation.DrawableRes;
 import jessevivanco.com.pegcitytransit.R;
 
 /**
- * Constants for bus route coverage types. This just
+ * Constants for bus route coverage types.
  */
 public enum RouteCoverage {
 
@@ -16,7 +16,7 @@ public enum RouteCoverage {
     RAPID_TRANSIT("rapid transit", R.drawable.rapid_transit_route, R.color.white),
     // NOTE: These come back as "regular" but we know that the spirit routes are 1, 2, and 3
     // Also, the route names contain the string "spirit" in them; that might be the better indicator.
-    // NOTE: Yes, the capital 'S' is intentional.
+    // NOTE: Capital 'S' is intentional.
     SPIRIT("Spirit", R.drawable.spirit_route, R.color.white);
 
     private String apiValue;
@@ -62,7 +62,7 @@ public enum RouteCoverage {
         } else if (coverageStrVal.equals(RAPID_TRANSIT.apiValue)) {
             return RAPID_TRANSIT;
         } else if (routeName != null && routeName.contains(SPIRIT.apiValue)) {
-            // Special case: There is no "spirit" coverage; the APi still returns those routes as
+            // Special case: There is no "spirit" coverage; the API still returns those routes as
             // "regular" routes, but the route's name contains the string "spirit" so we'll just go
             // by that.
             return SPIRIT;

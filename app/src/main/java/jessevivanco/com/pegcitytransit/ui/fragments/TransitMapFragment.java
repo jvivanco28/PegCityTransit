@@ -134,7 +134,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
      */
     private void clearMarkers() {
         // Clear markers, list, and filters.
-        routesPresenter.setBusStopFilter(null);
+//        routesPresenter.setBusStopFilter(null);
         busStopInfoWindowAdapter.clearMarkers();
     }
 

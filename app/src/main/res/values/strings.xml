@@ -44,6 +44,11 @@
     <string name="loading_message_finding_routes">Finding Routes&#8230;</string>
     <string name="loading_message_finding_schedule">Finding Schedule&#8230;</string>
 
+    <!-- Cache keys -->
+    <string name="cache_key_all_routes">ALL_ROUTES</string>
+    <string name="cache_key_stops_for_route">STOPS_FOR_{route}</string>
+    <string name="cache_key_routes_at_stop">ROUTES_AT_{stop}</string>
+
     <!-- Error states -->
     <string name="generic_error">Sorry. An error occurred.</string>
     <string name="no_bus_stops_in_that_area">Sorry. There are no bus stops in that area.</string>

@@ -21,15 +21,15 @@ public class RepositoriesModule {
     @Provides
     @Singleton
     @Inject
-    BusRoutesRepository provideBusRoutesRepository(RestApi restApi, @Nullable CacheManager cacheManager) {
-        return new BusRoutesRepository(restApi, cacheManager);
+    BusRoutesRepository provideBusRoutesRepository(Context context, RestApi restApi, @Nullable CacheManager cacheManager) {
+        return new BusRoutesRepository(context, restApi, cacheManager);
     }
 
     @Provides
     @Singleton
     @Inject
-    BusStopRepository provideBusStopRepository(RestApi restApi) {
-        return new BusStopRepository(restApi);
+    BusStopRepository provideBusStopRepository(Context context, RestApi restApi, @Nullable CacheManager cacheManager) {
+        return new BusStopRepository(context, restApi, cacheManager);
     }
 
     @Provides

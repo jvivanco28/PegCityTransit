@@ -30,8 +30,6 @@ public class MainActivity extends BaseActivity {
         // TODO "The bottom navigation bar remains in view when navigating through the app’s hierarchy." So we should only have one activity
 
         // TODO pre-load mapfragment to avoid chuggy frame-rate http://stackoverflow.com/questions/26265526/what-makes-my-map-fragment-loading-slow
-
-        // TODO use couchbase lite for local DB http://labs.couchbase.com/couchbase-mobile-portal/develop/training/build-first-android-app/index.html
     }
 
     @Override

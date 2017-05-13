@@ -17,6 +17,8 @@ public class CacheHelper {
 
     /**
      * Convenience method for retrieving cached data.
+     *
+     * @return The cached data, or {@code null} if no data exists under that key or the data is expired.
      */
     @SuppressWarnings("unchecked")
     public static @Nullable

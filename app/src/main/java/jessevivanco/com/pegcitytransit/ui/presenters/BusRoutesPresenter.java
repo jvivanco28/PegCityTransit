@@ -1,7 +1,7 @@
 package jessevivanco.com.pegcitytransit.ui.presenters;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 
 import java.util.List;
 
@@ -28,32 +28,32 @@ public class BusRoutesPresenter {
     private Disposable loadBusRoutesSubscription;
     private ViewContract viewContract;
 
-    private
-    @Nullable
-    BusStopViewModel busStopFilter;
-
     public BusRoutesPresenter(AppComponent injector, ViewContract viewContract) {
         injector.injectInto(this);
         this.viewContract = viewContract;
     }
 
-    @Nullable
-    public BusStopViewModel getBusStopFilter() {
-        return busStopFilter;
-    }
-
-    public void setBusStopFilter(@Nullable BusStopViewModel busStopFilter) {
-        this.busStopFilter = busStopFilter;
-    }
-
-    public void loadBusRoutes() {
+    public void loadAllBusRoutes() {
         dispose(loadBusRoutesSubscription);
 
-        loadBusRoutesSubscription = routesRepository.getRoutesForBusStop(busStopFilter != null ? busStopFilter.getKey() : null)
+        loadBusRoutesSubscription = routesRepository.getAllBusRoutes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        busRoutes -> viewContract.showBusRoutes(busRoutes),
+                        busRoutes -> viewContract.showAllBusRoutes(busRoutes),
+                        throwable -> viewContract.onLoadBusRoutesError(context.getString(R.string.error_loading_bus_routes))
+                );
+    }
+
+
+    public void loadBusRoutesForStop(@NonNull BusStopViewModel busStopFilter) {
+        dispose(loadBusRoutesSubscription);
+
+        loadBusRoutesSubscription = routesRepository.getRoutesForBusStop(busStopFilter.getKey())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        busRoutes -> viewContract.showBusRoutesForStop(busRoutes),
                         throwable -> viewContract.onLoadBusRoutesError(context.getString(R.string.error_loading_bus_routes))
                 );
     }
@@ -66,7 +66,9 @@ public class BusRoutesPresenter {
 
     public interface ViewContract {
 
-        void showBusRoutes(List<BusRouteViewModel> busRoutes);
+        void showAllBusRoutes(List<BusRouteViewModel> busRoutes);
+
+        void showBusRoutesForStop(List<BusRouteViewModel> busRoutes);
 
         void onLoadBusRoutesError(String message);
     }

@@ -12,7 +12,7 @@ import okhttp3.Response;
 
 /**
  * Signs each outgoing request with the API key as an additional query param (let's us avoid having to explicitly add
- * it to each method in <code>WinnipegTransitApi</code>.
+ * it to each method in {@link jessevivanco.com.pegcitytransit.data.rest.RestApi}.
  */
 public class ApiKeySignatureInterceptor implements Interceptor {
 
