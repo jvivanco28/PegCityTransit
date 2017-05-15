@@ -1,7 +1,6 @@
 package jessevivanco.com.pegcitytransit.ui.presenters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import java.util.List;
 
@@ -14,11 +13,10 @@ import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
-import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
-public class BusRoutesPresenter {
+public class BusRoutesListPresenter {
 
-    private static final String TAG = BusRoutesPresenter.class.getSimpleName();
+    private static final String TAG = BusRoutesListPresenter.class.getSimpleName();
 
     @Inject
     BusRoutesRepository routesRepository;
@@ -28,7 +26,7 @@ public class BusRoutesPresenter {
     private Disposable loadBusRoutesSubscription;
     private ViewContract viewContract;
 
-    public BusRoutesPresenter(AppComponent injector, ViewContract viewContract) {
+    public BusRoutesListPresenter(AppComponent injector, ViewContract viewContract) {
         injector.injectInto(this);
         this.viewContract = viewContract;
     }
@@ -45,22 +43,6 @@ public class BusRoutesPresenter {
                 );
     }
 
-
-    public void loadBusRoutesForStop(@NonNull BusStopViewModel busStopFilter) {
-        dispose(loadBusRoutesSubscription);
-
-        loadBusRoutesSubscription = routesRepository.getRoutesForBusStop(busStopFilter.getKey())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        busRoutes -> {
-                            busStopFilter.setRoutes(busRoutes);
-                            viewContract.showBusRoutesForStop(busStopFilter);
-                        },
-                        throwable -> viewContract.showErrorMessage(context.getString(R.string.error_loading_bus_routes))
-                );
-    }
-
     private void dispose(Disposable disposable) {
         if (disposable != null && !disposable.isDisposed()) {
             disposable.dispose();
@@ -70,7 +52,5 @@ public class BusRoutesPresenter {
     public interface ViewContract extends BaseViewContract {
 
         void showAllBusRoutes(List<BusRouteViewModel> busRoutes);
-
-        void showBusRoutesForStop(BusStopViewModel busStop);
     }
 }

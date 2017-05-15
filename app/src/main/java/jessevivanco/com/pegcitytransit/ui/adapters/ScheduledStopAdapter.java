@@ -9,7 +9,7 @@ import org.parceler.Parcels;
 
 import java.util.List;
 
-import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusStopScheduleListPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.ScheduledStopViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
@@ -17,10 +17,10 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<ScheduledStopView
 
     private static final String STATE_KEY_LIST = "list";
 
-    private BusStopSchedulePresenter schedulePresenter;
+    private BusStopScheduleListPresenter schedulePresenter;
     private List<ScheduledStopViewModel> scheduledStops;
 
-    public ScheduledStopAdapter(BusStopSchedulePresenter schedulePresenter, @Nullable Bundle savedInstanceState) {
+    public ScheduledStopAdapter(BusStopScheduleListPresenter schedulePresenter, @Nullable Bundle savedInstanceState) {
         this.schedulePresenter = schedulePresenter;
 
         if (savedInstanceState != null) {
@@ -49,7 +49,7 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<ScheduledStopView
         return scheduledStops != null ? scheduledStops.size() : 0;
     }
 
-    public BusStopSchedulePresenter getSchedulePresenter() {
+    public BusStopScheduleListPresenter getSchedulePresenter() {
         return schedulePresenter;
     }
 

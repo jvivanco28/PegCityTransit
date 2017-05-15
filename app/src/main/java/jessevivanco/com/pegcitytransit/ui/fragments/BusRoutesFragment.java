@@ -20,13 +20,12 @@ import jessevivanco.com.pegcitytransit.ui.AppRouter;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusRoutesAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
-import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesListPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
-import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 @Deprecated
-public class BusRoutesFragment extends BaseFragment implements BusRoutesPresenter.ViewContract, BusRouteCellViewHolder.OnBusRouteCellClickedListener {
+public class BusRoutesFragment extends BaseFragment implements BusRoutesListPresenter.ViewContract, BusRouteCellViewHolder.OnBusRouteCellClickedListener {
 
     private static final String STATE_KEY_VIEW_STATE = "view_state";
 
@@ -46,7 +45,7 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
     TextView loadingText;
 
     private BusRoutesAdapter routesAdapter;
-    private BusRoutesPresenter routesPresenter;
+    private BusRoutesListPresenter routesPresenter;
 
     public static BusRoutesFragment newInstance() {
         return new BusRoutesFragment();
@@ -90,7 +89,7 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
     }
 
     protected void setupAdapter(Bundle savedInstanceState) {
-        routesPresenter = new BusRoutesPresenter(getInjector(), this);
+        routesPresenter = new BusRoutesListPresenter(getInjector(), this);
         routesAdapter = new BusRoutesAdapter(routesPresenter, savedInstanceState, this);
     }
 
@@ -145,11 +144,6 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
 
     @Override
     public void showAllBusRoutes(List<BusRouteViewModel> busRoutes) {
-
-    }
-
-    @Override
-    public void showBusRoutesForStop(BusStopViewModel busStop) {
 
     }
 }

@@ -13,7 +13,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -29,7 +28,7 @@ import jessevivanco.com.pegcitytransit.ui.adapters.ScheduledStopAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
-import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusStopScheduleListPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
@@ -39,7 +38,7 @@ import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 public class BusStopsMapFragment extends BaseFragment implements TransitMapFragment.TransitMapCallbacks,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        BusStopSchedulePresenter.ViewContract {
+        BusStopScheduleListPresenter.ViewContract {
 
     private static final String TAG = BusStopsMapFragment.class.getSimpleName();
     private static final String PERMISSION_DIALOG_TAG = "dialog";
@@ -59,7 +58,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     @BindView(R.id.bottom_sheet_recycler_view)
     RecyclerView stopScheduleRecyclerView;
     ScheduledStopAdapter scheduledStopAdapter;
-    BusStopSchedulePresenter stopSchedulePresenter;
+    BusStopScheduleListPresenter stopSchedulePresenter;
 
     private GoogleApiClient googleApiClient;
     private TransitMapFragment transitMapFragment;
@@ -104,7 +103,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
         stopScheduleBottomSheetBehaviour = BottomSheetBehavior.from(stopScheduleBottomSheetContainer);
         stopScheduleBottomSheetBehaviour.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-        stopSchedulePresenter = new BusStopSchedulePresenter(getInjector(), this);
+        stopSchedulePresenter = new BusStopScheduleListPresenter(getInjector(), this);
         scheduledStopAdapter = new ScheduledStopAdapter(stopSchedulePresenter, savedInstanceState);
 
         stopScheduleRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));

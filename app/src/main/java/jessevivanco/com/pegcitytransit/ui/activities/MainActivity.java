@@ -18,18 +18,11 @@ import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
 import jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment;
-import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
-import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
-import jessevivanco.com.pegcitytransit.ui.presenters.BusStopsPresenter;
-import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
-import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
-import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
-public class MainActivity extends BaseActivity implements BusStopsPresenter.ViewContract,
-        BusRoutesPresenter.ViewContract,
-        TransitMapFragment.TransitMapCallbacks,
-        BusRouteCellViewHolder.OnBusRouteCellClickedListener {
+public class MainActivity extends BaseActivity implements TransmitMapPresenter.ViewContract,
+        TransitMapFragment.TransitMapCallbacks {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String STATE_KEY_SELECTED_TAB = "selected_tab";
@@ -49,9 +42,7 @@ public class MainActivity extends BaseActivity implements BusStopsPresenter.View
     private int mapSearchRadius;
 
     private TransitMapFragment transitMapFragment;
-
-    private BusStopsPresenter stopsPresenter;
-    private BusRoutesPresenter routesPresenter;
+    private TransmitMapPresenter transmitMapPresenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,7 +52,6 @@ public class MainActivity extends BaseActivity implements BusStopsPresenter.View
         // TODO check service advisories on startup
         mapSearchRadius = getResources().getInteger(R.integer.default_map_search_radius);
         setupMap(savedInstanceState);
-        setupPresenters();
         setupBottomNav(savedInstanceState);
     }
 
@@ -82,6 +72,7 @@ public class MainActivity extends BaseActivity implements BusStopsPresenter.View
             transitMapFragment = (TransitMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment_container);
             transitMapFragment.setTransitMapCallbacks(this);
         }
+        transmitMapPresenter = new TransmitMapPresenter(getInjector(), this);
     }
 
     private void setupBottomNav(@Nullable Bundle savedInstanceState) {
@@ -115,21 +106,6 @@ public class MainActivity extends BaseActivity implements BusStopsPresenter.View
         });
     }
 
-    private void setupPresenters() {
-        stopsPresenter = new BusStopsPresenter(getInjector(), this);
-        routesPresenter = new BusRoutesPresenter(getInjector(), this);
-    }
-
-    /**
-     * Bus routes for the provided <code>busStop</code> have been loaded. Find the bus stop in
-     * our Marker-BusStop HashMap, plug the routes into that BusStop, then refresh the info window
-     * for the bus stop marker. This will end up displaying the bus routes in the info window.
-     */
-    @Override
-    public void showAllBusRoutes(List<BusRouteViewModel> busRoutes) {
-//        busRoutesAdapter.setBusRoutes(busRoutes);
-    }
-
     @Override
     public void showBusRoutesForStop(BusStopViewModel busStop) {
         // The BusStopViewModel should now contain the list of bus routes that stop at that bus stop.
@@ -149,12 +125,9 @@ public class MainActivity extends BaseActivity implements BusStopsPresenter.View
     @Override
     public void onBusStopMarkerClicked(BusStopViewModel busStopViewModel) {
 
-        // TODO
-        // Allow the bottom sheet to peek up slightly so we can see the bus stop schedule.
-
         // If the bus stop doesn't have the routes loaded yet, then fetch them and refresh the info window.
         if (busStopViewModel.getRoutes() == null || busStopViewModel.getRoutes().size() == 0) {
-            routesPresenter.loadBusRoutesForStop(busStopViewModel);
+            transmitMapPresenter.loadBusRoutesForStop(busStopViewModel);
         }
     }
 
@@ -166,11 +139,6 @@ public class MainActivity extends BaseActivity implements BusStopsPresenter.View
     @Override
     public void showErrorMessage(String msg) {
         Snackbar.make(mapFragmentContainer, msg, Snackbar.LENGTH_LONG);
-    }
-
-    @Override
-    public void onBusRouteCellClicked(BusRouteViewModel busRoute) {
-        // TODO load bus stops for bus route and display them in the map.
     }
 
     @Override
@@ -188,7 +156,7 @@ public class MainActivity extends BaseActivity implements BusStopsPresenter.View
 
         if (transitMapFragment.isMapReady()) {
             LatLng cameraPosition = transitMapFragment.getCameraPosition();
-            stopsPresenter.loadBusStopsAroundCoordinates(cameraPosition.latitude, cameraPosition.longitude, mapSearchRadius);
+            transmitMapPresenter.loadBusStopsAroundCoordinates(cameraPosition.latitude, cameraPosition.longitude, mapSearchRadius);
             transitMapFragment.drawSearchRadius(cameraPosition.latitude, cameraPosition.longitude, mapSearchRadius);
         } else {
             Log.w(TAG, "Map not ready!");

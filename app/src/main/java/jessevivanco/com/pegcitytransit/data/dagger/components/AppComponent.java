@@ -12,9 +12,9 @@ import jessevivanco.com.pegcitytransit.ui.activities.BusRouteMapActivity;
 import jessevivanco.com.pegcitytransit.ui.fragments.BusRoutesFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.BusStopsMapFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment;
-import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
-import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
-import jessevivanco.com.pegcitytransit.ui.presenters.BusStopsPresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesListPresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusStopScheduleListPresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 
 /**
  * The bridge between our dependencies and our targets
@@ -39,10 +39,10 @@ public interface AppComponent {
 
     void injectInto(BusRoutesFragment target);
 
-    void injectInto(BusStopsPresenter target);
+    void injectInto(TransmitMapPresenter target);
 
-    void injectInto(BusRoutesPresenter target);
+    void injectInto(BusRoutesListPresenter target);
 
-    void injectInto(BusStopSchedulePresenter target);
+    void injectInto(BusStopScheduleListPresenter target);
 
 }

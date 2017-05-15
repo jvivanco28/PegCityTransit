@@ -20,12 +20,12 @@ import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
 import jessevivanco.com.pegcitytransit.ui.adapters.ScheduledStopAdapter;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
-import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusStopScheduleListPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
 @Deprecated
-public class BusStopScheduleActivity extends BaseActivity implements BusStopSchedulePresenter.ViewContract, SwipeRefreshLayout.OnRefreshListener {
+public class BusStopScheduleActivity extends BaseActivity implements BusStopScheduleListPresenter.ViewContract, SwipeRefreshLayout.OnRefreshListener {
 
     public static final String ARG_KEY_BUS_STOP = "bus_stop";
 
@@ -42,7 +42,7 @@ public class BusStopScheduleActivity extends BaseActivity implements BusStopSche
     RecyclerView recyclerView;
 
     ScheduledStopAdapter scheduledStopAdapter;
-    BusStopSchedulePresenter stopSchedulePresenter;
+    BusStopScheduleListPresenter stopSchedulePresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +89,7 @@ public class BusStopScheduleActivity extends BaseActivity implements BusStopSche
     }
 
     private void setupAdapter(Bundle savedInstanceState) {
-        stopSchedulePresenter = new BusStopSchedulePresenter(getInjector(), this);
+        stopSchedulePresenter = new BusStopScheduleListPresenter(getInjector(), this);
         scheduledStopAdapter = new ScheduledStopAdapter(stopSchedulePresenter, savedInstanceState);
     }
 

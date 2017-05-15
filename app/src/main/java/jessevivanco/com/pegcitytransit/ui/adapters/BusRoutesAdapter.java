@@ -9,7 +9,7 @@ import org.parceler.Parcels;
 
 import java.util.List;
 
-import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesListPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
@@ -18,12 +18,12 @@ public class BusRoutesAdapter extends RecyclerView.Adapter<BusRouteCellViewHolde
 
     private static final String STATE_KEY_LIST = "list";
 
-    private BusRoutesPresenter busRoutesPresenter;
+    private BusRoutesListPresenter busRoutesPresenter;
     private BusRouteCellViewHolder.OnBusRouteCellClickedListener onBusRouteCellClickedListener;
 
     private List<BusRouteViewModel> busRoutes;
 
-    public BusRoutesAdapter(BusRoutesPresenter busRoutesPresenter,
+    public BusRoutesAdapter(BusRoutesListPresenter busRoutesPresenter,
                             @Nullable Bundle savedInstanceState,
                             BusRouteCellViewHolder.OnBusRouteCellClickedListener onBusRouteCellClickedListener) {
 
@@ -54,7 +54,7 @@ public class BusRoutesAdapter extends RecyclerView.Adapter<BusRouteCellViewHolde
         return busRoutes != null ? busRoutes.size() : 0;
     }
 
-    public BusRoutesPresenter getBusRoutesPresenter() {
+    public BusRoutesListPresenter getBusRoutesPresenter() {
         return busRoutesPresenter;
     }
 

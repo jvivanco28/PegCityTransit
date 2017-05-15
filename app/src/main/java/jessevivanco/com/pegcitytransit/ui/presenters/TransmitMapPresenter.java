@@ -13,11 +13,12 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
+import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
-public class BusStopsPresenter {
+public class TransmitMapPresenter {
 
     /**
      * Default lat and long will only be used if the user has GPS disabled.
@@ -29,13 +30,15 @@ public class BusStopsPresenter {
     @Inject
     BusStopRepository stopsRepository;
     @Inject
+    BusRoutesRepository routesRepository;
+    @Inject
     Context context;
 
     private ViewContract viewContract;
 
-    private Disposable loadBusStopsSubscription;
+    private Disposable subscription;
 
-    public BusStopsPresenter(AppComponent injector, ViewContract viewContract) {
+    public TransmitMapPresenter(AppComponent injector, ViewContract viewContract) {
         injector.injectInto(this);
 
         this.viewContract = viewContract;
@@ -49,10 +52,10 @@ public class BusStopsPresenter {
 
     public void loadBusStopsAroundCoordinates(@Nullable Double latitude, @Nullable Double longitude, @Nullable Integer radius) {
 
-        dispose(loadBusStopsSubscription);
+        dispose(subscription);
 
         // NOTE: If lat, long, and radius are not supplied, then we just resort to the default values.
-        loadBusStopsSubscription = stopsRepository.getBusStopsNearLocation(
+        subscription = stopsRepository.getBusStopsNearLocation(
                 latitude != null ? latitude : DEFAULT_LAT,
                 longitude != null ? longitude : DEFAULT_LONG,
                 radius != null ? radius : DEFAULT_RADIUS)
@@ -73,10 +76,25 @@ public class BusStopsPresenter {
                 );
     }
 
-    public void loadBusStopsForBusRoute(@NonNull BusRouteViewModel route) {
-        dispose(loadBusStopsSubscription);
+    public void loadBusRoutesForStop(@NonNull BusStopViewModel busStopFilter) {
+        dispose(subscription);
 
-        loadBusStopsSubscription = stopsRepository.getBusStopsForRoute(route.getKey())
+        subscription = routesRepository.getRoutesForBusStop(busStopFilter.getKey())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        busRoutes -> {
+                            busStopFilter.setRoutes(busRoutes);
+                            viewContract.showBusRoutesForStop(busStopFilter);
+                        },
+                        throwable -> viewContract.showErrorMessage(context.getString(R.string.error_loading_bus_routes))
+                );
+    }
+
+    public void loadBusStopsForBusRoute(@NonNull BusRouteViewModel route) {
+        dispose(subscription);
+
+        subscription = stopsRepository.getBusStopsForRoute(route.getKey())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -103,5 +121,8 @@ public class BusStopsPresenter {
     public interface ViewContract extends BaseViewContract {
 
         void showBusStops(List<BusStopViewModel> busStops);
+
+        void showBusRoutesForStop(BusStopViewModel busStop);
+
     }
 }

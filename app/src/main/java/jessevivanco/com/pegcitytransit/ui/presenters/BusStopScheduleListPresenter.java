@@ -19,7 +19,7 @@ import jessevivanco.com.pegcitytransit.data.repositories.BusStopScheduleReposito
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
-public class BusStopSchedulePresenter {
+public class BusStopScheduleListPresenter {
 
     @Inject
     BusStopScheduleRepository scheduleRepository;
@@ -29,8 +29,8 @@ public class BusStopSchedulePresenter {
     private ViewContract viewContract;
     private Disposable loadScheduleSubscription;
 
-    public BusStopSchedulePresenter(AppComponent injector,
-                                    ViewContract viewContract) {
+    public BusStopScheduleListPresenter(AppComponent injector,
+                                        ViewContract viewContract) {
         injector.injectInto(this);
         this.viewContract = viewContract;
     }
