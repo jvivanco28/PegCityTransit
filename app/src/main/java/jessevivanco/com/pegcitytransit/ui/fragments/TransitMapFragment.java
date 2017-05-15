@@ -109,13 +109,6 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     }
 
     /**
-     * Clears all markers on the map.
-     */
-    private void clearMarkers() {
-        busStopInfoWindowAdapter.clearMarkers();
-    }
-
-    /**
      * Gets the LatLngBounds of a circle given the center and radius of the circle.
      * See <a href="http://stackoverflow.com/questions/15319431/how-to-convert-a-latlng-and-a-radius-to-a-latlngbounds-in-android-google-maps-ap">this</a> Stack Overflow post.
      *
@@ -128,6 +121,13 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         LatLng southwest = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 225);
         LatLng northeast = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 45);
         return new LatLngBounds(southwest, northeast);
+    }
+
+    /**
+     * Clears all markers on the map.
+     */
+    public void clearMarkers() {
+        busStopInfoWindowAdapter.clearMarkers();
     }
 
     public void setTransitMapCallbacks(TransitMapCallbacks transitMapCallbacks) {
@@ -270,8 +270,12 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
 
         // Display the bus stop info
         busStopInfoWindow.showBusStopInfo(busStop);
-        transitMapCallbacks.onBusStopMarkerClicked(busStop);
+        transitMapCallbacks.showBusStopSchedule(busStop);
 
+        // If the bus stop doesn't have the routes loaded yet, then fetch them and refresh the info window.
+        if (busStop.getRoutes() == null || busStop.getRoutes().size() == 0) {
+            transitMapCallbacks.loadBusRoutesForStop(busStop);
+        }
         return busStopInfoWindow;
     }
 
@@ -280,7 +284,9 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
 
         void onMapReady();
 
-        void onBusStopMarkerClicked(BusStopViewModel busStopViewModel);
+        void showBusStopSchedule(BusStopViewModel busStopViewModel);
+
+        void loadBusRoutesForStop(BusStopViewModel busStopViewModel);
 
         void onBusStopInfoWindowClicked(BusStopViewModel busStopViewModel);
     }

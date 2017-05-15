@@ -42,15 +42,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key"/>
 
-        <activity
-            android:name=".ui.activities.BusStopScheduleActivity"
-            android:parentActivityName=".ui.activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
-        <activity
-            android:name=".ui.activities.BusRouteMapActivity"
-            android:parentActivityName=".ui.activities.MainActivity"/>
-
     </application>
 
 </manifest>

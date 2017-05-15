@@ -61,6 +61,7 @@ public class TransmitMapPresenter {
                 radius != null ? radius : DEFAULT_RADIUS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable ->  viewContract.clearMarkersAndShowSearchRadius(latitude, longitude, radius))
                 .subscribe(
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
@@ -128,5 +129,6 @@ public class TransmitMapPresenter {
 
         void showBusRoutesForStop(BusStopViewModel busStop);
 
+        void clearMarkersAndShowSearchRadius(Double latitude, Double longitude, Integer searchRadius);
     }
 }

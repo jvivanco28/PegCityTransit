@@ -3,9 +3,11 @@ package jessevivanco.com.pegcitytransit.ui.activities;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -26,6 +28,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String STATE_KEY_SELECTED_TAB = "selected_tab";
+    private static final String STATE_KEY_BOTTOM_SHEET_STATE = "bottom_sheet_state";
 
     @BindView(R.id.map_fragment_container)
     FrameLayout mapFragmentContainer;
@@ -38,6 +41,10 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
     @BindView(R.id.tab_navigation)
     BottomNavigationView bottomNavigation;
+
+    @BindView(R.id.bottom_sheet_container)
+    ViewGroup bottomSheetContainer;
+    BottomSheetBehavior bottomSheetBehavior;
 
     private int mapSearchRadius;
 
@@ -53,6 +60,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         mapSearchRadius = getResources().getInteger(R.integer.default_map_search_radius);
         setupMap(savedInstanceState);
         setupBottomNav(savedInstanceState);
+        setupBottomSheet(savedInstanceState);
     }
 
     @Override
@@ -103,16 +111,27 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
                     break;
             }
-            return false;
-
-            // TODO peek up bottom sheet
-            // TODO kill previous subscriptions when switching tabs.
+            return true;
         });
-        // Setting a nav item reselected listener will prevent reselects from triggering the above
-        // listener. We only want to kill a previous REST call when switching tabs. Reselects
-        // shouldn't kill subscriptions.
+
         bottomNavigation.setOnNavigationItemReselectedListener(item -> {
-            Log.v("DEUBG", "reselected " + item.getTitle());
+            // Not doing anything here. Setting a nav item reselected listener will prevent
+            // reselects from triggering the above listener. We only want to kill a previous REST
+            // call when switching tabs. Reselects shouldn't kill subscriptions.
+        });
+    }
+
+    private void setupBottomSheet(@Nullable Bundle savedInstanceState) {
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer);
+        bottomSheetBehavior.setState(savedInstanceState != null ?
+                savedInstanceState.getInt(STATE_KEY_BOTTOM_SHEET_STATE, BottomSheetBehavior.STATE_HIDDEN) :
+                BottomSheetBehavior.STATE_HIDDEN);
+
+        // TODO TEST
+        mapFragmentContainer.post(() -> {
+
+            Log.v("DEBUG", "height " + mapFragmentContainer.getHeight() + " -- adf " + (mapFragmentContainer.getHeight() / 2));
+            bottomSheetBehavior.setPeekHeight((mapFragmentContainer.getHeight() / 2) + getResources().getDimensionPixelSize(R.dimen.action_bar_height));
         });
     }
 
@@ -133,29 +152,36 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     }
 
     @Override
-    public void onBusStopMarkerClicked(BusStopViewModel busStopViewModel) {
+    public void showBusStopSchedule(BusStopViewModel busStopViewModel) {
+        // Slightly open the bottom sheet so that we can display the bus stop's schedule.
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+    }
 
-        // If the bus stop doesn't have the routes loaded yet, then fetch them and refresh the info window.
-        if (busStopViewModel.getRoutes() == null || busStopViewModel.getRoutes().size() == 0) {
-            transmitMapPresenter.loadBusRoutesForStop(busStopViewModel);
-        }
+    @Override
+    public void loadBusRoutesForStop(BusStopViewModel busStopViewModel) {
+        transmitMapPresenter.loadBusRoutesForStop(busStopViewModel);
     }
 
     @Override
     public void onBusStopInfoWindowClicked(BusStopViewModel busStopViewModel) {
-        // TODO show bottom sheet with schedule
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     @Override
     public void showErrorMessage(String msg) {
-        Snackbar.make(mapFragmentContainer, msg, Snackbar.LENGTH_LONG);
+        Snackbar.make(mapFragmentContainer, msg, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         outState.putInt(STATE_KEY_SELECTED_TAB, bottomNavigation.getSelectedItemId());
+    }
+
+    @Override
+    public void clearMarkersAndShowSearchRadius(Double latitude, Double longitude, Integer searchRadius) {
+        transitMapFragment.clearMarkers();
+        transitMapFragment.drawSearchRadius(latitude, longitude, mapSearchRadius);
     }
 
     /**
@@ -167,7 +193,6 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         if (transitMapFragment.isMapReady()) {
             LatLng cameraPosition = transitMapFragment.getCameraPosition();
             transmitMapPresenter.loadBusStopsAroundCoordinates(cameraPosition.latitude, cameraPosition.longitude, mapSearchRadius);
-            transitMapFragment.drawSearchRadius(cameraPosition.latitude, cameraPosition.longitude, mapSearchRadius);
         } else {
             Log.w(TAG, "Map not ready!");
         }

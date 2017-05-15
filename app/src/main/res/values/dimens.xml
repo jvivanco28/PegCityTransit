@@ -18,13 +18,14 @@
     <dimen name="material_spacing_small">8dp</dimen>
     <dimen name="material_spacing_x_small">4dp</dimen>
 
+    <dimen name="action_bar_height">56dp</dimen>
+    <dimen name="fab_size">56dp</dimen>
+
     <dimen name="horizontal_list_cell_width">150dp</dimen>
     <dimen name="horizontal_list_height">150dp</dimen>
 
     <dimen name="map_cover_image_width">400dp</dimen>
     <dimen name="map_cover_image_height">400dp</dimen>
-
-    <dimen name="fab_size">56dp</dimen>
 
     <dimen name="map_search_border_width">@dimen/material_spacing_small</dimen>
 

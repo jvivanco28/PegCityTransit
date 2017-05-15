@@ -8,6 +8,7 @@ import com.iainconnor.objectcache.CacheManager;
 import com.squareup.phrase.Phrase;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -22,6 +23,7 @@ public class BusStopRepository {
 
     // Routes change from time to time.
     private static final int CACHE_EXPIRY = CacheManager.ExpiryTimes.ONE_DAY.asSeconds();
+    private static final String CACHE_KEY_SAVED_STOPS = "saved_stops";
 
     private Context context;
     private RestApi restApi;
@@ -81,4 +83,21 @@ public class BusStopRepository {
             }
         });
     }
+
+    public Single<List<BusStopViewModel>> getSavedBusStops() {
+        return Single.defer(() -> {
+
+            // Grab the cached list of bus stops.
+            List<BusStopViewModel> savedBusStops = CacheHelper.getFromCache(cacheManager,
+                    CACHE_KEY_SAVED_STOPS,
+                    butStopsTypeToken);
+
+            return savedBusStops != null ?
+                    Single.just(savedBusStops) :
+                    // We can't return null, so just return an empty list if we don't have any saved stops.
+                    Single.just(new ArrayList<>());
+        });
+    }
+
+
 }
