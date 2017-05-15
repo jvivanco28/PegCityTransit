@@ -25,14 +25,16 @@ public class BusRouteMapActivity extends BaseActivity implements TransitMapFragm
         if (savedInstanceState == null) {
             Log.v("DEBUG", "111");
 
-            transitMapFragment = TransitMapFragment.newInstance(this);
+//            transitMapFragment = TransitMapFragment.newInstance(this);
+            transitMapFragment = new TransitMapFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, transitMapFragment).commit();
         } else {
             Log.v("DEBUG", "222");
 
             transitMapFragment = (TransitMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-            transitMapFragment.setTransitMapCallbacks(this);
+//            transitMapFragment.setTransitMapCallbacks(this);
         }
+        transitMapFragment.setTransitMapCallbacks(this);
     }
 
     @Override
@@ -44,11 +46,16 @@ public class BusRouteMapActivity extends BaseActivity implements TransitMapFragm
     @Override
     public void onMapReady() {
         // TODO need to handle orientation changes
-        transitMapFragment.loadBusStopsForBusRoute(Parcels.unwrap(getIntent().getParcelableExtra(ARG_KEY_BUS_ROUTE)));
+//        transitMapFragment.loadBusStopsForBusRoute(Parcels.unwrap(getIntent().getParcelableExtra(ARG_KEY_BUS_ROUTE)));
     }
 
     @Override
-    public void showStopSchedule(BusStopViewModel busStopViewModel) {
-        // TODO
+    public void onBusStopMarkerClicked(BusStopViewModel busStopViewModel) {
+
+    }
+
+    @Override
+    public void onBusStopInfoWindowClicked(BusStopViewModel busStopViewModel) {
+
     }
 }

@@ -23,7 +23,9 @@ import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecor
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
+@Deprecated
 public class BusRoutesFragment extends BaseFragment implements BusRoutesPresenter.ViewContract, BusRouteCellViewHolder.OnBusRouteCellClickedListener {
 
     private static final String STATE_KEY_VIEW_STATE = "view_state";
@@ -75,7 +77,7 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
             routesRecyclerView.setVisibility(View.GONE);
             loadingViewContainer.setVisibility(View.VISIBLE);
 
-            routesPresenter.loadBusRoutes();
+            routesPresenter.loadAllBusRoutes();
         }
     }
 
@@ -112,24 +114,42 @@ public class BusRoutesFragment extends BaseFragment implements BusRoutesPresente
         appRouter.goToBusRouteMapScreen(getActivity(), busRoute);
     }
 
-    /**
-     * Bus Routes were loaded. Display them.
-     *
-     * @param routes
-     */
+//    /**
+//     * Bus Routes were loaded. Display them.
+//     *
+//     * @param routes
+//     */
+//    @Override
+//    public void showBusRoutes(List<BusRouteViewModel> routes) {
+//        routesRecyclerView.setVisibility(View.VISIBLE);
+//        loadingViewContainer.setVisibility(View.GONE);
+//
+//        routesAdapter.setBusRoutes(routes);
+//    }
+//
+//    @Override
+//    public void onLoadBusRoutesError(String message) {
+//        routesRecyclerView.setVisibility(View.VISIBLE);
+//        loadingViewContainer.setVisibility(View.GONE);
+//
+//        Snackbar.make(rootContainer, message, Snackbar.LENGTH_LONG).show();
+//    }
+
     @Override
-    public void showBusRoutes(List<BusRouteViewModel> routes) {
+    public void showErrorMessage(String msg) {
         routesRecyclerView.setVisibility(View.VISIBLE);
         loadingViewContainer.setVisibility(View.GONE);
 
-        routesAdapter.setBusRoutes(routes);
+        Snackbar.make(rootContainer, msg, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
-    public void onLoadBusRoutesError(String message) {
-        routesRecyclerView.setVisibility(View.VISIBLE);
-        loadingViewContainer.setVisibility(View.GONE);
+    public void showAllBusRoutes(List<BusRouteViewModel> busRoutes) {
 
-        Snackbar.make(rootContainer, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showBusRoutesForStop(BusStopViewModel busStop) {
+
     }
 }

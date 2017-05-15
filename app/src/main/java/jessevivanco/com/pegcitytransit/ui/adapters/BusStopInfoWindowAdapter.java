@@ -1,10 +1,7 @@
 package jessevivanco.com.pegcitytransit.ui.adapters;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
-import android.view.View;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -18,28 +15,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
-import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
-import jessevivanco.com.pegcitytransit.ui.views.BusStopInfoWindow;
 
-public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap.OnInfoWindowCloseListener {
+public class BusStopInfoWindowAdapter {
 
-    private static final String TAG = BusStopInfoWindowAdapter.class.getSimpleName();
     private static final String STATE_BUS_STOPS = "bus_stops";
-
-    // Just re-use the same view and change its contents.
-    private BusStopInfoWindow busStopInfoWindow;
-
-    private BusRoutesPresenter busRoutesPresenter;
 
     private List<BusStopViewModel> busStops;
     private Map<Marker, BusStopViewModel> markerToBusStopHashMap;
 
-    public BusStopInfoWindowAdapter(Context context, BusRoutesPresenter busRoutesPresenter, @Nullable Bundle savedInstanceState) {
-        this.busStopInfoWindow = new BusStopInfoWindow(context);
-        this.busRoutesPresenter = busRoutesPresenter;
-
+    public BusStopInfoWindowAdapter(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             busStops = Parcels.unwrap(savedInstanceState.getParcelable(STATE_BUS_STOPS));
         }
@@ -47,43 +32,6 @@ public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Go
 
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(STATE_BUS_STOPS, Parcels.wrap(busStops));
-    }
-
-    @Override
-    public View getInfoWindow(Marker marker) {
-        // Use the default window frame.
-        return null;
-    }
-
-    /**
-     * A marker has been clicked, so we show the bus stop information for that marker. Implicitly
-     * loads the list of bus routes for that bus stop.
-     *
-     * @param marker
-     * @return
-     */
-    @Override
-    public BusStopInfoWindow getInfoContents(Marker marker) {
-
-        Log.v("DEBUG", "tapped marker");
-
-        // Lookup the bus stop.
-        BusStopViewModel busStop = markerToBusStopHashMap.get(marker);
-
-        // TODO keep a reference to this bus stop. add saveInstanceState and restoreInstanceState methods. Add a busStopToMarker lookup method. on restore, show the info window is the busStop model is non-null.
-
-        // Display the bus stop info
-        busStopInfoWindow.showBusStopInfo(busStop);
-
-        // If we don't have the routes loaded for this bus stop, then load and display them.
-        if (busStop != null && busStop.getRoutes() == null) {
-            busRoutesPresenter.setBusStopFilter(busStop);
-            busRoutesPresenter.loadBusRoutes();
-        } else {
-            // TODO report this
-            Log.e(TAG, "Error. No bus stop for selected marker!");
-        }
-        return busStopInfoWindow;
     }
 
     public void clearMarkers() {
@@ -137,19 +85,9 @@ public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Go
         return latLngBoundsBuilder.build();
     }
 
-    @Override
-    public void onInfoWindowClose(Marker marker) {
-
-        // TODO
-    }
-
-    /**
-     * TODO DOC
-     *
-     * @param busStop
-     * @param busRoutes
-     */
-    public void showRoutesAtBusStopInfoWindow(BusStopViewModel busStop, List<BusRouteViewModel> busRoutes) {
+    // TODO
+    public void showInfoWindowForBusStop(BusStopViewModel busStop) {
+//                                            List<BusRouteViewModel> busRoutes) {
         // Add the routes to the bus stop POJO, then re-open the marker for that bus stop.
 
         // FYI: We have to do a reverse lookup b/c we don't currently know the marker for the bus stop.
@@ -158,15 +96,15 @@ public class BusStopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, Go
 
                 // Found the target marker-stop pair. Attach the routes to the bus stop, refresh the
                 // info window, then bust out of this loop.
-                entry.getValue().setRoutes(busRoutes);
+//                entry.getValue().setRoutes(busRoutes);
                 entry.getKey().showInfoWindow();
                 break;
             }
         }
     }
 
-    public @Nullable
-    List<BusStopViewModel> getBusStops() {
+    @Nullable
+    public List<BusStopViewModel> getBusStops() {
         return busStops;
     }
 

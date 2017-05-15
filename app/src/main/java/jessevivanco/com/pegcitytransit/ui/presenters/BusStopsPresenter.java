@@ -61,14 +61,14 @@ public class BusStopsPresenter {
                 .subscribe(
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
-                                viewContract.showBusStops(busStops, true);
+                                viewContract.showBusStops(busStops);
                             } else {
-                                viewContract.errorLoadingBusStops(context.getString(R.string.no_bus_stops_in_that_area));
+                                viewContract.showErrorMessage(context.getString(R.string.no_bus_stops_in_that_area));
                             }
                         },
                         throwable -> {
                             // TODO handle error
-                            viewContract.errorLoadingBusStops(context.getString(R.string.generic_error));
+                            viewContract.showErrorMessage(context.getString(R.string.generic_error));
                         }
                 );
     }
@@ -82,14 +82,14 @@ public class BusStopsPresenter {
                 .subscribe(
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
-                                viewContract.showBusStops(busStops, true);
+                                viewContract.showBusStops(busStops);
                             } else {
-                                viewContract.errorLoadingBusStops(context.getString(R.string.no_bus_stops_in_that_area));
+                                viewContract.showErrorMessage(context.getString(R.string.no_bus_stops_in_that_area));
                             }
                         },
                         throwable -> {
                             // TODO handle error
-                            viewContract.errorLoadingBusStops(context.getString(R.string.generic_error));
+                            viewContract.showErrorMessage(context.getString(R.string.generic_error));
                         }
                 );
     }
@@ -100,10 +100,8 @@ public class BusStopsPresenter {
         }
     }
 
-    public interface ViewContract {
+    public interface ViewContract extends BaseViewContract {
 
-        void showBusStops(List<BusStopViewModel> busStops, boolean animateCamera);
-
-        void errorLoadingBusStops(String message);
+        void showBusStops(List<BusStopViewModel> busStops);
     }
 }

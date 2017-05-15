@@ -128,8 +128,8 @@ public class BusStopScheduleActivity extends BaseActivity implements BusStopSche
     }
 
     @Override
-    public void showErrorLoadingScheduleMessage(String message) {
-        Snackbar.make(swipeRefreshLayout, message, Snackbar.LENGTH_LONG).show();
+    public void showErrorMessage(String msg) {
+        Snackbar.make(swipeRefreshLayout, msg, Snackbar.LENGTH_LONG).show();
         swipeRefreshLayout.setRefreshing(false);
     }
 }

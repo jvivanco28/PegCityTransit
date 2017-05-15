@@ -41,7 +41,7 @@ public class BusRoutesPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         busRoutes -> viewContract.showAllBusRoutes(busRoutes),
-                        throwable -> viewContract.onLoadBusRoutesError(context.getString(R.string.error_loading_bus_routes))
+                        throwable -> viewContract.showErrorMessage(context.getString(R.string.error_loading_bus_routes))
                 );
     }
 
@@ -53,8 +53,11 @@ public class BusRoutesPresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        busRoutes -> viewContract.showBusRoutesForStop(busRoutes),
-                        throwable -> viewContract.onLoadBusRoutesError(context.getString(R.string.error_loading_bus_routes))
+                        busRoutes -> {
+                            busStopFilter.setRoutes(busRoutes);
+                            viewContract.showBusRoutesForStop(busStopFilter);
+                        },
+                        throwable -> viewContract.showErrorMessage(context.getString(R.string.error_loading_bus_routes))
                 );
     }
 
@@ -64,12 +67,10 @@ public class BusRoutesPresenter {
         }
     }
 
-    public interface ViewContract {
+    public interface ViewContract extends BaseViewContract {
 
         void showAllBusRoutes(List<BusRouteViewModel> busRoutes);
 
-        void showBusRoutesForStop(List<BusRouteViewModel> busRoutes);
-
-        void onLoadBusRoutesError(String message);
+        void showBusRoutesForStop(BusStopViewModel busStop);
     }
 }

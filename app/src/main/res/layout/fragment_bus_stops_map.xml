@@ -43,7 +43,7 @@
     </LinearLayout>
 
     <FrameLayout
-        android:id="@+id/stop_schedule_container"
+        android:id="@+id/bottom_sheet_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorAccent"
@@ -55,7 +55,7 @@
         app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/stop_schedule_recycler_view"
+            android:id="@+id/bottom_sheet_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

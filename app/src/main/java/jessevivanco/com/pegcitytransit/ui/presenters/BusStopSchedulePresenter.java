@@ -65,7 +65,7 @@ public class BusStopSchedulePresenter {
                         }, throwable -> {
                             // TODO handle error
                             Log.e("DEBUG", "wtf!", throwable);
-                            viewContract.showErrorLoadingScheduleMessage(context.getString(R.string.error_loading_schedule));
+                            viewContract.showErrorMessage(context.getString(R.string.error_loading_schedule));
                         }
                 );
     }
@@ -77,10 +77,8 @@ public class BusStopSchedulePresenter {
         }
     }
 
-    public interface ViewContract {
+    public interface ViewContract extends BaseViewContract {
 
         void showScheduledStops(List<ScheduledStopViewModel> scheduledStops);
-
-        void showErrorLoadingScheduleMessage(String message);
     }
 }

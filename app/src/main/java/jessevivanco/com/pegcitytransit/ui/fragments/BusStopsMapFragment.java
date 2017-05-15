@@ -2,7 +2,6 @@ package jessevivanco.com.pegcitytransit.ui.fragments;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,7 +11,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
@@ -37,6 +35,7 @@ import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
+@Deprecated
 public class BusStopsMapFragment extends BaseFragment implements TransitMapFragment.TransitMapCallbacks,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -53,11 +52,11 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     @BindView(R.id.my_location_button)
     FloatingActionButton myLocationButton;
 
-    @BindView(R.id.stop_schedule_container)
+    @BindView(R.id.bottom_sheet_container)
     ViewGroup stopScheduleBottomSheetContainer;
     BottomSheetBehavior stopScheduleBottomSheetBehaviour;
 
-    @BindView(R.id.stop_schedule_recycler_view)
+    @BindView(R.id.bottom_sheet_recycler_view)
     RecyclerView stopScheduleRecyclerView;
     ScheduledStopAdapter scheduledStopAdapter;
     BusStopSchedulePresenter stopSchedulePresenter;
@@ -80,15 +79,17 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
         ButterKnife.bind(this, view);
 
         if (savedInstanceState == null) {
-            transitMapFragment = TransitMapFragment.newInstance(this);
+//            transitMapFragment = TransitMapFragment.newInstance(this);
+            transitMapFragment = new TransitMapFragment();
             getChildFragmentManager().beginTransaction().add(R.id.map_fragment_container, transitMapFragment).commit();
         } else {
             initialLoadFinished = savedInstanceState.getBoolean(STATE_KEY_INITIAL_LOAD_FINISHED, false);
             googleApiClientInitialized = savedInstanceState.getBoolean(STATE_KEY_GOOGLE_API_CLIENT_INITIALIZED, false);
 
             transitMapFragment = (TransitMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment_container);
-            transitMapFragment.setTransitMapCallbacks(this);
+//            transitMapFragment.setTransitMapCallbacks(this);
         }
+        transitMapFragment.setTransitMapCallbacks(this);
         setupBottomSheet(savedInstanceState);
         setupGoogleApiClient();
         setupMyLocationButton(savedInstanceState);
@@ -130,7 +131,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     private void setupMyLocationButton(@Nullable Bundle savedInstanceState) {
         // If we have access to the user's location, then show the "my location" button.
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && myLocationButton.getVisibility() != View.VISIBLE) {
-            showMyLocationButton(savedInstanceState == null);
+//            showMyLocationButton(savedInstanceState == null);
         }
     }
 
@@ -189,11 +190,11 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
         loadBusStopsAtUserLocationIfReady(false);
     }
 
-    @Override
-    public void showStopSchedule(BusStopViewModel busStopViewModel) {
-        stopSchedulePresenter.loadScheduleForBusStop(busStopViewModel.getKey());
-        stopScheduleBottomSheetBehaviour.setState(BottomSheetBehavior.STATE_COLLAPSED);
-    }
+//    @Override
+//    public void showStopSchedule(BusStopViewModel busStopViewModel) {
+//        stopSchedulePresenter.loadScheduleForBusStop(busStopViewModel.getKey());
+//        stopScheduleBottomSheetBehaviour.setState(BottomSheetBehavior.STATE_COLLAPSED);
+//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -207,7 +208,7 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
         if (PermissionUtils.isPermissionGranted(permissions, grantResults,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-            showMyLocationButton(true);
+            myLocationButton.show();
             loadBusStopsAtUserLocationIfReady(false);
         } else {
             // Permission was denied. Let's display a dialog explaining why we need location services, and how to grant
@@ -223,10 +224,10 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
         scheduledStopAdapter.setScheduledStops(scheduledStops);
     }
 
-    @Override
-    public void showErrorLoadingScheduleMessage(String message) {
-        Snackbar.make(rootContainer, message, Snackbar.LENGTH_LONG).show();
-    }
+//    @Override
+//    public void showErrorLoadingScheduleMessage(String message) {
+//        Snackbar.make(rootContainer, message, Snackbar.LENGTH_LONG).show();
+//    }
 
     /**
      * Once the map has loaded AND google API client has been setup, then searches for bus stops
@@ -237,36 +238,22 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
      * @param forceLoad
      */
     private void loadBusStopsAtUserLocationIfReady(boolean forceLoad) {
-        if (transitMapFragment.isMapReady() && googleApiClientInitialized && (!initialLoadFinished || forceLoad)) {
-
-            Location lastKnownLocation = null;
-
-            // Use the user's last known location if we have access to that information. Else just
-            // defaults to downtown Winnipeg.
-            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            }
-            transitMapFragment.loadBusStopsAtCoordinates(lastKnownLocation != null ? lastKnownLocation.getLatitude() : null,
-                    lastKnownLocation != null ? lastKnownLocation.getLongitude() : null,
-                    getResources().getInteger(R.integer.default_map_search_radius));
-
-            // Raise this flag. We don't need to search for bus stops on every orientation change.
-            initialLoadFinished = true;
-        }
-    }
-
-    private void showMyLocationButton(boolean fadeIn) {
-        if (fadeIn) {
-            AlphaAnimation fadeInAnimation = new AlphaAnimation(0, 1);
-            fadeInAnimation.setDuration(1000);
-            fadeInAnimation.setStartOffset(1000);
-            fadeInAnimation.setFillAfter(true);
-
-            myLocationButton.startAnimation(fadeInAnimation);
-            myLocationButton.setVisibility(View.VISIBLE);
-        } else {
-            myLocationButton.setVisibility(View.VISIBLE);
-        }
+//        if (transitMapFragment.isMapReady() && googleApiClientInitialized && (!initialLoadFinished || forceLoad)) {
+//
+//            Location lastKnownLocation = null;
+//
+//            // Use the user's last known location if we have access to that information. Else just
+//            // defaults to downtown Winnipeg.
+//            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//                lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+//            }
+//            transitMapFragment.loadBusStopsAtCoordinates(lastKnownLocation != null ? lastKnownLocation.getLatitude() : null,
+//                    lastKnownLocation != null ? lastKnownLocation.getLongitude() : null,
+//                    getResources().getInteger(R.integer.default_map_search_radius));
+//
+//            // Raise this flag. We don't need to search for bus stops on every orientation change.
+//            initialLoadFinished = true;
+//        }
     }
 
     @OnClick(R.id.my_location_button)
@@ -281,10 +268,25 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     @OnClick(R.id.refresh_bus_stops)
     public void searchForBusStops() {
 
-        if (transitMapFragment.isMapReady()) {
-            transitMapFragment.loadBusStopsAtCameraCoordinates(getResources().getInteger(R.integer.default_map_search_radius));
-        } else {
-            Log.w(TAG, "Map not ready!");
-        }
+//        if (transitMapFragment.isMapReady()) {
+//            transitMapFragment.loadBusStopsAtCameraCoordinates(getResources().getInteger(R.integer.default_map_search_radius));
+//        } else {
+//            Log.w(TAG, "Map not ready!");
+//        }
+    }
+
+    @Override
+    public void showErrorMessage(String msg) {
+
+    }
+
+    @Override
+    public void onBusStopMarkerClicked(BusStopViewModel busStopViewModel) {
+
+    }
+
+    @Override
+    public void onBusStopInfoWindowClicked(BusStopViewModel busStopViewModel) {
+
     }
 }

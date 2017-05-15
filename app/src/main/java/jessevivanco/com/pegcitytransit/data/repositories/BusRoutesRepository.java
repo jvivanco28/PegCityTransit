@@ -22,14 +22,16 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
 public class BusRoutesRepository {
 
-    private static final int CACHE_EXPIRY = CacheManager.ExpiryTimes.ONE_WEEK.asSeconds() * 2;
+    private static final int ALL_BUS_ROUTES_CACHE_EXPIRY = CacheManager.ExpiryTimes.ONE_WEEK.asSeconds() * 2;
+    private static final int BUS_ROUTES_AT_BUS_STOP_CACHE_EXPIRY = CacheManager.ExpiryTimes.ONE_DAY.asSeconds();
 
     private final String CACHE_KEY_ALL_ROUTES;
 
     private Context context;
     private RestApi restApi;
     @Nullable
-    private CacheManager cacheManager;
+    private
+    CacheManager cacheManager;
     private final Type routesTypeToken;
 
     public BusRoutesRepository(Context context, RestApi restApi, @Nullable CacheManager cacheManager) {
@@ -59,7 +61,7 @@ public class BusRoutesRepository {
                         .toList()
                         .doOnSuccess(busRouteViewModels -> {
                             if (cacheManager != null) {
-                                cacheManager.put(CACHE_KEY_ALL_ROUTES, busRouteViewModels, CACHE_EXPIRY, false);
+                                cacheManager.put(CACHE_KEY_ALL_ROUTES, busRouteViewModels, ALL_BUS_ROUTES_CACHE_EXPIRY, false);
                             }
                         });
             }
@@ -72,6 +74,7 @@ public class BusRoutesRepository {
             throw new IllegalArgumentException("Bus stop key must not be null!");
         }
 
+        // TODO DO we want to cache this? See how much space this all takes over time.
         return Single.defer(() -> {
 
             // Grab the cached list of bus routes for the
@@ -90,7 +93,7 @@ public class BusRoutesRepository {
                         .toList()
                         .doOnSuccess(busRouteViewModels -> {
                             if (cacheManager != null) {
-                                cacheManager.put(CACHE_KEY, busRouteViewModels, CACHE_EXPIRY, false);
+                                cacheManager.put(CACHE_KEY, busRouteViewModels, BUS_ROUTES_AT_BUS_STOP_CACHE_EXPIRY, false);
                             }
                         });
             }
