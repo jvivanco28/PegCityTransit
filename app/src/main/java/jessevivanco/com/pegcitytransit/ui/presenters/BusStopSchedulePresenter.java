@@ -1,10 +1,7 @@
 package jessevivanco.com.pegcitytransit.ui.presenters;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.util.Log;
-
-import com.squareup.phrase.Phrase;
 
 import java.util.List;
 
@@ -16,10 +13,9 @@ import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopScheduleRepository;
-import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
-public class BusStopScheduleListPresenter {
+public class BusStopSchedulePresenter {
 
     @Inject
     BusStopScheduleRepository scheduleRepository;
@@ -29,27 +25,11 @@ public class BusStopScheduleListPresenter {
     private ViewContract viewContract;
     private Disposable loadScheduleSubscription;
 
-    public BusStopScheduleListPresenter(AppComponent injector,
-                                        ViewContract viewContract) {
+    public BusStopSchedulePresenter(AppComponent injector,
+                                    ViewContract viewContract) {
         injector.injectInto(this);
         this.viewContract = viewContract;
     }
-
-    public String generateMapImageUrl(Resources res, BusStopViewModel busStop) {
-        double lat = busStop.getLatLng().latitude;
-        double lng = busStop.getLatLng().longitude;
-
-        return Phrase.from(res, R.string.static_map_url)
-                .put("center", lat + "," + lng)
-                .put("zoom", res.getInteger(R.integer.map_cover_image_zoom))
-                .put("width", res.getDimensionPixelSize(R.dimen.map_cover_image_width))
-                .put("height", res.getDimensionPixelSize(R.dimen.map_cover_image_height))
-                .put("markers", "color:red|size:mid|" + lat + "," + lng)
-                .put("key", res.getString(R.string.google_maps_key))
-                .format()
-                .toString();
-    }
-
 
     // TODO we might want to convert the schedule into a list of scheduled stops
     public void loadScheduleForBusStop(Long busStopKey) {

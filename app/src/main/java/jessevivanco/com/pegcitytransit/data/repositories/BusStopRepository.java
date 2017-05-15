@@ -29,14 +29,13 @@ public class BusStopRepository {
     private RestApi restApi;
     @Nullable
     private CacheManager cacheManager;
-    private final Type butStopsTypeToken;
+    private final Type busStopsTypeToken;
 
     public BusStopRepository(Context context, RestApi restApi, @Nullable CacheManager cacheManager) {
         this.context = context;
         this.restApi = restApi;
         this.cacheManager = cacheManager;
-
-        this.butStopsTypeToken = new TypeToken<List<BusStopViewModel>>() {
+        this.busStopsTypeToken = new TypeToken<List<BusStopViewModel>>() {
         }.getType();
     }
 
@@ -65,7 +64,7 @@ public class BusStopRepository {
             // Grab the cached list of bus stops.
             List<BusStopViewModel> cachedBusStops = CacheHelper.getFromCache(cacheManager,
                     CACHE_KEY,
-                    butStopsTypeToken);
+                    busStopsTypeToken);
 
             if (cachedBusStops != null) {
                 return Single.just(cachedBusStops);
@@ -90,14 +89,37 @@ public class BusStopRepository {
             // Grab the cached list of bus stops.
             List<BusStopViewModel> savedBusStops = CacheHelper.getFromCache(cacheManager,
                     CACHE_KEY_SAVED_STOPS,
-                    butStopsTypeToken);
+                    busStopsTypeToken);
 
             return savedBusStops != null ?
                     Single.just(savedBusStops) :
-                    // We can't return null, so just return an empty list if we don't have any saved stops.
-                    Single.just(new ArrayList<>());
+                    // We can't return null, so just return an empty HashMap if we don't have any saved stops.
+                    Single.just(new ArrayList<BusStopViewModel>());
         });
     }
 
+    public Single<List<BusStopViewModel>> saveBusStop(BusStopViewModel busStop) {
+        // Get the current list of saved stops.
+        return getSavedBusStops()
+                // Append the new stop
+                .flatMap(busStopViewModels -> {
+                    // If the key already exists in the list, then don't bother re-adding it.
+                    if (!busStopViewModels.contains(busStop)) {
+                        busStopViewModels.add(busStop);
+                    }
+                    // Return the new list of saved stops
+                    return Single.just(busStopViewModels);
+                });
+    }
 
+    public Single<List<BusStopViewModel>> removeSavedStop(BusStopViewModel busStop) {
+        // Get the current list of saved stops.
+        return getSavedBusStops()
+                .flatMap(busStopViewModels -> {
+                    // Remove the bus stop.
+                    busStopViewModels.remove(busStop);
+                    // Return the new list of saved stops.
+                    return Single.just(busStopViewModels);
+                });
+    }
 }

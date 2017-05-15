@@ -61,7 +61,7 @@ public class TransmitMapPresenter {
                 radius != null ? radius : DEFAULT_RADIUS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable ->  viewContract.clearMarkersAndShowSearchRadius(latitude, longitude, radius))
+                .doOnSubscribe(disposable -> viewContract.clearMarkersAndShowSearchRadius(latitude, longitude, radius))
                 .subscribe(
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
@@ -104,6 +104,27 @@ public class TransmitMapPresenter {
                                 viewContract.showBusStops(busStops);
                             } else {
                                 viewContract.showErrorMessage(context.getString(R.string.no_bus_stops_in_that_area));
+                            }
+                        },
+                        throwable -> {
+                            // TODO handle error
+                            viewContract.showErrorMessage(context.getString(R.string.generic_error));
+                        }
+                );
+    }
+
+    public void loadSavedBusStops() {
+        dispose(subscription);
+
+        subscription = stopsRepository.getSavedBusStops()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        busStops -> {
+                            if (busStops != null && busStops.size() > 0) {
+                                viewContract.showBusStops(busStops);
+                            } else {
+                                viewContract.showErrorMessage(context.getString(R.string.no_saved_stops));
                             }
                         },
                         throwable -> {

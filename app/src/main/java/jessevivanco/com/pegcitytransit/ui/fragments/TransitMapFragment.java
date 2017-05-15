@@ -251,7 +251,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
      */
     @Override
     public void onInfoWindowClick(Marker marker) {
-        transitMapCallbacks.onBusStopInfoWindowClicked(busStopInfoWindowAdapter.getBusStopForMarker(marker));
+        transitMapCallbacks.showBusStopSchedule(busStopInfoWindowAdapter.getBusStopForMarker(marker));
     }
 
     @Override
@@ -287,7 +287,5 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         void showBusStopSchedule(BusStopViewModel busStopViewModel);
 
         void loadBusRoutesForStop(BusStopViewModel busStopViewModel);
-
-        void onBusStopInfoWindowClicked(BusStopViewModel busStopViewModel);
     }
 }

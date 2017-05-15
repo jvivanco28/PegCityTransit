@@ -9,7 +9,6 @@ import org.parceler.Parcels;
 
 import java.util.List;
 
-import jessevivanco.com.pegcitytransit.ui.presenters.BusStopScheduleListPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.ScheduledStopViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
@@ -17,12 +16,9 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<ScheduledStopView
 
     private static final String STATE_KEY_LIST = "list";
 
-    private BusStopScheduleListPresenter schedulePresenter;
     private List<ScheduledStopViewModel> scheduledStops;
 
-    public ScheduledStopAdapter(BusStopScheduleListPresenter schedulePresenter, @Nullable Bundle savedInstanceState) {
-        this.schedulePresenter = schedulePresenter;
-
+    public ScheduledStopAdapter(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             scheduledStops = Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_LIST));
         }
@@ -49,16 +45,8 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<ScheduledStopView
         return scheduledStops != null ? scheduledStops.size() : 0;
     }
 
-    public BusStopScheduleListPresenter getSchedulePresenter() {
-        return schedulePresenter;
-    }
-
     public void setScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
         this.scheduledStops = scheduledStops;
         notifyDataSetChanged();
-    }
-
-    public List<ScheduledStopViewModel> getScheduledStops() {
-        return scheduledStops;
     }
 }

@@ -58,9 +58,4 @@ public class BusRouteMapActivity extends BaseActivity implements TransitMapFragm
     public void loadBusRoutesForStop(BusStopViewModel busStopViewModel) {
 
     }
-
-    @Override
-    public void onBusStopInfoWindowClicked(BusStopViewModel busStopViewModel) {
-
-    }
 }

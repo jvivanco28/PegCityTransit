@@ -13,7 +13,7 @@ import jessevivanco.com.pegcitytransit.ui.fragments.BusRoutesFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.BusStopsMapFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesListPresenter;
-import jessevivanco.com.pegcitytransit.ui.presenters.BusStopScheduleListPresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 
 /**
@@ -43,6 +43,6 @@ public interface AppComponent {
 
     void injectInto(BusRoutesListPresenter target);
 
-    void injectInto(BusStopScheduleListPresenter target);
+    void injectInto(BusStopSchedulePresenter target);
 
 }

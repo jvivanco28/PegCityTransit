@@ -77,6 +77,17 @@ public class BusStopViewModel {
         this.routes = routes;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof BusStopViewModel) {
+            BusStopViewModel other = (BusStopViewModel) obj;
+            if (this.key != null && other.getKey() != null && other.getKey().equals(this.key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static final class Builder {
         private Long key;
         private String name;

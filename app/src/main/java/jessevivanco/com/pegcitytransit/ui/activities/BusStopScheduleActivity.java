@@ -8,8 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
-
 import org.parceler.Parcels;
 
 import java.util.List;
@@ -20,12 +18,12 @@ import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
 import jessevivanco.com.pegcitytransit.ui.adapters.ScheduledStopAdapter;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
-import jessevivanco.com.pegcitytransit.ui.presenters.BusStopScheduleListPresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
 @Deprecated
-public class BusStopScheduleActivity extends BaseActivity implements BusStopScheduleListPresenter.ViewContract, SwipeRefreshLayout.OnRefreshListener {
+public class BusStopScheduleActivity extends BaseActivity implements BusStopSchedulePresenter.ViewContract, SwipeRefreshLayout.OnRefreshListener {
 
     public static final String ARG_KEY_BUS_STOP = "bus_stop";
 
@@ -42,7 +40,7 @@ public class BusStopScheduleActivity extends BaseActivity implements BusStopSche
     RecyclerView recyclerView;
 
     ScheduledStopAdapter scheduledStopAdapter;
-    BusStopScheduleListPresenter stopSchedulePresenter;
+    BusStopSchedulePresenter stopSchedulePresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,8 +87,8 @@ public class BusStopScheduleActivity extends BaseActivity implements BusStopSche
     }
 
     private void setupAdapter(Bundle savedInstanceState) {
-        stopSchedulePresenter = new BusStopScheduleListPresenter(getInjector(), this);
-        scheduledStopAdapter = new ScheduledStopAdapter(stopSchedulePresenter, savedInstanceState);
+        stopSchedulePresenter = new BusStopSchedulePresenter(getInjector(), this);
+        scheduledStopAdapter = new ScheduledStopAdapter(savedInstanceState);
     }
 
     private void setupRecyclerView() {
@@ -105,11 +103,11 @@ public class BusStopScheduleActivity extends BaseActivity implements BusStopSche
 
     private void setupCoverImage(BusStopViewModel busStop) {
 
-        Picasso.with(this)
-                .load(stopSchedulePresenter.generateMapImageUrl(getResources(), busStop))
-                .fit()
-                .centerCrop()
-                .into(coverImage);
+//        Picasso.with(this)
+//                .load(stopSchedulePresenter.generateMapImageUrl(getResources(), busStop))
+//                .fit()
+//                .centerCrop()
+//                .into(coverImage);
     }
 
     @Override

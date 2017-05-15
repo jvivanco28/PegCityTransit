@@ -6,6 +6,8 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -19,12 +21,17 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
+import jessevivanco.com.pegcitytransit.ui.adapters.ScheduledStopAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment;
+import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
+import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
+import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
 public class MainActivity extends BaseActivity implements TransmitMapPresenter.ViewContract,
-        TransitMapFragment.TransitMapCallbacks {
+        TransitMapFragment.TransitMapCallbacks,
+        BusStopSchedulePresenter.ViewContract {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String STATE_KEY_SELECTED_TAB = "selected_tab";
@@ -46,6 +53,11 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     ViewGroup bottomSheetContainer;
     BottomSheetBehavior bottomSheetBehavior;
 
+    @BindView(R.id.schedule_recycler_view)
+    RecyclerView stopScheduleRecyclerView;
+    ScheduledStopAdapter stopScheduleAdapter;
+    BusStopSchedulePresenter stopSchedulePresenter;
+
     private int mapSearchRadius;
 
     private TransitMapFragment transitMapFragment;
@@ -61,6 +73,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         setupMap(savedInstanceState);
         setupBottomNav(savedInstanceState);
         setupBottomSheet(savedInstanceState);
+        setupStopSchedule(savedInstanceState);
     }
 
     @Override
@@ -97,18 +110,13 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
             switch (item.getItemId()) {
                 case R.id.map:
-                    // TODO
-                    Log.v("DEBUG", "tapped map");
-
+                    // TODO go to your location???
                     break;
                 case R.id.my_stops:
-                    // TODO
-                    Log.v("DEBUG", "tapped my stops");
+                    transmitMapPresenter.loadSavedBusStops();
                     break;
                 case R.id.routes:
-                    // TODO
-                    Log.v("DEBUG", "tapped routes");
-
+                    showAllBusRoutes();
                     break;
             }
             return true;
@@ -127,12 +135,26 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                 savedInstanceState.getInt(STATE_KEY_BOTTOM_SHEET_STATE, BottomSheetBehavior.STATE_HIDDEN) :
                 BottomSheetBehavior.STATE_HIDDEN);
 
-        // TODO TEST
+        // TODO ensure this works every time.
+        // Set the bottom sheet peek height to half the height of the map view.
         mapFragmentContainer.post(() -> {
-
-            Log.v("DEBUG", "height " + mapFragmentContainer.getHeight() + " -- adf " + (mapFragmentContainer.getHeight() / 2));
             bottomSheetBehavior.setPeekHeight((mapFragmentContainer.getHeight() / 2) + getResources().getDimensionPixelSize(R.dimen.action_bar_height));
+            Log.v("DEBUG", "Peek height = " + bottomSheetBehavior.getPeekHeight());
         });
+    }
+
+    private void setupStopSchedule(@Nullable Bundle savedInstanceState) {
+
+        stopSchedulePresenter = new BusStopSchedulePresenter(getInjector(), this);
+        stopScheduleAdapter = new ScheduledStopAdapter(savedInstanceState);
+
+        stopScheduleRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        stopScheduleRecyclerView.addItemDecoration(new VerticalListItemDecoration(getResources().getDimensionPixelSize(R.dimen.material_spacing_small), getResources().getDimensionPixelSize(R.dimen.material_spacing_small)));
+        stopScheduleRecyclerView.setAdapter(stopScheduleAdapter);
+    }
+
+    private void showAllBusRoutes() {
+        // TODO
     }
 
     @Override
@@ -155,16 +177,14 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     public void showBusStopSchedule(BusStopViewModel busStopViewModel) {
         // Slightly open the bottom sheet so that we can display the bus stop's schedule.
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+        // Load the schedule or the bus stop.
+        stopSchedulePresenter.loadScheduleForBusStop(busStopViewModel.getKey());
     }
 
     @Override
     public void loadBusRoutesForStop(BusStopViewModel busStopViewModel) {
         transmitMapPresenter.loadBusRoutesForStop(busStopViewModel);
-    }
-
-    @Override
-    public void onBusStopInfoWindowClicked(BusStopViewModel busStopViewModel) {
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     @Override
@@ -182,6 +202,11 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     public void clearMarkersAndShowSearchRadius(Double latitude, Double longitude, Integer searchRadius) {
         transitMapFragment.clearMarkers();
         transitMapFragment.drawSearchRadius(latitude, longitude, mapSearchRadius);
+    }
+
+    @Override
+    public void showScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
+        stopScheduleAdapter.setScheduledStops(scheduledStops);
     }
 
     /**
