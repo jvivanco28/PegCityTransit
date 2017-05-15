@@ -112,6 +112,10 @@ public class TransmitMapPresenter {
                 );
     }
 
+    public void killSubscription() {
+        dispose(subscription);
+    }
+
     private void dispose(Disposable disposable) {
         if (disposable != null && !disposable.isDisposed()) {
             disposable.dispose();

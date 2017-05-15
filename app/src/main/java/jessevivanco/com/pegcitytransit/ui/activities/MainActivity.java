@@ -85,17 +85,21 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
         bottomNavigation.setOnNavigationItemSelectedListener(item -> {
 
+            transmitMapPresenter.killSubscription();
+
             switch (item.getItemId()) {
                 case R.id.map:
                     // TODO
+                    Log.v("DEBUG", "tapped map");
 
                     break;
                 case R.id.my_stops:
                     // TODO
-
+                    Log.v("DEBUG", "tapped my stops");
                     break;
                 case R.id.routes:
                     // TODO
+                    Log.v("DEBUG", "tapped routes");
 
                     break;
             }
@@ -103,6 +107,12 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
             // TODO peek up bottom sheet
             // TODO kill previous subscriptions when switching tabs.
+        });
+        // Setting a nav item reselected listener will prevent reselects from triggering the above
+        // listener. We only want to kill a previous REST call when switching tabs. Reselects
+        // shouldn't kill subscriptions.
+        bottomNavigation.setOnNavigationItemReselectedListener(item -> {
+            Log.v("DEUBG", "reselected " + item.getTitle());
         });
     }
 

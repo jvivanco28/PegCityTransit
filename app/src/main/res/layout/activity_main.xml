@@ -51,7 +51,7 @@
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/tab_navigation"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/bottom_tabs_height"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         app:menu="@menu/navigation"/>
 
