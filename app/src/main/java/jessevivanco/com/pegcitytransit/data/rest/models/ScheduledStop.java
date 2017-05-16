@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName;
 
 public class ScheduledStop {
 
-    // TODO string or long??
     @SerializedName("key")
     @Expose
     String key;

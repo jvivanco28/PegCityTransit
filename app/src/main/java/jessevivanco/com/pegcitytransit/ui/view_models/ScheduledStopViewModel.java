@@ -18,59 +18,58 @@ import jessevivanco.com.pegcitytransit.ui.util.RouteCoverage;
 @Parcel
 public class ScheduledStopViewModel {
 
-    // TODO integer.xml
-    private static final int MAX_RELATIVE_MINUTES = 20;
-
     private ScheduledStopViewModel(Builder builder) {
         routeNumber = builder.routeNumber;
         routeName = builder.routeName;
         routeCoverage = builder.routeCoverage;
         departureTimeFormatted = builder.departureTimeFormatted;
+        departureTime = builder.departureTime;
         status = builder.status;
     }
 
-    public static ScheduledStopViewModel createFromRouteSchedule(Context context, Integer routeNumber, RouteCoverage routeCoverage, ScheduledStop scheduledStop) {
+    public static ScheduledStopViewModel createFromRouteSchedule(Context context,
+                                                                 Integer routeNumber,
+                                                                 RouteCoverage routeCoverage,
+                                                                 ScheduledStop scheduledStop,
+                                                                 final int MAX_RELATIVE_MINUTES) {
         if (routeNumber == null || scheduledStop == null) {
             return null;
         } else {
 
-            String departureTimeFormatted = null;
-            String status = null;
+            String departureTimeFormatted;
+            String status;
+            Date departureTime;
 
-            // TODO we gotta test the crap outta this.
             // Set our departure time text.
-            if (scheduledStop.getTimes() != null) {
+            long timeDiffInMillis = scheduledStop.getTimes().getDeparture().getEstimated().getTime() - System.currentTimeMillis();
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(timeDiffInMillis);
 
-                if (scheduledStop.getTimes().getDeparture() != null && scheduledStop.getTimes().getDeparture().getEstimated() != null && scheduledStop.getTimes().getDeparture().getScheduled() != null) {
+            departureTime = scheduledStop.getTimes().getDeparture().getEstimated();
 
-                    long timeDiffInMillis = scheduledStop.getTimes().getDeparture().getEstimated().getTime() - System.currentTimeMillis();
-                    long minutes = TimeUnit.MILLISECONDS.toMinutes(timeDiffInMillis);
+            departureTimeFormatted =
+                    minutes == 0 ?
+                            context.getString(R.string.due) :
+                            minutes < MAX_RELATIVE_MINUTES ?
+                                    Phrase.from(context, R.string.departs_in)
+                                            .put("time", String.valueOf(minutes))
+                                            .put("time_unit", context.getResources().getQuantityString(R.plurals.minutes, (int) minutes))
+                                            .format()
+                                            .toString() :
+                                    getTimeFormatted(scheduledStop.getTimes().getDeparture().getEstimated());
 
-                    departureTimeFormatted =
-                            minutes == 0 ?
-                                    context.getString(R.string.due) :
-                                    minutes < MAX_RELATIVE_MINUTES ?
-                                            Phrase.from(context, R.string.departs_in)
-                                                    .put("time", String.valueOf(minutes))
-                                                    .put("time_unit", context.getResources().getQuantityString(R.plurals.minutes, (int) minutes))
-                                                    .format()
-                                                    .toString() :
-                                            getTimeFormatted(scheduledStop.getTimes().getDeparture().getEstimated());
-
-                    if (scheduledStop.getTimes().getDeparture().getEstimated().getTime() > scheduledStop.getTimes().getDeparture().getScheduled().getTime()) {
-                        status = context.getString(R.string.late);
-                    } else if (scheduledStop.getTimes().getDeparture().getEstimated().getTime() < scheduledStop.getTimes().getDeparture().getScheduled().getTime()) {
-                        status = context.getString(R.string.early);
-                    } else {
-                        status = context.getString(R.string.on_time);
-                    }
-                }
+            if (scheduledStop.getTimes().getDeparture().getEstimated().getTime() > scheduledStop.getTimes().getDeparture().getScheduled().getTime()) {
+                status = context.getString(R.string.late);
+            } else if (scheduledStop.getTimes().getDeparture().getEstimated().getTime() < scheduledStop.getTimes().getDeparture().getScheduled().getTime()) {
+                status = context.getString(R.string.early);
+            } else {
+                status = context.getString(R.string.on_time);
             }
             return new Builder()
                     .routeNumber(routeNumber)
                     .routeName(scheduledStop.getVariant() != null ? scheduledStop.getVariant().getName() : null)
                     .routeCoverage(routeCoverage)
                     .departureTimeFormatted(departureTimeFormatted)
+                    .departureTime(departureTime)
                     .status(status)
                     .build();
         }
@@ -92,13 +91,10 @@ public class ScheduledStopViewModel {
     String routeName;
     RouteCoverage routeCoverage;
     String departureTimeFormatted;
+    Date departureTime;
     String status;
 
     public ScheduledStopViewModel() {
-    }
-
-    public static int getMaxRelativeMinutes() {
-        return MAX_RELATIVE_MINUTES;
     }
 
     public Integer getRouteNumber() {
@@ -121,12 +117,17 @@ public class ScheduledStopViewModel {
         return status;
     }
 
+    public Date getDepartureTime() {
+        return departureTime;
+    }
+
     public static final class Builder {
         private Integer routeNumber;
         private String routeName;
         private RouteCoverage routeCoverage;
         private String departureTimeFormatted;
         private String status;
+        private Date departureTime;
 
         public Builder() {
         }
@@ -153,6 +154,11 @@ public class ScheduledStopViewModel {
 
         public Builder status(String val) {
             status = val;
+            return this;
+        }
+
+        public Builder departureTime(Date val) {
+            departureTime = val;
             return this;
         }
 
