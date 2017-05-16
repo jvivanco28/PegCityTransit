@@ -306,7 +306,12 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                     getString(R.string.location_permission_dialog_title),
                     getString(R.string.location_permission_rational),
                     PERMISSION_DIALOG_TAG);
+        } else {
+            // Permission is already granted. We can show the "my location" button.
+            myLocationButton.show();
         }
+        // Attempt to load near by bus stops regardless if the permission has been granted. If
+        // permission isn't granted, we'll default to downtown Winnipeg.
         loadBusStopsAtUserLocationIfReady(false);
     }
 
@@ -361,5 +366,10 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         } else {
             Log.w(TAG, "Map not ready!");
         }
+    }
+
+    @OnClick(R.id.my_location_button)
+    public void goToMyLocation() {
+        loadBusStopsAtUserLocationIfReady(true);
     }
 }

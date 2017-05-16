@@ -34,6 +34,7 @@
                 android:layout_marginBottom="88dp"
                 android:layout_marginEnd="@dimen/material_spacing_medium"
                 android:layout_marginRight="@dimen/material_spacing_medium"
+                android:visibility="gone"
                 app:backgroundTint="@color/white"
                 app:layout_anchor="@id/map_fragment_container"
                 app:layout_anchorGravity="bottom|right|end"
