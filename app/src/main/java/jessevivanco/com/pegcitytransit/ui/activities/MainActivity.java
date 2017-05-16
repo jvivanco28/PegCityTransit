@@ -181,12 +181,11 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                 savedInstanceState.getInt(STATE_KEY_BOTTOM_SHEET_STATE, BottomSheetBehavior.STATE_HIDDEN) :
                 BottomSheetBehavior.STATE_HIDDEN);
 
-        // TODO ensure this works every time.
         // Set the bottom sheet peek height to half the height of the map view.
         mapFragmentContainer.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                bottomSheetBehavior.setPeekHeight((mapFragmentContainer.getHeight() / 2) + MainActivity.this.getResources().getDimensionPixelSize(R.dimen.action_bar_height));
+                bottomSheetBehavior.setPeekHeight(mapFragmentContainer.getHeight() / 2);
                 mapFragmentContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });

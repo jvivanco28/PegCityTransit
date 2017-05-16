@@ -1,7 +1,6 @@
 package jessevivanco.com.pegcitytransit.ui.views;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -28,55 +27,30 @@ public class BusStopInfoView extends LinearLayout {
     @BindView(R.id.bus_routes)
     FlowLayout busRoutesFlowLayout;
 
-    public BusStopInfoView(Context context, WidgetSize widgetSize) {
+    public BusStopInfoView(Context context) {
         super(context);
-        setup(null);
+        setup();
     }
 
     public BusStopInfoView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        setup(attrs);
+        setup();
     }
 
     public BusStopInfoView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setup(attrs);
+        setup();
     }
 
-    private void setup(@Nullable AttributeSet attrs) {
+    private void setup() {
         setOrientation(VERTICAL);
         LayoutInflater.from(getContext()).inflate(R.layout.info_window_bus_stop, this, true);
         ButterKnife.bind(this);
 
-        applyAttributes(attrs);
-    }
+        busStopKeyTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.text_small));
+        busStopNameTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.text_small));
 
-    private void applyAttributes(@Nullable AttributeSet attrs) {
-        if (attrs != null) {
-            TypedArray attrArray = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.BusStopInfoView, 0, 0);
-            try {
-                int widgetSize = attrArray.getInteger(R.styleable.BusStopInfoView_widget_size, 0);
-                setWidgetSize(WidgetSize.values()[widgetSize]);
-            } finally {
-                attrArray.recycle();
-            }
-        } else {
-            setWidgetSize(WidgetSize.SMALL);
-        }
-    }
-
-    public void setWidgetSize(WidgetSize widgetSize) {
-        int padding;
-
-        if (widgetSize != null && widgetSize == WidgetSize.LARGE) {
-            busStopKeyTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.text_title));
-            busStopNameTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.text_title));
-            padding = getResources().getDimensionPixelSize(R.dimen.material_spacing_medium);
-        } else {
-            busStopKeyTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.text_small));
-            busStopNameTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.text_small));
-            padding = getResources().getDimensionPixelSize(R.dimen.material_spacing_x_small);
-        }
+        int padding = getResources().getDimensionPixelSize(R.dimen.material_spacing_x_small);
         setPadding(padding, padding, padding, padding);
     }
 
@@ -103,10 +77,5 @@ public class BusStopInfoView extends LinearLayout {
         BusRouteTextView busRouteTextView = new BusRouteTextView(getContext(), BusRouteTextView.Size.MINI);
         busRouteTextView.setBusRoute(route);
         return busRouteTextView;
-    }
-
-    public enum WidgetSize {
-        SMALL,
-        LARGE
     }
 }

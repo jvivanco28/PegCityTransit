@@ -107,7 +107,7 @@ dependencies {
 
     // https://github.com/airbnb/lottie-android
     // Render After Effects animations natively on Android and iOS
-    compile 'com.airbnb.android:lottie:2.0.0-beta4'
+    compile 'com.airbnb.android:lottie:2.0.0-rc1'
 
     // Handy extensions to the Google Maps Android API.
     // https://github.com/googlemaps/android-maps-utils

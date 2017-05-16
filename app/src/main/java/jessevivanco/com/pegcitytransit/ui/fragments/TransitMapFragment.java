@@ -101,7 +101,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         }
 
         // We're re-using the same info window when tapping on a marker.
-        busStopInfoWindow = new BusStopInfoView(getActivity(), BusStopInfoView.WidgetSize.SMALL);
+        busStopInfoWindow = new BusStopInfoView(getActivity());
     }
 
     private void setupAdapters(Bundle savedInstanceState) {
