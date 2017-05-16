@@ -13,6 +13,7 @@ import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopScheduleRepository;
+import jessevivanco.com.pegcitytransit.data.util.DisposableUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
 public class BusStopSchedulePresenter {
@@ -33,7 +34,7 @@ public class BusStopSchedulePresenter {
 
     // TODO we might want to convert the schedule into a list of scheduled stops
     public void loadScheduleForBusStop(Long busStopKey) {
-        dispose(loadScheduleSubscription);
+        DisposableUtil.dispose(loadScheduleSubscription);
 
         loadScheduleSubscription = scheduleRepository.getBusStopSchedule(busStopKey)
                 .subscribeOn(Schedulers.io())
@@ -48,13 +49,6 @@ public class BusStopSchedulePresenter {
                             viewContract.showErrorMessage(context.getString(R.string.error_loading_schedule));
                         }
                 );
-    }
-
-    // TODO move this into a util method
-    private void dispose(Disposable disposable) {
-        if (disposable != null && !disposable.isDisposed()) {
-            disposable.dispose();
-        }
     }
 
     public interface ViewContract extends BaseViewContract {

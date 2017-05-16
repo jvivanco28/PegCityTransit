@@ -16,7 +16,7 @@ import io.reactivex.Single;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.rest.RestApi;
 import jessevivanco.com.pegcitytransit.data.rest.models.base.WinnipegTransitResponse;
-import jessevivanco.com.pegcitytransit.data.util.CacheHelper;
+import jessevivanco.com.pegcitytransit.data.util.CacheUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 public class BusStopRepository {
@@ -62,7 +62,7 @@ public class BusStopRepository {
             final String CACHE_KEY = Phrase.from(context, R.string.cache_key_stops_for_route).put("route", String.valueOf(routeKey)).format().toString();
 
             // Grab the cached list of bus stops.
-            List<BusStopViewModel> cachedBusStops = CacheHelper.getFromCache(cacheManager,
+            List<BusStopViewModel> cachedBusStops = CacheUtil.getFromCache(cacheManager,
                     CACHE_KEY,
                     busStopsTypeToken);
 
@@ -87,7 +87,7 @@ public class BusStopRepository {
         return Single.defer(() -> {
 
             // Grab the cached list of bus stops.
-            List<BusStopViewModel> savedBusStops = CacheHelper.getFromCache(cacheManager,
+            List<BusStopViewModel> savedBusStops = CacheUtil.getFromCache(cacheManager,
                     CACHE_KEY_SAVED_STOPS,
                     busStopsTypeToken);
 

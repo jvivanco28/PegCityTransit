@@ -15,6 +15,7 @@ import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
+import jessevivanco.com.pegcitytransit.data.util.DisposableUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
@@ -52,7 +53,7 @@ public class TransmitMapPresenter {
 
     public void loadBusStopsAroundCoordinates(@Nullable Double latitude, @Nullable Double longitude, @Nullable Integer radius) {
 
-        dispose(subscription);
+        DisposableUtil.dispose(subscription);
 
         // NOTE: If lat, long, and radius are not supplied, then we just resort to the default values.
         subscription = stopsRepository.getBusStopsNearLocation(
@@ -78,7 +79,7 @@ public class TransmitMapPresenter {
     }
 
     public void loadBusRoutesForStop(@NonNull BusStopViewModel busStopFilter) {
-        dispose(subscription);
+        DisposableUtil.dispose(subscription);
 
         subscription = routesRepository.getRoutesForBusStop(busStopFilter.getKey())
                 .subscribeOn(Schedulers.io())
@@ -93,7 +94,7 @@ public class TransmitMapPresenter {
     }
 
     public void loadBusStopsForBusRoute(@NonNull BusRouteViewModel route) {
-        dispose(subscription);
+        DisposableUtil.dispose(subscription);
 
         subscription = stopsRepository.getBusStopsForRoute(route.getKey())
                 .subscribeOn(Schedulers.io())
@@ -114,7 +115,7 @@ public class TransmitMapPresenter {
     }
 
     public void loadSavedBusStops() {
-        dispose(subscription);
+        DisposableUtil.dispose(subscription);
 
         subscription = stopsRepository.getSavedBusStops()
                 .subscribeOn(Schedulers.io())
@@ -134,14 +135,11 @@ public class TransmitMapPresenter {
                 );
     }
 
-    public void killSubscription() {
-        dispose(subscription);
-    }
-
-    private void dispose(Disposable disposable) {
-        if (disposable != null && !disposable.isDisposed()) {
-            disposable.dispose();
-        }
+    /**
+     * Kills all active subscriptions.
+     */
+    public void tearDown() {
+        DisposableUtil.dispose(subscription);
     }
 
     public interface ViewContract extends BaseViewContract {

@@ -12,6 +12,7 @@ import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
+import jessevivanco.com.pegcitytransit.data.util.DisposableUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
 public class BusRoutesListPresenter {
@@ -32,7 +33,7 @@ public class BusRoutesListPresenter {
     }
 
     public void loadAllBusRoutes() {
-        dispose(loadBusRoutesSubscription);
+        DisposableUtil.dispose(loadBusRoutesSubscription);
 
         loadBusRoutesSubscription = routesRepository.getAllBusRoutes()
                 .subscribeOn(Schedulers.io())
@@ -41,12 +42,6 @@ public class BusRoutesListPresenter {
                         busRoutes -> viewContract.showAllBusRoutes(busRoutes),
                         throwable -> viewContract.showErrorMessage(context.getString(R.string.error_loading_bus_routes))
                 );
-    }
-
-    private void dispose(Disposable disposable) {
-        if (disposable != null && !disposable.isDisposed()) {
-            disposable.dispose();
-        }
     }
 
     public interface ViewContract extends BaseViewContract {

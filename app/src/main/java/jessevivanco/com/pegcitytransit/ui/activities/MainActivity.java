@@ -152,7 +152,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
         bottomNavigation.setOnNavigationItemSelectedListener(item -> {
 
-            transmitMapPresenter.killSubscription();
+            transmitMapPresenter.tearDown();
 
             switch (item.getItemId()) {
                 case R.id.map:

@@ -8,11 +8,11 @@ import com.iainconnor.objectcache.CacheManager;
 
 import java.lang.reflect.Type;
 
-public class CacheHelper {
+public class CacheUtil {
 
-    private static final String TAG = CacheHelper.class.getSimpleName();
+    private static final String TAG = CacheUtil.class.getSimpleName();
 
-    private CacheHelper() {
+    private CacheUtil() {
     }
 
     /**

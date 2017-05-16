@@ -16,7 +16,7 @@ import io.reactivex.Single;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.rest.RestApi;
 import jessevivanco.com.pegcitytransit.data.rest.models.base.WinnipegTransitResponse;
-import jessevivanco.com.pegcitytransit.data.util.CacheHelper;
+import jessevivanco.com.pegcitytransit.data.util.CacheUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
 
@@ -48,7 +48,7 @@ public class BusRoutesRepository {
 
         return Single.defer(() -> {
 
-            List<BusRouteViewModel> cachedBusRoutes = CacheHelper.getFromCache(cacheManager, CACHE_KEY_ALL_ROUTES, routesTypeToken);
+            List<BusRouteViewModel> cachedBusRoutes = CacheUtil.getFromCache(cacheManager, CACHE_KEY_ALL_ROUTES, routesTypeToken);
 
             if (cachedBusRoutes != null) {
                 return Single.just(cachedBusRoutes);
@@ -80,7 +80,7 @@ public class BusRoutesRepository {
             // Grab the cached list of bus routes for the
             final String CACHE_KEY = Phrase.from(context, R.string.cache_key_routes_at_stop).put("stop", String.valueOf(busStopKey)).format().toString();
 
-            List<BusRouteViewModel> cachedBusRoutes = CacheHelper.getFromCache(cacheManager, CACHE_KEY, routesTypeToken);
+            List<BusRouteViewModel> cachedBusRoutes = CacheUtil.getFromCache(cacheManager, CACHE_KEY, routesTypeToken);
 
             if (cachedBusRoutes != null) {
                 return Single.just(cachedBusRoutes);
