@@ -1,5 +1,6 @@
 package jessevivanco.com.pegcitytransit.ui.view_holders;
 
+import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -14,7 +15,7 @@ import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusRouteTextView;
 
-public class ScheduledStopViewHolder extends RecyclerView.ViewHolder {
+public class ScheduledStopCellViewHolder extends RecyclerView.ViewHolder {
 
     @BindView(R.id.route_number)
     BusRouteTextView routeNumber;
@@ -28,8 +29,8 @@ public class ScheduledStopViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.departure_time)
     IconTextView departureTime;
 
-    public ScheduledStopViewHolder(ViewGroup parent) {
-        super(LayoutInflater.from(parent.getContext()).inflate(R.layout.cell_scheduled_stop, parent, false));
+    public ScheduledStopCellViewHolder(ViewGroup parent) {
+        super(LayoutInflater.from(parent.getContext()).inflate(getLayoutResId(), parent, false));
         ButterKnife.bind(this, itemView);
     }
 
@@ -45,5 +46,10 @@ public class ScheduledStopViewHolder extends RecyclerView.ViewHolder {
             status.setText(null);
             departureTime.setText(null);
         }
+    }
+
+    @LayoutRes
+    public static int getLayoutResId() {
+        return R.layout.cell_scheduled_stop;
     }
 }

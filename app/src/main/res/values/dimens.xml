@@ -32,6 +32,7 @@
     <dimen name="card_corner_radius">2dp</dimen>
 
     <dimen name="text_title">20sp</dimen>
+    <dimen name="text_small">14sp</dimen>
     <dimen name="text_bus_route_mini">14sp</dimen>
     <dimen name="text_bus_route_large">32sp</dimen>
     <dimen name="text_loading">24sp</dimen>

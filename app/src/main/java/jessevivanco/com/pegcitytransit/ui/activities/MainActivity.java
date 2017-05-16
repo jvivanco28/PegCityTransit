@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -137,9 +138,12 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
         // TODO ensure this works every time.
         // Set the bottom sheet peek height to half the height of the map view.
-        mapFragmentContainer.post(() -> {
-            bottomSheetBehavior.setPeekHeight((mapFragmentContainer.getHeight() / 2) + getResources().getDimensionPixelSize(R.dimen.action_bar_height));
-            Log.v("DEBUG", "Peek height = " + bottomSheetBehavior.getPeekHeight());
+        mapFragmentContainer.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                bottomSheetBehavior.setPeekHeight((mapFragmentContainer.getHeight() / 2) + MainActivity.this.getResources().getDimensionPixelSize(R.dimen.action_bar_height));
+                mapFragmentContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
         });
     }
 
@@ -177,6 +181,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     public void showBusStopSchedule(BusStopViewModel busStopViewModel) {
         // Slightly open the bottom sheet so that we can display the bus stop's schedule.
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        stopScheduleAdapter.setBusStop(busStopViewModel);
 
         // Load the schedule or the bus stop.
         stopSchedulePresenter.loadScheduleForBusStop(busStopViewModel.getKey());

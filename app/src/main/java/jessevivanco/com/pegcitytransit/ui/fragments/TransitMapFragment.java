@@ -28,7 +28,7 @@ import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
-import jessevivanco.com.pegcitytransit.ui.views.BusStopInfoWindow;
+import jessevivanco.com.pegcitytransit.ui.views.BusStopInfoView;
 
 // TODO Need to handle orientation changes
 public class TransitMapFragment extends BaseFragment implements OnMapReadyCallback,
@@ -46,7 +46,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     private TransitMapCallbacks transitMapCallbacks;
 
     // Just re-use the same view and change its contents.
-    private BusStopInfoWindow busStopInfoWindow;
+    private BusStopInfoView busStopInfoWindow;
 
     private
     @Nullable
@@ -101,7 +101,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         }
 
         // We're re-using the same info window when tapping on a marker.
-        busStopInfoWindow = new BusStopInfoWindow(getActivity());
+        busStopInfoWindow = new BusStopInfoView(getActivity(), BusStopInfoView.WidgetSize.SMALL);
     }
 
     private void setupAdapters(Bundle savedInstanceState) {
