@@ -39,8 +39,7 @@ public interface RestApi {
      * @param latitude  The latitude of the point to find stops near. Use in conjunction with 'lon' and 'distance'.
      * @param longitude The longitude of the point to find stops near. Use in conjunction with 'lat' and 'distance'.
      * @param radius    The distance in metres from the given point which returned stops must fall within.
-     * @return
-     * @see <a href="https://api.winnipegtransit.com/home/api/v2/services/stops">https://api.winnipegtransit
+     * @return @see <a href="https://api.winnipegtransit.com/home/api/v2/services/stops">https://api.winnipegtransit
      * .com/home/api/v2/services/stops</a>
      */
     @GET("stops.json")
@@ -51,19 +50,14 @@ public interface RestApi {
     /**
      * Gets all bus stop for the provided bus route. We can use this info to display the entire
      * route on a map.
-     *
-     * @param busRouteKey
-     * @return
      */
     @GET("stops.json")
     Single<WinnipegTransitResponse<List<BusStop>>> getBusStopsForRoute(@Query("route") Long busRouteKey);
 
     /**
-     * Retrieves the but stop schedule for the given <code>busStopKey</code>. Each entry in the schedule
-     * is an upcoming scheduled stop which is sorted by soonest to latest.
-     *
-     * @param busStopKey
-     * @return
+     * Retrieves the bus stop schedule for the given <code>busStopKey</code>. Each entry in the schedule
+     * is an upcoming scheduled stop which is sorted by soonest to latest. Retrieves all scheduled
+     * stops up until two hours of the time of the request.
      */
     @GET("stops/{bus_stop}/schedule.json")
     Single<WinnipegTransitResponse<StopSchedule>> getBusStopSchedule(@Path("bus_stop") Long busStopKey);
@@ -72,8 +66,7 @@ public interface RestApi {
      * Retrieves a list of bus routes for a given bus stop.
      *
      * @param busStop The bus stop we want to get the list of bus routes for.
-     * @return
-     * @see <a href="https://api.winnipegtransit.com/home/api/v2/services/routes">https://api.winnipegtransit
+     * @return @see <a href="https://api.winnipegtransit.com/home/api/v2/services/routes">https://api.winnipegtransit
      * .com/home/api/v2/services/routes</a>
      */
     @GET("routes.json")
@@ -82,8 +75,7 @@ public interface RestApi {
     /**
      * Retrieves the list of all bus routes.
      *
-     * @return
-     * @see <a href="https://api.winnipegtransit.com/home/api/v2/services/routes">https://api.winnipegtransit
+     * @return @see <a href="https://api.winnipegtransit.com/home/api/v2/services/routes">https://api.winnipegtransit
      * .com/home/api/v2/services/routes</a>
      */
     @GET("routes.json")

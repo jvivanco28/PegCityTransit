@@ -6,7 +6,8 @@
     android:id="@+id/cell_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardCornerRadius="@dimen/card_corner_radius">
+    card_view:cardCornerRadius="@dimen/card_corner_radius"
+    tools:ignore="MissingPrefix">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,6 +30,7 @@
 
             <TextView
                 android:id="@+id/route_name"
+                fontPath="fonts/bariol_bold.ttf"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -59,8 +61,7 @@
                 fontPath="fonts/bariol_bold.ttf"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/text_title"
-                tools:ignore="MissingPrefix"/>
+                android:textSize="@dimen/text_title"/>
 
             <TextView
                 android:id="@+id/status"
