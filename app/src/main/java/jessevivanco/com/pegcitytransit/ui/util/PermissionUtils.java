@@ -1,7 +1,8 @@
 package jessevivanco.com.pegcitytransit.ui.util;
 
 import android.content.pm.PackageManager;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 
 import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
 import jessevivanco.com.pegcitytransit.ui.fragments.dialog.RationaleDialog;
@@ -17,7 +18,7 @@ public abstract class PermissionUtils {
      * Requests <code>permission</code>. If a rationale with an additional explanation should be shown to the user,
      * displays a dialog that triggers the request.
      */
-    public static void requestPermission(Fragment fromFragment,
+    public static void requestPermission(AppCompatActivity fromActivity,
                                          int requestId,
                                          String permissionId,
                                          String permissionDialogTitle,
@@ -25,17 +26,18 @@ public abstract class PermissionUtils {
                                          String dialogFragmentTag) {
 
         // If the user has already denied the request, we'll show a different dialog with permission rationale.
-        if (fromFragment.shouldShowRequestPermissionRationale(permissionId)) {
 
-            FragmentUtils.showFragment(fromFragment, RationaleDialog.newInstance(requestId,
-                    fromFragment,
-                    permissionId,
-                    permissionDialogTitle,
-                    permissionRationale),
+        if (ActivityCompat.shouldShowRequestPermissionRationale(fromActivity, permissionId)) {
+            FragmentUtils.showFragment(fromActivity.getSupportFragmentManager(),
+                    RationaleDialog.newInstance(requestId,
+                            null,
+                            permissionId,
+                            permissionDialogTitle,
+                            permissionRationale),
                     dialogFragmentTag);
         } else {
             // Location permission has not been granted yet, request it.
-            fromFragment.requestPermissions(new String[]{permissionId}, requestId);
+            ActivityCompat.requestPermissions(fromActivity, new String[]{permissionId}, requestId);
         }
     }
 

@@ -4,6 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- TODO Add fav button -->
+
     <TextView
         android:id="@+id/bus_stop_key"
         android:layout_width="wrap_content"
@@ -21,7 +23,7 @@
         android:id="@+id/bus_routes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/material_spacing_x_small"
+        android:layout_marginTop="@dimen/material_spacing_small"
         app:childSpacing="@dimen/material_spacing_x_small"
         app:childSpacingForLastRow="align"
         app:rowSpacing="@dimen/material_spacing_x_small"/>

@@ -26,7 +26,6 @@ import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.adapters.ScheduledStopAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
-import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
@@ -64,7 +63,6 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
     private TransitMapFragment transitMapFragment;
 
     private boolean initialLoadFinished;
-
     private boolean googleApiClientInitialized;
 
     public static BusStopsMapFragment newInstance() {
@@ -159,12 +157,12 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
         // If permission to get user's location has not yet been granted, then ask the user.
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            PermissionUtils.requestPermission(this,
-                    IntentRequestCodes.LOCATION_PERMISSION_REQUEST_CODE.ordinal(),
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    getString(R.string.location_permission_dialog_title),
-                    getString(R.string.location_permission_rational),
-                    PERMISSION_DIALOG_TAG);
+//            PermissionUtils.requestPermission(this,
+//                    IntentRequestCodes.LOCATION_PERMISSION_REQUEST_CODE.ordinal(),
+//                    Manifest.permission.ACCESS_FINE_LOCATION,
+//                    getString(R.string.location_permission_dialog_title),
+//                    getString(R.string.location_permission_rational),
+//                    PERMISSION_DIALOG_TAG);
         }
         loadBusStopsAtUserLocationIfReady(false);
     }
@@ -212,9 +210,9 @@ public class BusStopsMapFragment extends BaseFragment implements TransitMapFragm
         } else {
             // Permission was denied. Let's display a dialog explaining why we need location services, and how to grant
             // the permission if it's permanently denied.
-            FragmentUtils.showFragment(this,
-                    PermissionDeniedDialog.newInstance(getString(R.string.location_permission_denied)),
-                    PERMISSION_DIALOG_TAG);
+//            FragmentUtils.showFragment(this,
+//                    PermissionDeniedDialog.newInstance(getString(R.string.location_permission_denied)),
+//                    PERMISSION_DIALOG_TAG);
         }
     }
 

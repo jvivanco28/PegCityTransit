@@ -30,7 +30,7 @@ import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusStopInfoView;
 
-// TODO Need to handle orientation changes
+// TODO Need to retain opened info window on orientation changes.
 public class TransitMapFragment extends BaseFragment implements OnMapReadyCallback,
         GoogleMap.OnInfoWindowClickListener,
         GoogleMap.InfoWindowAdapter {
