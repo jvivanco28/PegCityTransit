@@ -50,7 +50,7 @@
                 android:layout_marginRight="@dimen/material_spacing_medium"
                 app:layout_anchor="@id/map_fragment_container"
                 app:layout_anchorGravity="bottom|right|end"
-                app:srcCompat="@drawable/ic_refresh_white_24dp"/>
+                app:srcCompat="@drawable/ic_search_white_24dp"/>
 
         </android.support.design.widget.CoordinatorLayout>
 
@@ -63,7 +63,7 @@
 
     </RelativeLayout>
 
-    <jessevivanco.com.pegcitytransit.ui.view_holders.BusStopScheduleBottomSheet
+    <jessevivanco.com.pegcitytransit.ui.views.BusStopScheduleBottomSheet
         android:id="@+id/bottom_sheet_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

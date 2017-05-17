@@ -1,4 +1,4 @@
-package jessevivanco.com.pegcitytransit.ui.view_holders;
+package jessevivanco.com.pegcitytransit.ui.views;
 
 import android.content.Context;
 import android.os.Bundle;

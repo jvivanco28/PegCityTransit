@@ -34,7 +34,7 @@ import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialo
 import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
-import jessevivanco.com.pegcitytransit.ui.view_holders.BusStopScheduleBottomSheet;
+import jessevivanco.com.pegcitytransit.ui.views.BusStopScheduleBottomSheet;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
