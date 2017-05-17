@@ -135,7 +135,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     private void setupBottomNav(@Nullable Bundle savedInstanceState) {
         // Select the first tab on initial launch.
         if (savedInstanceState == null) {
-            bottomNavigation.setSelectedItemId(R.id.map);
+            bottomNavigation.setSelectedItemId(R.id.search);
         } else {
             bottomNavigation.setSelectedItemId(savedInstanceState.getInt(STATE_KEY_SELECTED_TAB));
         }
@@ -145,7 +145,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
             transmitMapPresenter.tearDown();
 
             switch (item.getItemId()) {
-                case R.id.map:
+                case R.id.search:
                     loadBusStopsAtUserLocationIfReady(true);
                     break;
                 case R.id.my_stops:
@@ -173,7 +173,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
      * floating action button stays hidden if we don't have access to the user's location.
      */
     private void setupFabVisibility(int selectedTabItemId) {
-        if (selectedTabItemId != R.id.map) {
+        if (selectedTabItemId != R.id.search) {
             searchBusStopsFab.hide();
             myLocationFab.hide();
         } else {
@@ -213,23 +213,29 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     }
 
     /**
-     * Searches for bus stops around the user's location if the map has loaded AND the google API
-     * client has been initialized. If {@code forceLoad} is set to {@code false}, then we only
+     * Searches for bus stops around the user's location if:<br/>
+     * 1. The map has loaded<br/>
+     * 2. The google API client has been initialized.<br/>
+     * 3. We have permission to access the user's location.<br/>
+     * <p>
+     * If {@code forceLoad} is set to {@code false}, then we only
      * load once (additional calls will be ignored). Otherwise, we load as long as the map is
      * ready and we have the user's last known location.
-     *
-     * @param forceLoad
      */
     private void loadBusStopsAtUserLocationIfReady(boolean forceLoad) {
-        if (transitMapFragment.isMapReady() && googleApiClientInitialized && (!initialLoadFinished || forceLoad)) {
+        Log.v("DEBUG", "loadBusStopsAtUserLocationIfReady");
 
-            Location lastKnownLocation = null;
+        if (transitMapFragment.isMapReady() &&
+                googleApiClientInitialized &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                (!initialLoadFinished || forceLoad)) {
+
+
+            Log.v("DEBUG", "doing it!");
 
             // Use the user's last known location if we have access to that information. Else just
             // defaults to downtown Winnipeg.
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            }
+            Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
             transmitMapPresenter.loadBusStopsAroundCoordinates(lastKnownLocation != null ? lastKnownLocation.getLatitude() : null,
                     lastKnownLocation != null ? lastKnownLocation.getLongitude() : null,
@@ -239,7 +245,6 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
             initialLoadFinished = true;
         }
     }
-
 
     @Override
     public void showBusRoutesForStop(BusStopViewModel busStop) {
@@ -344,6 +349,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
+        Log.v("DEBUG", "onRequestPermissionsResult");
         // We're only interested in location services
         if (requestCode != IntentRequestCodes.LOCATION_PERMISSION_REQUEST_CODE.ordinal()) {
             return;
