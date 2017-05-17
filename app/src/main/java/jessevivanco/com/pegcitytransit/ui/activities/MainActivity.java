@@ -14,10 +14,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -76,6 +80,15 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     RecyclerView stopScheduleRecyclerView;
     ScheduledStopAdapter stopScheduleAdapter;
     BusStopSchedulePresenter stopSchedulePresenter;
+
+    @BindView(R.id.bottom_sheet_toolbar_title)
+    TextView bottomSheetToolbarTitle;
+
+    @BindView(R.id.toolbar_fav_stop)
+    LottieAnimationView favStopButton;
+
+    @BindView(R.id.bottom_sheet_progress_bar)
+    ProgressBar bottomSheetProgressBar;
 
     private GoogleApiClient googleApiClient;
     private int mapSearchRadius;
@@ -252,9 +265,10 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
     @Override
     public void showBusStopSchedule(BusStopViewModel busStopViewModel) {
+
         // Slightly open the bottom sheet so that we can display the bus stop's schedule.
+        bottomSheetToolbarTitle.setText(busStopViewModel.getName());
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        stopScheduleAdapter.setBusStop(busStopViewModel);
 
         // Load the schedule or the bus stop.
         stopSchedulePresenter.loadScheduleForBusStop(busStopViewModel.getKey());
@@ -290,6 +304,15 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     @Override
     public void showScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
         stopScheduleAdapter.setScheduledStops(scheduledStops);
+    }
+
+    @Override
+    public void showLoadingScheduleIndicator(boolean visible) {
+        if (visible) {
+            bottomSheetProgressBar.setVisibility(View.VISIBLE);
+        } else {
+            bottomSheetProgressBar.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -370,5 +393,17 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     @OnClick(R.id.my_location_button)
     public void goToMyLocation() {
         loadBusStopsAtUserLocationIfReady(true);
+    }
+
+    @OnClick(R.id.bottom_sheet_toolbar_close_button)
+    public void closeBottomSheet() {
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    @OnClick(R.id.toolbar_fav_stop)
+    public void toggleFavStop() {
+        // TODO get current stop
+        favStopButton.playAnimation();
+//        favStopButton.reverseAnimation();
     }
 }

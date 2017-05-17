@@ -12,6 +12,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!-- Inner coordinator layout here so we can shift the FAB buttons when displaying SnackBar messages. -->
         <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -62,21 +63,7 @@
 
     </RelativeLayout>
 
-    <!-- TODO play with numbers here -->
-    <FrameLayout
-        android:id="@+id/bottom_sheet_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorAccent"
-        app:behavior_hideable="true"
-        app:behavior_skipCollapsed="true"
-        app:layout_behavior="@string/bottom_sheet_behavior">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/schedule_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    </FrameLayout>
+    <!-- Bottom sheet. Using coordinator layout so we can handle pinning the toolbar, paralax effect, etc.  -->
+    <include layout="@layout/bottom_sheet_schedule"/>
 
 </android.support.design.widget.CoordinatorLayout>

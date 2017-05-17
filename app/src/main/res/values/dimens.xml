@@ -18,7 +18,9 @@
     <dimen name="material_spacing_small">8dp</dimen>
     <dimen name="material_spacing_x_small">4dp</dimen>
 
+    <dimen name="text_toolbar_button">32sp</dimen>
     <dimen name="fab_size">56dp</dimen>
+    <dimen name="toolbar_button_size">42dp</dimen>
 
     <dimen name="horizontal_list_cell_width">150dp</dimen>
     <dimen name="horizontal_list_height">150dp</dimen>

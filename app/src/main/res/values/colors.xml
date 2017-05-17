@@ -17,6 +17,8 @@
     <color name="grey">#C9CBCE</color>
     <color name="text_grey">#5E656D</color>
 
+    <color name="list_background">@color/white</color>
+
     <color name="spirit_route">#008000</color>
     <color name="normal_route">@color/white</color>
     <color name="express_route">#ffff00</color>

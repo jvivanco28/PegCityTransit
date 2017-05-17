@@ -130,4 +130,9 @@ public class BusStopScheduleActivity extends BaseActivity implements BusStopSche
         Snackbar.make(swipeRefreshLayout, msg, Snackbar.LENGTH_LONG).show();
         swipeRefreshLayout.setRefreshing(false);
     }
+
+    @Override
+    public void showLoadingScheduleIndicator(boolean visible) {
+
+    }
 }

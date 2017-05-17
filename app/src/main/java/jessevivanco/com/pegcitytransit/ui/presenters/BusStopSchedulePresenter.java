@@ -39,6 +39,11 @@ public class BusStopSchedulePresenter {
         loadScheduleSubscription = scheduleRepository.getBusStopSchedule(busStopKey)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> {
+                    viewContract.showScheduledStops(null);
+                    viewContract.showLoadingScheduleIndicator(true);
+                })
+                .doFinally(() -> viewContract.showLoadingScheduleIndicator(false))
                 .subscribe(
                         scheduledStops -> {
                             // TODO handle nothing in schedule
@@ -52,6 +57,8 @@ public class BusStopSchedulePresenter {
     }
 
     public interface ViewContract extends BaseViewContract {
+
+        void showLoadingScheduleIndicator(boolean visible);
 
         void showScheduledStops(List<ScheduledStopViewModel> scheduledStops);
     }
