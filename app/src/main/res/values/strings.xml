@@ -29,6 +29,7 @@
     <string name="routes">Routes</string>
 
     <!--    UI Labels   -->
+    <string name="select_a_bus_route">Select a Bus Route</string>
     <string name="departs_in">Departs in {time} {time_unit}</string>
     <string name="due">Due</string>
 

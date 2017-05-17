@@ -9,25 +9,20 @@ import org.parceler.Parcels;
 
 import java.util.List;
 
-import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesListPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
-// TODO generify this!
 public class BusRoutesAdapter extends RecyclerView.Adapter<BusRouteCellViewHolder> {
 
     private static final String STATE_KEY_LIST = "list";
 
-    private BusRoutesListPresenter busRoutesPresenter;
     private BusRouteCellViewHolder.OnBusRouteCellClickedListener onBusRouteCellClickedListener;
 
     private List<BusRouteViewModel> busRoutes;
 
-    public BusRoutesAdapter(BusRoutesListPresenter busRoutesPresenter,
-                            @Nullable Bundle savedInstanceState,
+    public BusRoutesAdapter(@Nullable Bundle savedInstanceState,
                             BusRouteCellViewHolder.OnBusRouteCellClickedListener onBusRouteCellClickedListener) {
 
-        this.busRoutesPresenter = busRoutesPresenter;
         this.onBusRouteCellClickedListener = onBusRouteCellClickedListener;
 
         if (savedInstanceState != null) {
@@ -54,16 +49,8 @@ public class BusRoutesAdapter extends RecyclerView.Adapter<BusRouteCellViewHolde
         return busRoutes != null ? busRoutes.size() : 0;
     }
 
-    public BusRoutesListPresenter getBusRoutesPresenter() {
-        return busRoutesPresenter;
-    }
-
     public void setBusRoutes(List<BusRouteViewModel> routes) {
         this.busRoutes = routes;
         notifyDataSetChanged();
-    }
-
-    public List<BusRouteViewModel> getBusRoutes() {
-        return busRoutes;
     }
 }

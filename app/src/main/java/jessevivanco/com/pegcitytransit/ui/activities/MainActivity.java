@@ -27,6 +27,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
+import jessevivanco.com.pegcitytransit.ui.fragments.BusRoutesDialogFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
 import jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
@@ -34,12 +35,14 @@ import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusStopScheduleBottomSheet;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 public class MainActivity extends BaseActivity implements TransmitMapPresenter.ViewContract,
         TransitMapFragment.TransitMapCallbacks,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        BusRoutesDialogFragment.OnBusRouteSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -149,16 +152,18 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                     transmitMapPresenter.loadSavedBusStops();
                     break;
                 case R.id.routes:
-                    showAllBusRoutes();
+                    showBusRoutesModal();
                     break;
             }
             return true;
         });
 
         bottomNavigation.setOnNavigationItemReselectedListener(item -> {
-            // Not doing anything here. Setting a nav item reselected listener will prevent
-            // reselects from triggering the above listener. We only want to kill a previous REST
-            // call when switching tabs. Reselects shouldn't kill subscriptions.
+
+            // Only re-selecting the bus routes tab will do something.
+            if (item.getItemId() == R.id.routes) {
+                showBusRoutesModal();
+            }
         });
     }
 
@@ -184,8 +189,8 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         });
     }
 
-    private void showAllBusRoutes() {
-        // TODO
+    private void showBusRoutesModal() {
+        BusRoutesDialogFragment.newInstance().show(getSupportFragmentManager(), BusRoutesDialogFragment.TAG);
     }
 
     /**
@@ -338,6 +343,11 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                     PermissionDeniedDialog.newInstance(getString(R.string.location_permission_denied)),
                     PERMISSION_DIALOG_TAG);
         }
+    }
+
+    @Override
+    public void onBusRouteSelected(BusRouteViewModel busRoute) {
+        transmitMapPresenter.loadBusStopsForBusRoute(busRoute);
     }
 
     /**

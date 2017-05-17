@@ -15,9 +15,9 @@ import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.data.util.DisposableUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
-public class BusRoutesListPresenter {
+public class BusRoutesPresenter {
 
-    private static final String TAG = BusRoutesListPresenter.class.getSimpleName();
+    private static final String TAG = BusRoutesPresenter.class.getSimpleName();
 
     @Inject
     BusRoutesRepository routesRepository;
@@ -27,7 +27,7 @@ public class BusRoutesListPresenter {
     private Disposable loadBusRoutesSubscription;
     private ViewContract viewContract;
 
-    public BusRoutesListPresenter(AppComponent injector, ViewContract viewContract) {
+    public BusRoutesPresenter(AppComponent injector, ViewContract viewContract) {
         injector.injectInto(this);
         this.viewContract = viewContract;
     }
@@ -38,6 +38,8 @@ public class BusRoutesListPresenter {
         loadBusRoutesSubscription = routesRepository.getAllBusRoutes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> viewContract.showLoadingIndicator(true))
+                .doFinally(() -> viewContract.showLoadingIndicator(false))
                 .subscribe(
                         busRoutes -> viewContract.showAllBusRoutes(busRoutes),
                         throwable -> viewContract.showErrorMessage(context.getString(R.string.error_loading_bus_routes))
@@ -45,6 +47,8 @@ public class BusRoutesListPresenter {
     }
 
     public interface ViewContract extends BaseViewContract {
+
+        void showLoadingIndicator(boolean visible);
 
         void showAllBusRoutes(List<BusRouteViewModel> busRoutes);
     }
