@@ -119,7 +119,8 @@ public class BusStopInfoWindowAdapter {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
-                            marker -> marker.setVisible(visible), throwable -> {
+                            marker -> marker.setVisible(visible),
+                            throwable -> {
                                 // TODO report crash
                                 Log.e("DEBUG", "asdf", throwable);
                             }

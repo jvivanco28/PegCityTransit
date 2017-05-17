@@ -63,7 +63,14 @@
 
     </RelativeLayout>
 
-    <!-- Bottom sheet. Using coordinator layout so we can handle pinning the toolbar, paralax effect, etc.  -->
-    <include layout="@layout/bottom_sheet_schedule"/>
+    <jessevivanco.com.pegcitytransit.ui.view_holders.BusStopScheduleBottomSheet
+        android:id="@+id/bottom_sheet_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/list_background"
+        android:fitsSystemWindows="true"
+        app:behavior_hideable="true"
+        app:behavior_skipCollapsed="true"
+        app:layout_behavior="@string/bottom_sheet_behavior"/>
 
 </android.support.design.widget.CoordinatorLayout>

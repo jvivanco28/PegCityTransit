@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -151,9 +152,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
      */
     public void drawSearchRadius(@Nullable Double latitude, @Nullable Double longitude, int radius) {
         // Remove previous search area circle
-        if (searchArea != null) {
-            searchArea.remove();
-        }
+        clearSearchRadius();
 
         if (latitude == null) {
             latitude = googleMap.getCameraPosition().target.latitude;
@@ -170,6 +169,16 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
                 .strokeWidth(getResources().getDimensionPixelSize(R.dimen.map_search_border_width));
 
         searchArea = googleMap.addCircle(circleOptions);
+    }
+
+    /**
+     * Removes the search area circle if one was drawn.
+     */
+    public void clearSearchRadius() {
+        if (searchArea != null) {
+            searchArea.remove();
+        }
+        searchArea = null;
     }
 
     /**
@@ -266,6 +275,9 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
      */
     @Override
     public View getInfoContents(Marker marker) {
+        // FIXME window refresh is causing the first schedule subscription to get cancelled.
+        Log.v("DEBUG", "Called getInfoContents");
+
         BusStopViewModel busStop = busStopInfoWindowAdapter.getBusStopForMarker(marker);
 
         // Display the bus stop info

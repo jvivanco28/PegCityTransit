@@ -11,17 +11,10 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -34,21 +27,17 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
-import jessevivanco.com.pegcitytransit.ui.adapters.ScheduledStopAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
 import jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
-import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
-import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
+import jessevivanco.com.pegcitytransit.ui.view_holders.BusStopScheduleBottomSheet;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
-import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
 public class MainActivity extends BaseActivity implements TransmitMapPresenter.ViewContract,
         TransitMapFragment.TransitMapCallbacks,
-        BusStopSchedulePresenter.ViewContract,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
@@ -73,22 +62,8 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     BottomNavigationView bottomNavigation;
 
     @BindView(R.id.bottom_sheet_container)
-    ViewGroup bottomSheetContainer;
+    BusStopScheduleBottomSheet stopScheduleBottomSheet;
     BottomSheetBehavior bottomSheetBehavior;
-
-    @BindView(R.id.schedule_recycler_view)
-    RecyclerView stopScheduleRecyclerView;
-    ScheduledStopAdapter stopScheduleAdapter;
-    BusStopSchedulePresenter stopSchedulePresenter;
-
-    @BindView(R.id.bottom_sheet_toolbar_title)
-    TextView bottomSheetToolbarTitle;
-
-    @BindView(R.id.toolbar_fav_stop)
-    LottieAnimationView favStopButton;
-
-    @BindView(R.id.bottom_sheet_progress_bar)
-    ProgressBar bottomSheetProgressBar;
 
     private GoogleApiClient googleApiClient;
     private int mapSearchRadius;
@@ -110,7 +85,6 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         setupGoogleApiClient();
         setupBottomNav(savedInstanceState);
         setupBottomSheet(savedInstanceState);
-        setupStopSchedule(savedInstanceState);
     }
 
     @Override
@@ -189,7 +163,13 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     }
 
     private void setupBottomSheet(@Nullable Bundle savedInstanceState) {
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer);
+
+        stopScheduleBottomSheet.initialize(savedInstanceState, getInjector());
+        stopScheduleBottomSheet.setOnCloseButtonClickedListener(v -> {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        });
+
+        bottomSheetBehavior = BottomSheetBehavior.from(stopScheduleBottomSheet);
         bottomSheetBehavior.setState(savedInstanceState != null ?
                 savedInstanceState.getInt(STATE_KEY_BOTTOM_SHEET_STATE, BottomSheetBehavior.STATE_HIDDEN) :
                 BottomSheetBehavior.STATE_HIDDEN);
@@ -202,16 +182,6 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                 mapFragmentContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
-    }
-
-    private void setupStopSchedule(@Nullable Bundle savedInstanceState) {
-
-        stopSchedulePresenter = new BusStopSchedulePresenter(getInjector(), this);
-        stopScheduleAdapter = new ScheduledStopAdapter(savedInstanceState);
-
-        stopScheduleRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        stopScheduleRecyclerView.addItemDecoration(new VerticalListItemDecoration(getResources().getDimensionPixelSize(R.dimen.material_spacing_small), getResources().getDimensionPixelSize(R.dimen.material_spacing_small)));
-        stopScheduleRecyclerView.setAdapter(stopScheduleAdapter);
     }
 
     private void showAllBusRoutes() {
@@ -267,11 +237,10 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     public void showBusStopSchedule(BusStopViewModel busStopViewModel) {
 
         // Slightly open the bottom sheet so that we can display the bus stop's schedule.
-        bottomSheetToolbarTitle.setText(busStopViewModel.getName());
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         // Load the schedule or the bus stop.
-        stopSchedulePresenter.loadScheduleForBusStop(busStopViewModel.getKey());
+        stopScheduleBottomSheet.loadScheduleForBusStop(busStopViewModel);
     }
 
     @Override
@@ -288,7 +257,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        stopScheduleAdapter.onSaveInstanceState(outState);
+        stopScheduleBottomSheet.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_KEY_INITIAL_LOAD_FINISHED, initialLoadFinished);
         outState.putInt(STATE_KEY_SELECTED_TAB, bottomNavigation.getSelectedItemId());
@@ -296,23 +265,18 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     }
 
     @Override
-    public void clearMarkersAndShowSearchRadius(Double latitude, Double longitude, Integer searchRadius) {
-        transitMapFragment.clearMarkers();
+    public void showSearchRadius(Double latitude, Double longitude, Integer searchRadius) {
         transitMapFragment.drawSearchRadius(latitude, longitude, mapSearchRadius);
     }
 
     @Override
-    public void showScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
-        stopScheduleAdapter.setScheduledStops(scheduledStops);
+    public void clearMarkers() {
+        transitMapFragment.clearMarkers();
     }
 
     @Override
-    public void showLoadingScheduleIndicator(boolean visible) {
-        if (visible) {
-            bottomSheetProgressBar.setVisibility(View.VISIBLE);
-        } else {
-            bottomSheetProgressBar.setVisibility(View.GONE);
-        }
+    public void clearSearchRadius() {
+        transitMapFragment.clearSearchRadius();
     }
 
     @Override
@@ -393,17 +357,5 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     @OnClick(R.id.my_location_button)
     public void goToMyLocation() {
         loadBusStopsAtUserLocationIfReady(true);
-    }
-
-    @OnClick(R.id.bottom_sheet_toolbar_close_button)
-    public void closeBottomSheet() {
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-    }
-
-    @OnClick(R.id.toolbar_fav_stop)
-    public void toggleFavStop() {
-        // TODO get current stop
-        favStopButton.playAnimation();
-//        favStopButton.reverseAnimation();
     }
 }

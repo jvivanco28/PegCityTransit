@@ -103,12 +103,27 @@ public class BusStopRepository {
         return getSavedBusStops()
                 // Append the new stop
                 .flatMap(busStopViewModels -> {
+
+                    if (busStop == null) {
+                        throw new IllegalArgumentException("Bus Stop must not be null!");
+                    }
+
                     // If the key already exists in the list, then don't bother re-adding it.
                     if (!busStopViewModels.contains(busStop)) {
+
+                        // Don't allow routes to be saved for bus stops. Since there is no expiry
+                        // time for saved stops, we need to be able to refresh the bus routes for
+                        // each bus stop.
+                        busStop.setRoutes(null);
                         busStopViewModels.add(busStop);
                     }
                     // Return the new list of saved stops
                     return Single.just(busStopViewModels);
+                }).doOnSuccess(busStopViewModels -> {
+                    if (cacheManager != null) {
+                        // No expiry on saved stops
+                        cacheManager.put(CACHE_KEY_SAVED_STOPS, busStopViewModels);
+                    }
                 });
     }
 
