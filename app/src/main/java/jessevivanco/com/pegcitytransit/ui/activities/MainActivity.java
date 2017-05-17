@@ -55,11 +55,11 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     @BindView(R.id.map_fragment_container)
     FrameLayout mapFragmentContainer;
 
-    @BindView(R.id.my_location_button)
-    FloatingActionButton myLocationButton;
+    @BindView(R.id.my_location_fab)
+    FloatingActionButton myLocationFab;
 
-    @BindView(R.id.refresh_bus_stops)
-    FloatingActionButton refreshBusStopsButton;
+    @BindView(R.id.search_bus_stops_fab)
+    FloatingActionButton searchBusStopsFab;
 
     @BindView(R.id.tab_navigation)
     BottomNavigationView bottomNavigation;
@@ -146,7 +146,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
             switch (item.getItemId()) {
                 case R.id.map:
-                    // TODO go to your location???
+                    loadBusStopsAtUserLocationIfReady(true);
                     break;
                 case R.id.my_stops:
                     transmitMapPresenter.loadSavedBusStops();
@@ -155,6 +155,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                     showBusRoutesModal();
                     break;
             }
+            setupFabVisibility(item.getItemId());
             return true;
         });
 
@@ -165,6 +166,24 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                 showBusRoutesModal();
             }
         });
+    }
+
+    /**
+     * Displays the floating action buttons for the "Search" tab if it is selected. The "my location"
+     * floating action button stays hidden if we don't have access to the user's location.
+     */
+    private void setupFabVisibility(int selectedTabItemId) {
+        if (selectedTabItemId != R.id.map) {
+            searchBusStopsFab.hide();
+            myLocationFab.hide();
+        } else {
+            searchBusStopsFab.show();
+
+            // We can only show "my location" button if we have permission to access the user's location.
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                myLocationFab.show();
+            }
+        }
     }
 
     private void setupBottomSheet(@Nullable Bundle savedInstanceState) {
@@ -299,7 +318,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                     PERMISSION_DIALOG_TAG);
         } else {
             // Permission is already granted. We can show the "my location" button.
-            myLocationButton.show();
+            setupFabVisibility(bottomNavigation.getSelectedItemId());
         }
         // Attempt to load near by bus stops regardless if the permission has been granted. If
         // permission isn't granted, we'll default to downtown Winnipeg.
@@ -334,7 +353,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         if (PermissionUtils.isPermissionGranted(permissions, grantResults,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-            myLocationButton.show();
+            setupFabVisibility(bottomNavigation.getSelectedItemId());
             loadBusStopsAtUserLocationIfReady(true);
         } else {
             // Permission was denied. Let's display a dialog explaining why we need location services, and how to grant
@@ -353,7 +372,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     /**
      * Search the current map camera location for bus stops.
      */
-    @OnClick(R.id.refresh_bus_stops)
+    @OnClick(R.id.search_bus_stops_fab)
     public void searchForBusStops() {
 
         if (transitMapFragment.isMapReady()) {
@@ -364,7 +383,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         }
     }
 
-    @OnClick(R.id.my_location_button)
+    @OnClick(R.id.my_location_fab)
     public void goToMyLocation() {
         loadBusStopsAtUserLocationIfReady(true);
     }

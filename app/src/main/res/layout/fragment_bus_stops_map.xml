@@ -26,7 +26,7 @@
 
         <!-- This button is hidden until we have access to the user's location. -->
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/my_location_button"
+            android:id="@+id/my_location_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -34,7 +34,7 @@
             app:srcCompat="@drawable/ic_my_location_grey_800_24dp"/>
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/refresh_bus_stops"
+            android:id="@+id/search_bus_stops_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/material_spacing_medium"
