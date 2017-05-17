@@ -220,12 +220,12 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     @Override
     public void showBusRoutesForStop(BusStopViewModel busStop) {
         // The BusStopViewModel should now contain the list of bus routes that stop at that bus stop.
-        transitMapFragment.refreshBusStopInfoWindow(busStop);
+        transitMapFragment.showInfoWindowForBusStop(busStop);
     }
 
     @Override
-    public void showBusStops(List<BusStopViewModel> busStops) {
-        transitMapFragment.showBusStops(busStops, true);
+    public void showBusStops(List<BusStopViewModel> busStops, long markerVisibilityDelayMillis) {
+        transitMapFragment.showBusStops(busStops, true, markerVisibilityDelayMillis);
     }
 
     @Override

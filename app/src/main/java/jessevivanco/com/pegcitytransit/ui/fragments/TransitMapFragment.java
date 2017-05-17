@@ -20,12 +20,12 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.SphericalUtil;
 
+import org.parceler.Parcels;
+
 import java.util.List;
 
 import butterknife.ButterKnife;
 import jessevivanco.com.pegcitytransit.R;
-import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
-import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
@@ -33,13 +33,14 @@ import jessevivanco.com.pegcitytransit.ui.views.BusStopInfoView;
 
 // TODO Need to retain opened info window on orientation changes.
 public class TransitMapFragment extends BaseFragment implements OnMapReadyCallback,
+        GoogleMap.OnMarkerClickListener,
         GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnInfoWindowCloseListener,
         GoogleMap.InfoWindowAdapter {
 
     private static final String STATE_KEY_MAP_CAMERA = "camera_position";
     private static final String STATE_KEY_SEARCH_AREA = "search_area_circle";
-
-    private AppComponent injector;
+    private static final String STATE_KEY_SELECTED_BUS_STOP = "selected_stop";
 
     private SupportMapFragment mapFragment;
     private GoogleMap googleMap;
@@ -49,29 +50,30 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     // Just re-use the same view and change its contents.
     private BusStopInfoView busStopInfoWindow;
 
-    private
+    // Keeping track of ths selected marker/bus stop so we can retain the opened info window on
+    // orientation change.
     @Nullable
-    Circle searchArea;
+    private BusStopViewModel selectedBusStop;
 
-    private
     @Nullable
-    LatLng restoredSearchAreaCoordinates;
+    private Circle searchArea;
 
-    private
     @Nullable
-    CameraPosition restoredCameraPosition;
+    private LatLng restoredSearchAreaCoordinates;
+
+    @Nullable
+    private CameraPosition restoredCameraPosition;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+        getInjector().injectInto(this);
+
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
 
-        injector = ((PegCityTransitApp) getActivity().getApplication()).getInjector();
-        injector.injectInto(this);
-
-        setupMap(savedInstanceState);
         setupAdapters(savedInstanceState);
+        setupMap(savedInstanceState);
     }
 
     @Override
@@ -91,18 +93,22 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         if (googleMap != null) {
             outState.putParcelable(STATE_KEY_MAP_CAMERA, googleMap.getCameraPosition());
         }
+        if (selectedBusStop != null) {
+            outState.putParcelable(STATE_KEY_SELECTED_BUS_STOP, Parcels.wrap(selectedBusStop));
+        }
     }
 
     private void setupMap(Bundle savedInstanceState) {
         mapFragment.getMapAsync(this);
 
+        // We're re-using the same info window when tapping on a marker.
+        busStopInfoWindow = new BusStopInfoView(getActivity());
+
         if (savedInstanceState != null) {
             restoredCameraPosition = savedInstanceState.getParcelable(STATE_KEY_MAP_CAMERA);
             restoredSearchAreaCoordinates = savedInstanceState.getParcelable(STATE_KEY_SEARCH_AREA);
+            selectedBusStop = Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_SELECTED_BUS_STOP));
         }
-
-        // We're re-using the same info window when tapping on a marker.
-        busStopInfoWindow = new BusStopInfoView(getActivity());
     }
 
     private void setupAdapters(Bundle savedInstanceState) {
@@ -143,7 +149,10 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         return googleMap.getCameraPosition().target;
     }
 
-    public void refreshBusStopInfoWindow(BusStopViewModel busStop) {
+    /**
+     * Shows an info window on the map for the provided bus stop.
+     */
+    public void showInfoWindowForBusStop(BusStopViewModel busStop) {
         busStopInfoWindowAdapter.showInfoWindowForBusStop(busStop);
     }
 
@@ -183,17 +192,24 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
 
     /**
      * Show the list of bus stops as markers on the map.
+     *
+     * @param busStops                    The list of bus stops to show as markers.
+     * @param animateCamera               If set to {@code true} then pans & zooms the camera such that it can fit
+     *                                    all markers on screen.
+     * @param delayMarkerVisibilityMillis Number of milliseconds to delay when showing a marker as
+     *                                    visible.
      */
-    public void showBusStops(List<BusStopViewModel> busStops, boolean animateCamera) {
+    public void showBusStops(List<BusStopViewModel> busStops,
+                             boolean animateCamera,
+                             long delayMarkerVisibilityMillis) {
 
         clearMarkers();
 
         // Add the bus stops as markers to the map. We're given the bounding box of all of the
         // markers such that we can zoom to fit all markers on the map.
-        LatLngBounds bounds = busStopInfoWindowAdapter.showBusStopsAsMarkers(googleMap, busStops);
+        LatLngBounds bounds = busStopInfoWindowAdapter.showBusStopsAsMarkers(googleMap, busStops, delayMarkerVisibilityMillis);
 
         if (animateCamera) {
-
             // If we've drawn a circular "search" area, then zoom in on the map such that we fit the
             // entire circle within the view bounds.
             if (searchArea != null) {
@@ -213,32 +229,12 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         if (transitMapCallbacks == null) {
             throw new IllegalArgumentException("TransitMapCallbacks must not be null!");
         }
-
         this.googleMap = googleMap;
 
-        // Restore the camera position if we just changed orientation.
-        if (restoredCameraPosition != null) {
-            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(restoredCameraPosition));
-        } else {
-            // Default coordinates if we don't have user's location permission.
-            LatLng downtownWinnipeg = new LatLng(Double.valueOf(getString(R.string.downtown_winnipeg_latitude)), Double.valueOf(getString(R.string.downtown_winnipeg_longitude)));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(downtownWinnipeg, getResources().getInteger(R.integer.default_city_wide_map_zoom)));
-        }
-
-        // Redraw the searched bus stop area if we just changed orientation
-        if (restoredSearchAreaCoordinates != null) {
-            drawSearchRadius(restoredSearchAreaCoordinates.latitude,
-                    restoredSearchAreaCoordinates.longitude,
-                    getResources().getInteger(R.integer.default_map_search_radius));
-        }
-
-        // Redraw bus stop markers if we changed orientation.
-        if (busStopInfoWindowAdapter.getBusStops() != null) {
-            showBusStops(busStopInfoWindowAdapter.getBusStops(), false);
-        }
-
+        googleMap.setOnMarkerClickListener(this);
         googleMap.setInfoWindowAdapter(this);
         googleMap.setOnInfoWindowClickListener(this);
+        googleMap.setOnInfoWindowCloseListener(this);
 
         // Hide the "my location" button.
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -252,7 +248,77 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
             googleMap.setMyLocationEnabled(true);
         }
 
+        // Restore the camera position if we just changed orientation.
+        if (restoredCameraPosition != null) {
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(restoredCameraPosition));
+        } else {
+            // Default coordinates if we don't have user's location permission.
+            LatLng downtownWinnipeg = new LatLng(Double.valueOf(getString(R.string.downtown_winnipeg_latitude)), Double.valueOf(getString(R.string.downtown_winnipeg_longitude)));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(downtownWinnipeg, getResources().getInteger(R.integer.default_city_wide_map_zoom)));
+        }
+        // Redraw the searched bus stop area if we just changed orientation
+        if (restoredSearchAreaCoordinates != null) {
+            drawSearchRadius(restoredSearchAreaCoordinates.latitude,
+                    restoredSearchAreaCoordinates.longitude,
+                    getResources().getInteger(R.integer.default_map_search_radius));
+        }
+        // Now that the map is ready, we can restore the state of the map as it was before the
+        // the orientation change.
+        if (busStopInfoWindowAdapter.getBusStops() != null) {
+            showBusStops(busStopInfoWindowAdapter.getBusStops(), false, 0);
+
+            // If we were displaying an info window prior to orientation change, then re-show that window.
+            if (selectedBusStop != null) {
+                showInfoWindowForBusStop(selectedBusStop);
+            }
+        }
         transitMapCallbacks.onMapReady();
+    }
+
+    /**
+     * A marker was clicked. Get the {code BusStopViewModel} that maps to that specific marker and
+     * load the upcoming schedule for that stop.
+     */
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        BusStopViewModel busStop = busStopInfoWindowAdapter.getBusStopForMarker(marker);
+
+        transitMapCallbacks.showBusStopSchedule(busStop);
+
+        // If the bus stop doesn't have the routes loaded yet, then fetch them and refresh the info window.
+        if (busStop.getRoutes() == null || busStop.getRoutes().size() == 0) {
+            transitMapCallbacks.loadBusRoutesForStop(busStop);
+        }
+        return false;
+    }
+
+    @Override
+    public View getInfoWindow(Marker marker) {
+        // We're just using the default window. We have our own layout for its contents though. See getInfoContents(Marker).
+        return null;
+    }
+
+    /**
+     * We're about to display the info window for a clicked marker. Get the {code BusStopViewModel}
+     * that maps to that specific marker, and display the bus stop information.
+     */
+    @Override
+    public View getInfoContents(Marker marker) {
+        BusStopViewModel busStop = busStopInfoWindowAdapter.getBusStopForMarker(marker);
+
+        // Keep track of the selected bus stop just so we can retain the state of an open info window.
+        selectedBusStop = busStop;
+
+        // Display the bus stop info
+        busStopInfoWindow.showBusStopInfo(busStop);
+
+        return busStopInfoWindow;
+    }
+
+    @Override
+    public void onInfoWindowClose(Marker marker) {
+        // We closed the info window, so we don't care about this selected bus stop anymore.
+        selectedBusStop = null;
     }
 
     /**
@@ -261,34 +327,6 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     @Override
     public void onInfoWindowClick(Marker marker) {
         transitMapCallbacks.showBusStopSchedule(busStopInfoWindowAdapter.getBusStopForMarker(marker));
-    }
-
-    @Override
-    public View getInfoWindow(Marker marker) {
-        // We're just using the default window. We have out own layout for its contents though. See getInfoContents(Marker).
-        return null;
-    }
-
-    /**
-     * A marker was clicked. Get the {code BusStopViewModel} that maps to that specific marker, and
-     * display its info along with which bus routes stop at the bus stop.
-     */
-    @Override
-    public View getInfoContents(Marker marker) {
-        // FIXME window refresh is causing the first schedule subscription to get cancelled.
-        Log.v("DEBUG", "Called getInfoContents");
-
-        BusStopViewModel busStop = busStopInfoWindowAdapter.getBusStopForMarker(marker);
-
-        // Display the bus stop info
-        busStopInfoWindow.showBusStopInfo(busStop);
-        transitMapCallbacks.showBusStopSchedule(busStop);
-
-        // If the bus stop doesn't have the routes loaded yet, then fetch them and refresh the info window.
-        if (busStop.getRoutes() == null || busStop.getRoutes().size() == 0) {
-            transitMapCallbacks.loadBusRoutesForStop(busStop);
-        }
-        return busStopInfoWindow;
     }
 
     // TODO DOCUMENT THIS

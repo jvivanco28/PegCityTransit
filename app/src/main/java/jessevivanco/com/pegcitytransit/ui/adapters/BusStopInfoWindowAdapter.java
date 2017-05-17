@@ -28,7 +28,6 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 public class BusStopInfoWindowAdapter {
 
     private static final String STATE_BUS_STOPS = "bus_stops";
-    private static final int MARKER_VISIBILITY_DELAY_MILLIS = 50;
 
     private List<BusStopViewModel> busStops;
     private Map<Marker, BusStopViewModel> markerToBusStopHashMap;
@@ -65,7 +64,9 @@ public class BusStopInfoWindowAdapter {
      * @return The camera bounds that surrounds all markers displayed on the map. Used so that we
      * can zoom in on the map as much as possible while still keeping all markers visible on screen.
      */
-    public LatLngBounds showBusStopsAsMarkers(GoogleMap googleMap, List<BusStopViewModel> busStops) {
+    public LatLngBounds showBusStopsAsMarkers(GoogleMap googleMap,
+                                              List<BusStopViewModel> busStops,
+                                              long delayMarkerVisibilityMillis) {
 
         this.busStops = busStops;
 
@@ -99,21 +100,24 @@ public class BusStopInfoWindowAdapter {
         this.markerToBusStopHashMap = markerToKeyHashMap;
 
         // Now display all markers.
-        cascadeMarkerVisibility(true);
-
+        if (delayMarkerVisibilityMillis > 0) {
+            cascadeMarkerVisibility(true, delayMarkerVisibilityMillis);
+        } else {
+            changeMarkerVisibility(true);
+        }
         return latLngBoundsBuilder.build();
     }
 
     /**
      * Cascades the visibility of all markers within {@code markerToBusStopHashMap}.
      */
-    private void cascadeMarkerVisibility(boolean visible) {
+    private void cascadeMarkerVisibility(boolean visible, long delayMarkerVisibilityMillis) {
         DisposableUtil.dispose(showMarkerVisibilitySubscription);
 
         if (markerToBusStopHashMap != null) {
             final ArrayList<Marker> markerList = new ArrayList<>(markerToBusStopHashMap.keySet());
 
-            showMarkerVisibilitySubscription = Observable.interval(MARKER_VISIBILITY_DELAY_MILLIS, MARKER_VISIBILITY_DELAY_MILLIS, TimeUnit.MILLISECONDS)
+            showMarkerVisibilitySubscription = Observable.interval(delayMarkerVisibilityMillis, delayMarkerVisibilityMillis, TimeUnit.MILLISECONDS)
                     .map(i -> markerList.get(i.intValue()))
                     .take(markerList.size())
                     .subscribeOn(Schedulers.io())
@@ -125,6 +129,17 @@ public class BusStopInfoWindowAdapter {
                                 Log.e("DEBUG", "asdf", throwable);
                             }
                     );
+        }
+    }
+
+    /**
+     * Changes the visibility of all markers within {@code markerToBusStopHashMap}.
+     */
+    private void changeMarkerVisibility(boolean visible) {
+        if (markerToBusStopHashMap != null) {
+            for (Marker m : markerToBusStopHashMap.keySet()) {
+                m.setVisible(visible);
+            }
         }
     }
 

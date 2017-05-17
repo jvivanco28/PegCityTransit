@@ -27,6 +27,7 @@ public class TransmitMapPresenter {
     private final double DEFAULT_LAT;
     private final double DEFAULT_LONG;
     private final int DEFAULT_RADIUS;
+    private final long MARKER_VISIBILITY_DELAY_MILLIS;
 
     @Inject
     BusStopRepository stopsRepository;
@@ -49,6 +50,7 @@ public class TransmitMapPresenter {
         DEFAULT_LONG = Double.parseDouble(context.getString(R.string.downtown_winnipeg_longitude));
         DEFAULT_RADIUS = context.getResources().getInteger(R.integer
                 .default_map_search_radius);
+        MARKER_VISIBILITY_DELAY_MILLIS = context.getResources().getInteger(R.integer.marker_visibility_delay_millis);
     }
 
     public void loadBusStopsAroundCoordinates(@Nullable Double latitude, @Nullable Double longitude, @Nullable Integer radius) {
@@ -69,7 +71,7 @@ public class TransmitMapPresenter {
                 .subscribe(
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
-                                viewContract.showBusStops(busStops);
+                                viewContract.showBusStops(busStops, MARKER_VISIBILITY_DELAY_MILLIS);
                             } else {
                                 viewContract.showErrorMessage(context.getString(R.string.no_bus_stops_in_that_area));
                             }
@@ -105,7 +107,7 @@ public class TransmitMapPresenter {
                 .subscribe(
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
-                                viewContract.showBusStops(busStops);
+                                viewContract.showBusStops(busStops, MARKER_VISIBILITY_DELAY_MILLIS);
                             } else {
                                 viewContract.showErrorMessage(context.getString(R.string.no_bus_stops_in_that_area));
                             }
@@ -130,7 +132,7 @@ public class TransmitMapPresenter {
                 .subscribe(
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
-                                viewContract.showBusStops(busStops);
+                                viewContract.showBusStops(busStops, MARKER_VISIBILITY_DELAY_MILLIS);
                             } else {
                                 viewContract.showErrorMessage(context.getString(R.string.no_saved_stops));
                             }
@@ -151,7 +153,7 @@ public class TransmitMapPresenter {
 
     public interface ViewContract extends BaseViewContract {
 
-        void showBusStops(List<BusStopViewModel> busStops);
+        void showBusStops(List<BusStopViewModel> busStops, long delayMarkerVisibilityMillis);
 
         void showBusRoutesForStop(BusStopViewModel busStop);
 
