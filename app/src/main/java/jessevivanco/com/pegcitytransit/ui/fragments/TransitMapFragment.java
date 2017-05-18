@@ -27,6 +27,7 @@ import butterknife.ButterKnife;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
 import jessevivanco.com.pegcitytransit.ui.fragments.base.BaseFragment;
+import jessevivanco.com.pegcitytransit.ui.util.ScreenUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusStopInfoView;
 
@@ -233,6 +234,10 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         googleMap.setInfoWindowAdapter(this);
         googleMap.setOnInfoWindowClickListener(this);
         googleMap.setOnInfoWindowCloseListener(this);
+
+        // TODO verify this works on older devices.
+        int mapPadding = ScreenUtil.getStatusBarHeight(getContext());
+        googleMap.setPadding(0, mapPadding, 0, 0);
 
         // Hide the "my location" button.
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);

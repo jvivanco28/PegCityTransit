@@ -24,7 +24,7 @@
     <string name="location_permission_denied">This app uses location services to find bus stops near your location. If the permission has been permanently denied, it can be enabled from System Settings &gt; Apps &gt; \'PegCityTransit\'.</string>
 
     <!-- Bottom Tabs -->
-    <string name="search">Search</string>
+    <string name="search_stops">Search Stops</string>
     <string name="my_stops">My Stops</string>
     <string name="routes">Routes</string>
 
