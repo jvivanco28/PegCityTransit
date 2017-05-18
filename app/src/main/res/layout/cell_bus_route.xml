@@ -1,47 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="busRoute"
-            type="jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel"/>
-    </data>
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/cell_container"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        card_view:cardCornerRadius="@dimen/card_corner_radius"
-        card_view:contentPadding="@dimen/material_spacing_small">
+        android:orientation="horizontal">
 
-        <LinearLayout
+        <jessevivanco.com.pegcitytransit.ui.views.BusRouteTextView
+            android:id="@+id/bus_route_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/bus_route_name"
+            fontPath="fonts/bariol_bold.ttf"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/material_spacing_small"
+            android:layout_marginStart="@dimen/material_spacing_small"
+            android:textSize="@dimen/text_title"
+            tools:ignore="MissingPrefix"/>
 
-            <jessevivanco.com.pegcitytransit.ui.views.BusRouteTextView
-                android:id="@+id/bus_route_number"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+    </LinearLayout>
 
-            <TextView
-                android:id="@+id/bus_route_name"
-                fontPath="fonts/bariol_bold.ttf"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="@dimen/material_spacing_small"
-                android:layout_marginStart="@dimen/material_spacing_small"
-                android:text="@{busRoute.name}"
-                android:textSize="@dimen/text_title"
-                tools:ignore="MissingPrefix"/>
-
-        </LinearLayout>
-
-    </android.support.v7.widget.CardView>
-
-</layout>
+</merge>

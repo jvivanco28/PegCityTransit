@@ -11,17 +11,18 @@ import java.util.List;
 
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.views.BusRouteCell;
 
 public class BusRoutesAdapter extends RecyclerView.Adapter<BusRouteCellViewHolder> {
 
     private static final String STATE_KEY_LIST = "list";
 
-    private BusRouteCellViewHolder.OnBusRouteCellClickedListener onBusRouteCellClickedListener;
+    private BusRouteCell.OnBusRouteSelectedListener onBusRouteCellClickedListener;
 
     private List<BusRouteViewModel> busRoutes;
 
     public BusRoutesAdapter(@Nullable Bundle savedInstanceState,
-                            BusRouteCellViewHolder.OnBusRouteCellClickedListener onBusRouteCellClickedListener) {
+                            BusRouteCell.OnBusRouteSelectedListener onBusRouteCellClickedListener) {
 
         this.onBusRouteCellClickedListener = onBusRouteCellClickedListener;
 

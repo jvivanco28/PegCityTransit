@@ -34,15 +34,16 @@ import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialo
 import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
-import jessevivanco.com.pegcitytransit.ui.views.BusStopScheduleBottomSheet;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
+import jessevivanco.com.pegcitytransit.ui.views.BusRouteCell;
+import jessevivanco.com.pegcitytransit.ui.views.BusStopScheduleBottomSheet;
 
 public class MainActivity extends BaseActivity implements TransmitMapPresenter.ViewContract,
         TransitMapFragment.TransitMapCallbacks,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        BusRoutesDialogFragment.OnBusRouteSelectedListener {
+        BusRouteCell.OnBusRouteSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -73,6 +74,8 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
     private TransitMapFragment transitMapFragment;
     private TransmitMapPresenter transmitMapPresenter;
+
+    private BusRoutesDialogFragment busRoutesModal;
 
     private boolean initialLoadFinished;
     private boolean googleApiClientInitialized;
@@ -209,7 +212,10 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     }
 
     private void showBusRoutesModal() {
-        BusRoutesDialogFragment.newInstance().show(getSupportFragmentManager(), BusRoutesDialogFragment.TAG);
+        if (busRoutesModal == null) {
+            busRoutesModal = BusRoutesDialogFragment.newInstance();
+        }
+        busRoutesModal.show(getSupportFragmentManager(), BusRoutesDialogFragment.TAG);
     }
 
     /**
@@ -223,15 +229,11 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
      * ready and we have the user's last known location.
      */
     private void loadBusStopsAtUserLocationIfReady(boolean forceLoad) {
-        Log.v("DEBUG", "loadBusStopsAtUserLocationIfReady");
 
         if (transitMapFragment.isMapReady() &&
                 googleApiClientInitialized &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 (!initialLoadFinished || forceLoad)) {
-
-
-            Log.v("DEBUG", "doing it!");
 
             // Use the user's last known location if we have access to that information. Else just
             // defaults to downtown Winnipeg.
@@ -349,7 +351,6 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        Log.v("DEBUG", "onRequestPermissionsResult");
         // We're only interested in location services
         if (requestCode != IntentRequestCodes.LOCATION_PERMISSION_REQUEST_CODE.ordinal()) {
             return;
@@ -372,6 +373,10 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
     @Override
     public void onBusRouteSelected(BusRouteViewModel busRoute) {
+        // Dismiss the dialog and load the route.
+        if (busRoutesModal != null) {
+            busRoutesModal.dismissAllowingStateLoss();
+        }
         transmitMapPresenter.loadBusStopsForBusRoute(busRoute);
     }
 

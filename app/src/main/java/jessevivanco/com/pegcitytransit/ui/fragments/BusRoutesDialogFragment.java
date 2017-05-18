@@ -22,10 +22,10 @@ import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusRoutesAdapter;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
-import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
+import jessevivanco.com.pegcitytransit.ui.views.BusRouteCell;
 
-public class BusRoutesDialogFragment extends BottomSheetDialogFragment implements BusRoutesPresenter.ViewContract, BusRouteCellViewHolder.OnBusRouteCellClickedListener {
+public class BusRoutesDialogFragment extends BottomSheetDialogFragment implements BusRoutesPresenter.ViewContract, BusRouteCell.OnBusRouteSelectedListener {
 
     public static final String TAG = BusRoutesDialogFragment.class.getSimpleName();
     private static final String STATE_KEY_LOADING_INDICATOR_VISIBILITY = "bus_route_loading_indicator_visibility";
@@ -42,7 +42,7 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     private BusRoutesAdapter routesAdapter;
     private BusRoutesPresenter routesPresenter;
 
-    private OnBusRouteSelectedListener listener;
+    private BusRouteCell.OnBusRouteSelectedListener listener;
 
     public static BusRoutesDialogFragment newInstance() {
         return new BusRoutesDialogFragment();
@@ -76,10 +76,10 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (context instanceof OnBusRouteSelectedListener) {
-            listener = (OnBusRouteSelectedListener) context;
+        if (context instanceof BusRouteCell.OnBusRouteSelectedListener) {
+            listener = (BusRouteCell.OnBusRouteSelectedListener) context;
         } else {
-            throw new IllegalStateException("Hosting activity must implement " + OnBusRouteSelectedListener.class.getSimpleName());
+            throw new IllegalStateException("Hosting activity must implement " + BusRouteCell.OnBusRouteSelectedListener.class.getSimpleName());
         }
     }
 
@@ -108,6 +108,11 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     }
 
     @Override
+    public void onBusRouteSelected(BusRouteViewModel busRoute) {
+        listener.onBusRouteSelected(busRoute);
+    }
+
+    @Override
     public void showLoadingIndicator(boolean visible) {
         loadingIndicator.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
@@ -119,12 +124,6 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     }
 
     @Override
-    public void onBusRouteCellClicked(BusRouteViewModel busRoute) {
-        listener.onBusRouteSelected(busRoute);
-        dismissAllowingStateLoss();
-    }
-
-    @Override
     public void showAllBusRoutes(List<BusRouteViewModel> busRoutes) {
         routesAdapter.setBusRoutes(busRoutes);
     }
@@ -132,10 +131,5 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     @OnClick(R.id.toolbar_close_button)
     public void closeModal() {
         dismissAllowingStateLoss();
-    }
-
-    public interface OnBusRouteSelectedListener {
-
-        void onBusRouteSelected(BusRouteViewModel busRoute);
     }
 }
