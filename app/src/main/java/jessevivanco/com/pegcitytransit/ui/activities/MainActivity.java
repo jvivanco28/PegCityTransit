@@ -8,10 +8,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
@@ -34,6 +36,7 @@ import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialo
 import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
+import jessevivanco.com.pegcitytransit.ui.util.ScreenUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusRouteCell;
@@ -50,11 +53,15 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     private static final String STATE_KEY_INITIAL_LOAD_FINISHED = "initial_load_finished";
     private static final String STATE_KEY_SELECTED_TAB = "selected_tab";
     private static final String STATE_KEY_BOTTOM_SHEET_STATE = "bottom_sheet_state";
+    private static final String STATE_KEY_ROUTE_CELL_VISIBILITY = "route_cell_visibility";
 
     private static final String PERMISSION_DIALOG_TAG = "dialog";
 
     @BindView(R.id.map_fragment_container)
     FrameLayout mapFragmentContainer;
+
+    @BindView(R.id.bus_route_info)
+    BusRouteCell busRouteCell;
 
     @BindView(R.id.my_location_fab)
     FloatingActionButton myLocationFab;
@@ -88,6 +95,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         // TODO check service advisories on startup
         mapSearchRadius = getResources().getInteger(R.integer.default_map_search_radius);
         setupMap(savedInstanceState);
+        setupBusRouteCell(savedInstanceState);
         setupGoogleApiClient();
         setupBottomNav(savedInstanceState);
         setupBottomSheet(savedInstanceState);
@@ -124,6 +132,23 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         transmitMapPresenter = new TransmitMapPresenter(getInjector(), this);
     }
 
+    private void setupBusRouteCell(@Nullable Bundle savedInstanceState) {
+
+        // Adding a top margin so that we can avoid being occluded by the status bar.
+        // NOTE: Was having issues getting fitsSystemWindow to work for this in the xml layout file.
+        CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) busRouteCell.getLayoutParams();
+        lp.topMargin += ScreenUtil.getStatusBarHeight(this);
+        busRouteCell.setLayoutParams(lp);
+
+        busRouteCell.onRestoreInstanceState(savedInstanceState);
+        busRouteCell.setVisibility(savedInstanceState != null ?
+                savedInstanceState.getInt(STATE_KEY_ROUTE_CELL_VISIBILITY, View.GONE) :
+                View.GONE);
+
+        // Just re-open the bus routes modal if we tap on this cell.
+        busRouteCell.setOnCellClickedListener(busRoute -> showBusRoutesModal());
+    }
+
     private void setupGoogleApiClient() {
         if (googleApiClient == null) {
 
@@ -149,9 +174,11 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
             switch (item.getItemId()) {
                 case R.id.search:
+                    busRouteCell.setVisibility(View.GONE);
                     loadBusStopsAtUserLocationIfReady(true);
                     break;
                 case R.id.my_stops:
+                    busRouteCell.setVisibility(View.GONE);
                     transmitMapPresenter.loadSavedBusStops();
                     break;
                 case R.id.routes:
@@ -289,7 +316,9 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         super.onSaveInstanceState(outState);
 
         stopScheduleBottomSheet.onSaveInstanceState(outState);
+        busRouteCell.onSaveInstanceState(outState);
 
+        outState.putInt(STATE_KEY_ROUTE_CELL_VISIBILITY, busRouteCell.getVisibility());
         outState.putBoolean(STATE_KEY_INITIAL_LOAD_FINISHED, initialLoadFinished);
         outState.putInt(STATE_KEY_SELECTED_TAB, bottomNavigation.getSelectedItemId());
         outState.putInt(STATE_KEY_BOTTOM_SHEET_STATE, bottomSheetBehavior.getState());
@@ -372,7 +401,10 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     }
 
     @Override
-    public void onBusRouteSelected(BusRouteViewModel busRoute) {
+    public void onBusRouteSelected(@Nullable BusRouteViewModel busRoute) {
+        busRouteCell.setVisibility(View.VISIBLE);
+        busRouteCell.bind(busRoute);
+
         // Dismiss the dialog and load the route.
         if (busRoutesModal != null) {
             busRoutesModal.dismissAllowingStateLoss();
@@ -385,7 +417,6 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
      */
     @OnClick(R.id.search_bus_stops_fab)
     public void searchForBusStops() {
-
         if (transitMapFragment.isMapReady()) {
             LatLng cameraPosition = transitMapFragment.getCameraPosition();
             transmitMapPresenter.loadBusStopsAroundCoordinates(cameraPosition.latitude, cameraPosition.longitude, mapSearchRadius);

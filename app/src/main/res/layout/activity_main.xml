@@ -19,6 +19,13 @@
             android:layout_above="@+id/tab_navigation"
             android:orientation="vertical">
 
+            <jessevivanco.com.pegcitytransit.ui.views.BusRouteCell
+                android:id="@+id/bus_route_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/material_spacing_small"
+                android:visibility="gone"/>
+
             <FrameLayout
                 android:id="@+id/map_fragment_container"
                 android:name="jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment"

@@ -1,11 +1,14 @@
 package jessevivanco.com.pegcitytransit.ui.views;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.TextView;
+
+import org.parceler.Parcels;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -13,6 +16,8 @@ import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
 public class BusRouteCell extends CardView {
+
+    private static final String STATE_KEY_BUS_ROUTE = "bus_route";
 
     @BindView(R.id.bus_route_name)
     TextView busRouteName;
@@ -67,8 +72,18 @@ public class BusRouteCell extends CardView {
         this.onBusRouteSelected = onCellClickedListener;
     }
 
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(STATE_KEY_BUS_ROUTE, Parcels.wrap(busRoute));
+    }
+
+    public void onRestoreInstanceState(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            bind(Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_BUS_ROUTE)));
+        }
+    }
+
     public interface OnBusRouteSelectedListener {
 
-        void onBusRouteSelected(BusRouteViewModel busRoute);
+        void onBusRouteSelected(@Nullable BusRouteViewModel busRoute);
     }
 }
