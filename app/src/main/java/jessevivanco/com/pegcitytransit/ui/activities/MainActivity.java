@@ -412,6 +412,11 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         transmitMapPresenter.loadBusStopsForBusRoute(busRoute);
     }
 
+    @Override
+    public void showRouteLoadingIndicator(boolean visible) {
+        busRouteCell.showLoadingIndicator(visible);
+    }
+
     /**
      * Search the current map camera location for bus stops.
      */

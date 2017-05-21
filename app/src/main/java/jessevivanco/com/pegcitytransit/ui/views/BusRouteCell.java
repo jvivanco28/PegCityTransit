@@ -6,7 +6,10 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.TextView;
+
+import com.airbnb.lottie.LottieAnimationView;
 
 import org.parceler.Parcels;
 
@@ -24,6 +27,9 @@ public class BusRouteCell extends CardView {
 
     @BindView(R.id.bus_route_number)
     BusRouteTextView busRouteTextView;
+
+    @BindView(R.id.loading_view)
+    LottieAnimationView loadingView;
 
     private BusRouteViewModel busRoute;
     private OnBusRouteSelectedListener onBusRouteSelected;
@@ -80,6 +86,15 @@ public class BusRouteCell extends CardView {
         if (savedInstanceState != null) {
             bind(Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_BUS_ROUTE)));
         }
+    }
+
+    public void showLoadingIndicator(boolean visible) {
+        if (visible) {
+            loadingView.playAnimation();
+        } else {
+            loadingView.cancelAnimation();
+        }
+        loadingView.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     public interface OnBusRouteSelectedListener {

@@ -109,7 +109,9 @@ public class TransmitMapPresenter {
                 .doOnSubscribe(disposable -> {
                     viewContract.clearMarkers();
                     viewContract.clearSearchRadius();
+                    viewContract.showRouteLoadingIndicator(true);
                 })
+                .doFinally(() -> viewContract.showRouteLoadingIndicator(false))
                 .subscribe(
                         busStops -> viewContract.showBusStops(busStops, BUS_ROUTE_MARKER_DELAY_MILLIS),
                         throwable -> {
@@ -155,6 +157,8 @@ public class TransmitMapPresenter {
 
         void showBusStops(List<BusStopViewModel> busStops, long delayMarkerVisibilityMillis);
 
+        void showRouteLoadingIndicator(boolean visible);
+
         void showBusRoutesForStop(BusStopViewModel busStop);
 
         void showSearchRadius(Double latitude, Double longitude, Integer searchRadius);
@@ -162,7 +166,5 @@ public class TransmitMapPresenter {
         void clearMarkers();
 
         void clearSearchRadius();
-
-        // TODO show loading indicator
     }
 }

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -11,19 +12,42 @@
         <jessevivanco.com.pegcitytransit.ui.views.BusRouteTextView
             android:id="@+id/bus_route_number"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
 
         <TextView
             android:id="@+id/bus_route_name"
             fontPath="fonts/bariol_bold.ttf"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:layout_marginLeft="@dimen/material_spacing_small"
             android:layout_marginStart="@dimen/material_spacing_small"
+            android:layout_toEndOf="@id/bus_route_number"
+            android:layout_toLeftOf="@+id/loading_view"
+            android:layout_toRightOf="@id/bus_route_number"
+            android:layout_toStartOf="@+id/loading_view"
             android:textSize="@dimen/text_title"
             tools:ignore="MissingPrefix"/>
 
-    </LinearLayout>
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/loading_view"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/material_spacing_small"
+            android:layout_marginLeft="@dimen/material_spacing_small"
+            android:layout_marginRight="@dimen/material_spacing_small"
+            android:layout_marginStart="@dimen/material_spacing_small"
+            android:visibility="gone"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="loading.json"
+            app:lottie_loop="true"/>
+
+    </RelativeLayout>
 
 </merge>
