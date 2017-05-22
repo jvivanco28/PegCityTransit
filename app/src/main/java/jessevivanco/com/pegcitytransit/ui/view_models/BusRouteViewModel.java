@@ -80,7 +80,27 @@ public class BusRouteViewModel {
         }
 
         public Builder name(String val) {
-            name = val;
+            String newName;
+
+            String[] tokens = val.split(" ");
+
+            // This is a little hacky. Each "name" comes back with "Route ##". It's sort of unnecessary,
+            // so we can remove it. Maybe there's a nicer way of doing this with a regex.
+            if (tokens.length > 2 && tokens[0].startsWith("Route")) {
+
+                StringBuilder builder = new StringBuilder();
+                for (int i = 2; i < tokens.length; i++) {
+                    String s = tokens[i];
+                    if (builder.length() > 0) {
+                        builder.append(" ");
+                    }
+                    builder.append(s);
+                }
+                newName = builder.toString();
+            } else {
+                newName = val;
+            }
+            name = newName;
             return this;
         }
 
