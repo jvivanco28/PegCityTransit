@@ -6,6 +6,5 @@
     <integer name="map_cover_image_zoom">18</integer>
 
     <integer name="max_relative_minutes">20</integer>
-    <integer name="search_area_marker_delay_millis">50</integer>
-    <integer name="bus_route_marker_delay_millis">5</integer>
+    <integer name="search_area_marker_delay_millis">25</integer>
 </resources>

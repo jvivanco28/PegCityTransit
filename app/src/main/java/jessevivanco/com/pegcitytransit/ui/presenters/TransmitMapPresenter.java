@@ -28,7 +28,6 @@ public class TransmitMapPresenter {
     private final double DEFAULT_LONG;
     private final int DEFAULT_RADIUS;
     private final long SEARCH_AREA_MARKER_DELAY_MILLIS;
-    private final long BUS_ROUTE_MARKER_DELAY_MILLIS;
 
     @Inject
     BusStopRepository stopsRepository;
@@ -52,7 +51,6 @@ public class TransmitMapPresenter {
         DEFAULT_RADIUS = context.getResources().getInteger(R.integer
                 .default_map_search_radius);
         SEARCH_AREA_MARKER_DELAY_MILLIS = context.getResources().getInteger(R.integer.search_area_marker_delay_millis);
-        BUS_ROUTE_MARKER_DELAY_MILLIS = context.getResources().getInteger(R.integer.bus_route_marker_delay_millis);
     }
 
     public void loadBusStopsAroundCoordinates(@Nullable Double latitude, @Nullable Double longitude, @Nullable Integer radius) {
@@ -113,7 +111,7 @@ public class TransmitMapPresenter {
                 })
                 .doFinally(() -> viewContract.showRouteLoadingIndicator(false))
                 .subscribe(
-                        busStops -> viewContract.showBusStops(busStops, BUS_ROUTE_MARKER_DELAY_MILLIS),
+                        busStops -> viewContract.showBusStops(busStops, 0),
                         throwable -> {
                             // TODO handle error
                             viewContract.showErrorMessage(context.getString(R.string.generic_error));

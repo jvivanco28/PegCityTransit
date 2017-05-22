@@ -13,6 +13,8 @@ final public class ScreenUtil {
      * StackOverflow post.
      */
     public static int getStatusBarHeight(Context context) {
+        // TODO verify this works on older devices.
+
         int result = 0;
         int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {

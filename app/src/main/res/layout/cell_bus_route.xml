@@ -44,7 +44,6 @@
             android:layout_marginRight="@dimen/material_spacing_small"
             android:layout_marginStart="@dimen/material_spacing_small"
             android:visibility="gone"
-            app:lottie_autoPlay="true"
             app:lottie_fileName="loading.json"
             app:lottie_loop="true"/>
 

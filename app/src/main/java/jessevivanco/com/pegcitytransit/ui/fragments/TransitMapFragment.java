@@ -41,6 +41,8 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     private static final String STATE_KEY_SEARCH_AREA = "search_area_circle";
     private static final String STATE_KEY_SELECTED_BUS_STOP = "selected_stop";
 
+    private static final double MARKER_PADDING_RATIO = 0.12;
+
     private SupportMapFragment mapFragment;
     private GoogleMap googleMap;
     private BusStopInfoWindowAdapter busStopInfoWindowAdapter;
@@ -216,7 +218,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
             }
             int width = getResources().getDisplayMetrics().widthPixels;
             int height = getResources().getDisplayMetrics().heightPixels;
-            int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
+            int padding = (int) (width * MARKER_PADDING_RATIO); // offset from edges of the map 10% of screen
 
             googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding));
         }
@@ -235,9 +237,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         googleMap.setOnInfoWindowClickListener(this);
         googleMap.setOnInfoWindowCloseListener(this);
 
-        // TODO verify this works on older devices.
-        int mapPadding = ScreenUtil.getStatusBarHeight(getContext());
-        googleMap.setPadding(0, mapPadding, 0, 0);
+        googleMap.setPadding(0, ScreenUtil.getStatusBarHeight(getContext()), 0, 0);
 
         // Hide the "my location" button.
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
