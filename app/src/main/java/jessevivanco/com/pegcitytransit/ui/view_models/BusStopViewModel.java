@@ -13,7 +13,7 @@ import jessevivanco.com.pegcitytransit.data.rest.models.BusStop;
 @Parcel
 public class BusStopViewModel {
 
-    public static BusStopViewModel createFromBusStop(BusStop busStop) {
+    public static BusStopViewModel createFromBusStop(BusStop busStop, boolean isSavedStop) {
         if (busStop == null) {
             return null;
         } else {
@@ -23,6 +23,7 @@ public class BusStopViewModel {
                     .latLng(busStop.getCentre() != null && busStop.getCentre().getGeographic() != null ? busStop.getCentre().getGeographic().getLatLng() : null)
                     .name(busStop.getName())
                     .number(busStop.getNumber())
+                    .isSavedStop(isSavedStop)
                     .build();
         }
     }
@@ -32,6 +33,7 @@ public class BusStopViewModel {
     Integer number;
     LatLng latLng;
     String distance;
+    boolean isSavedStop;
 
     @Nullable
     List<BusRouteViewModel> routes;
@@ -46,6 +48,7 @@ public class BusStopViewModel {
         latLng = builder.latLng;
         distance = builder.distance;
         routes = builder.routes;
+        isSavedStop = builder.isSavedStop;
     }
 
     public Long getKey() {
@@ -77,6 +80,14 @@ public class BusStopViewModel {
         this.routes = routes;
     }
 
+    public boolean isSavedStop() {
+        return isSavedStop;
+    }
+
+    public void setSavedStop(boolean savedStop) {
+        isSavedStop = savedStop;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof BusStopViewModel) {
@@ -95,6 +106,7 @@ public class BusStopViewModel {
         private LatLng latLng;
         private String distance;
         private List<BusRouteViewModel> routes;
+        private boolean isSavedStop;
 
         public Builder() {
         }
@@ -126,6 +138,11 @@ public class BusStopViewModel {
 
         public Builder routes(List<BusRouteViewModel> val) {
             routes = val;
+            return this;
+        }
+
+        public Builder isSavedStop(boolean val) {
+            isSavedStop = val;
             return this;
         }
 

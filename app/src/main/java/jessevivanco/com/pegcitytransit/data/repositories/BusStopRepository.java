@@ -2,6 +2,8 @@ package jessevivanco.com.pegcitytransit.data.repositories;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v4.util.LongSparseArray;
+import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
 import com.iainconnor.objectcache.CacheManager;
@@ -13,13 +15,18 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.rest.RestApi;
 import jessevivanco.com.pegcitytransit.data.rest.models.base.WinnipegTransitResponse;
 import jessevivanco.com.pegcitytransit.data.util.CacheUtil;
+import jessevivanco.com.pegcitytransit.data.util.ListUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 public class BusStopRepository {
+
+    private static final String TAG = BusStopRepository.class.getSimpleName();
 
     // Routes change from time to time.
     private static final int CACHE_EXPIRY = CacheManager.ExpiryTimes.ONE_DAY.asSeconds();
@@ -31,12 +38,53 @@ public class BusStopRepository {
     private CacheManager cacheManager;
     private final Type busStopsTypeToken;
 
+    // This only exists so that we can quickly lookup which stops are saved by their keys.
+    private LongSparseArray<BusStopViewModel> savedStopsCacheMap;
+
     public BusStopRepository(Context context, RestApi restApi, @Nullable CacheManager cacheManager) {
         this.context = context;
         this.restApi = restApi;
         this.cacheManager = cacheManager;
         this.busStopsTypeToken = new TypeToken<List<BusStopViewModel>>() {
         }.getType();
+
+        loadSavedStopsCacheMap();
+    }
+
+    private void loadSavedStopsCacheMap() {
+        getSavedBusStops()
+                .map(this::listToLongSparseArray)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        busStopViewModelLongSparseArray -> this.savedStopsCacheMap = busStopViewModelLongSparseArray,
+                        throwable -> {
+                            // TODO rethrow error?
+                            Log.e(TAG, "Error loading saved stops from cache.", throwable);
+                        }
+                );
+    }
+
+    /**
+     * Converts a list of bus stops to a {@link LongSparseArray} with the intention of being able
+     * to quickly lookup a bus stop by its key.
+     * <p>
+     * NOTE: I would have just cached a {@link LongSparseArray} of {@link BusStopViewModel} types
+     * but GSON was having some issues deserializing. This is just a workaround.
+     */
+    private LongSparseArray<BusStopViewModel> listToLongSparseArray(List<BusStopViewModel> list) {
+        LongSparseArray<BusStopViewModel> sparseArray = new LongSparseArray<>();
+
+        if (list != null) {
+            for (BusStopViewModel element : list) {
+                sparseArray.put(element.getKey(), element);
+            }
+        }
+        return sparseArray;
+    }
+
+    private boolean isBusStopSaved(Long key) {
+        return savedStopsCacheMap.get(key) != null;
     }
 
     public Single<List<BusStopViewModel>> getBusStopsNearLocation(Double latitude,
@@ -46,7 +94,8 @@ public class BusStopRepository {
         return restApi.getBusStopsNearLocation(latitude, longitude, radius)
                 .map(WinnipegTransitResponse::getElement)
                 .flatMapObservable(Observable::fromIterable)
-                .map(BusStopViewModel::createFromBusStop)
+                // Create the view model. We're also setting a flag which tells us if the bus stop saved under "my stops".
+                .map(busStop -> BusStopViewModel.createFromBusStop(busStop, isBusStopSaved(busStop.getKey())))
                 .toList();
 
         // Notes for myself:
@@ -72,7 +121,8 @@ public class BusStopRepository {
                 return restApi.getBusStopsForRoute(routeKey)
                         .map(WinnipegTransitResponse::getElement)
                         .flatMapObservable(Observable::fromIterable)
-                        .map(BusStopViewModel::createFromBusStop)
+                        // Create the view model. We're also setting a flag which tells us if the bus stop saved under "my stops".
+                        .map(busStop -> BusStopViewModel.createFromBusStop(busStop, isBusStopSaved(busStop.getKey())))
                         .toList()
                         .doOnSuccess(busStopViewModels -> {
                             if (cacheManager != null) {
@@ -86,55 +136,61 @@ public class BusStopRepository {
     public Single<List<BusStopViewModel>> getSavedBusStops() {
         return Single.defer(() -> {
 
-            // Grab the cached list of bus stops.
-            List<BusStopViewModel> savedBusStops = CacheUtil.getFromCache(cacheManager,
-                    CACHE_KEY_SAVED_STOPS,
-                    busStopsTypeToken);
+            // If already loaded, then we don't need to load from ObjectCache.
+            if (savedStopsCacheMap != null) {
+                return Single.just(ListUtil.asList(savedStopsCacheMap));
 
-            return savedBusStops != null ?
-                    Single.just(savedBusStops) :
-                    // We can't return null, so just return an empty HashMap if we don't have any saved stops.
-                    Single.just(new ArrayList<BusStopViewModel>());
+            } else {
+                List<BusStopViewModel> savedBusStops = CacheUtil.getFromCache(cacheManager,
+                        CACHE_KEY_SAVED_STOPS,
+                        busStopsTypeToken);
+
+                return savedBusStops != null ?
+                        Single.just(savedBusStops) :
+                        // We can't return null, so just return an empty HashMap if we don't have any saved stops.
+                        Single.just(new ArrayList<>());
+            }
         });
     }
 
     public Single<List<BusStopViewModel>> saveBusStop(BusStopViewModel busStop) {
-        // Get the current list of saved stops.
-        return getSavedBusStops()
-                // Append the new stop
-                .flatMap(busStopViewModels -> {
 
-                    if (busStop == null) {
-                        throw new IllegalArgumentException("Bus Stop must not be null!");
-                    }
+        return Single.defer(() -> {
+            if (busStop == null) {
+                throw new IllegalArgumentException("Can not add a null bus stop to cache.");
+            }
+            // Don't allow routes to be saved for bus stops. Since there is no expiry
+            // time for saved stops, we need to be able to refresh the bus routes for
+            // each bus stop.
+            busStop.setRoutes(null);
+            busStop.setSavedStop(true);
 
-                    // If the key already exists in the list, then don't bother re-adding it.
-                    if (!busStopViewModels.contains(busStop)) {
+            savedStopsCacheMap.put(busStop.getKey(), busStop);
+            return Single.just(ListUtil.asList(savedStopsCacheMap));
 
-                        // Don't allow routes to be saved for bus stops. Since there is no expiry
-                        // time for saved stops, we need to be able to refresh the bus routes for
-                        // each bus stop.
-                        busStop.setRoutes(null);
-                        busStopViewModels.add(busStop);
-                    }
-                    // Return the new list of saved stops
-                    return Single.just(busStopViewModels);
-                }).doOnSuccess(busStopViewModels -> {
-                    if (cacheManager != null) {
-                        // No expiry on saved stops
-                        cacheManager.put(CACHE_KEY_SAVED_STOPS, busStopViewModels);
-                    }
-                });
+        }).doOnSuccess(busStopViewModels -> {
+            if (cacheManager != null) {
+                // No expiry on saved stops
+                cacheManager.put(CACHE_KEY_SAVED_STOPS, busStopViewModels);
+            }
+        });
     }
 
     public Single<List<BusStopViewModel>> removeSavedStop(BusStopViewModel busStop) {
-        // Get the current list of saved stops.
-        return getSavedBusStops()
-                .flatMap(busStopViewModels -> {
-                    // Remove the bus stop.
-                    busStopViewModels.remove(busStop);
-                    // Return the new list of saved stops.
-                    return Single.just(busStopViewModels);
-                });
+
+        return Single.defer(() -> {
+            if (busStop == null) {
+                throw new IllegalArgumentException("Can not remove a null bus stop from cache.");
+            }
+            // Remove the bus stop.
+            savedStopsCacheMap.delete(busStop.getKey());
+            // Return the new list of saved stops.
+            return Single.just(ListUtil.asList(savedStopsCacheMap));
+        }).doOnSuccess(busStopViewModels -> {
+            if (cacheManager != null) {
+                // No expiry on saved stops
+                cacheManager.put(CACHE_KEY_SAVED_STOPS, busStopViewModels);
+            }
+        });
     }
 }

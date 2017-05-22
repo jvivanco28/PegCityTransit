@@ -33,6 +33,8 @@ import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
 public class BusStopScheduleBottomSheet extends CoordinatorLayout implements BusStopSchedulePresenter.ViewContract {
 
+    private static final String TAG = BusStopScheduleBottomSheet.class.getSimpleName();
+
     private static final String STATE_KEY_PROGRESS_BAR_VISIBILITY = "progress_bar";
     private static final String STATE_KEY_BUS_STOP = "bus_stop";
 
@@ -53,6 +55,7 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
     @BindView(R.id.bottom_sheet_progress_bar)
     ProgressBar bottomSheetProgressBar;
 
+    private OnFavStopRemovedListener onFavStopRemovedListener;
     private BusStopViewModel busStop;
 
     public BusStopScheduleBottomSheet(Context context) {
@@ -75,8 +78,11 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
         ButterKnife.bind(this);
     }
 
-    public void initialize(@Nullable Bundle savedInstanceState,
+    public void initialize(OnFavStopRemovedListener onFavStopRemovedListener,
+                           @Nullable Bundle savedInstanceState,
                            AppComponent injector) {
+
+        this.onFavStopRemovedListener = onFavStopRemovedListener;
 
         stopSchedulePresenter = new BusStopSchedulePresenter(injector, this);
         stopScheduleAdapter = new ScheduledStopAdapter(savedInstanceState);
@@ -93,9 +99,17 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
                 Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_BUS_STOP)) :
                 null;
 
-        bottomSheetToolbarTitle.setText(busStop != null ?
-                busStop.getName() :
-                null);
+        displayBusStopInfo(busStop);
+    }
+
+    private void displayBusStopInfo(@Nullable BusStopViewModel busStop) {
+        if (busStop != null) {
+            bottomSheetToolbarTitle.setText(busStop.getName());
+            favStopButton.setProgress(busStop.isSavedStop() ? 1 : 0);
+        } else {
+            bottomSheetToolbarTitle.setText(null);
+            favStopButton.setProgress(0);
+        }
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -107,7 +121,7 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
     public void loadScheduleForBusStop(BusStopViewModel busStop) {
         this.busStop = busStop;
 
-        bottomSheetToolbarTitle.setText(busStop.getName());
+        displayBusStopInfo(busStop);
         stopSchedulePresenter.loadScheduleForBusStop(busStop.getKey());
     }
 
@@ -138,9 +152,26 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
 
     @OnClick(R.id.toolbar_fav_stop)
     public void toggleFavStop() {
-        // TODO Figure out if the stop is already saved or not.
-        favStopButton.playAnimation();
-        stopSchedulePresenter.saveBusStop(busStop);
-//        favStopButton.reverseAnimation();
+
+        if (busStop != null) {
+            if (busStop.isSavedStop()) {
+                favStopButton.reverseAnimation();
+                stopSchedulePresenter.removeSavedBusStop(busStop, onFavStopRemovedListener);
+            } else {
+                favStopButton.playAnimation();
+                stopSchedulePresenter.saveBusStop(busStop);
+            }
+        } else {
+            // TODO report error
+            Log.e(TAG, "Can't save a null bus stop!");
+        }
+    }
+
+    /**
+     * Listener invoked when a stop is removed from the user's list of saved stops.
+     */
+    public interface OnFavStopRemovedListener {
+
+        void onFavStopRemoved(BusStopViewModel busStop);
     }
 }

@@ -46,7 +46,8 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         TransitMapFragment.TransitMapCallbacks,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        BusRouteCell.OnBusRouteSelectedListener {
+        BusRouteCell.OnBusRouteSelectedListener,
+        BusStopScheduleBottomSheet.OnFavStopRemovedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -218,7 +219,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
     private void setupBottomSheet(@Nullable Bundle savedInstanceState) {
 
-        stopScheduleBottomSheet.initialize(savedInstanceState, getInjector());
+        stopScheduleBottomSheet.initialize(this, savedInstanceState, getInjector());
         stopScheduleBottomSheet.setOnCloseButtonClickedListener(v -> {
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         });
@@ -415,6 +416,19 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     @Override
     public void showRouteLoadingIndicator(boolean visible) {
         busRouteCell.showLoadingIndicator(visible);
+    }
+
+    /**
+     * A bus stop was removed from the favorites list. If the selected tab is "My Stops" then
+     * we need to remove the bus stop marker.
+     */
+    @Override
+    public void onFavStopRemoved(BusStopViewModel busStop) {
+        if (bottomNavigation.getSelectedItemId() == R.id.my_stops) {
+            // Just Refresh the list.
+            transmitMapPresenter.loadSavedBusStops();
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        }
     }
 
     /**

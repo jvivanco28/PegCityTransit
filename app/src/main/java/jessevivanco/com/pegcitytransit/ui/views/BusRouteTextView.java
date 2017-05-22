@@ -55,9 +55,13 @@ public class BusRouteTextView extends AppCompatTextView {
         setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
     }
 
-    public void setBusRoute(BusRouteViewModel route) {
+    public void setBusRoute(@Nullable BusRouteViewModel route) {
 
-        setBusRoute(route.getNumber(), route.getCoverage());
+        if (route != null) {
+            setBusRoute(route.getNumber(), route.getCoverage());
+        } else {
+            setBusRoute(null, null);
+        }
     }
 
     public void setBusRoute(Integer routeNumber, RouteCoverage coverage) {

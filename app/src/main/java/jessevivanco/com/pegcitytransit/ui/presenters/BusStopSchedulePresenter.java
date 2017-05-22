@@ -17,6 +17,7 @@ import jessevivanco.com.pegcitytransit.data.repositories.BusStopScheduleReposito
 import jessevivanco.com.pegcitytransit.data.util.DisposableUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
+import jessevivanco.com.pegcitytransit.ui.views.BusStopScheduleBottomSheet;
 
 public class BusStopSchedulePresenter {
 
@@ -51,12 +52,9 @@ public class BusStopSchedulePresenter {
                 })
                 .doFinally(() -> viewContract.showLoadingScheduleIndicator(false))
                 .subscribe(
-                        scheduledStops -> {
-                            // TODO handle nothing in schedule
-                            viewContract.showScheduledStops(scheduledStops);
-                        }, throwable -> {
+                        scheduledStops -> viewContract.showScheduledStops(scheduledStops), throwable -> {
                             // TODO handle error
-                            Log.e("DEBUG", "wtf!", throwable);
+                            Log.e(TAG, "Error loading bus stop schedule", throwable);
                             viewContract.showErrorMessage(context.getString(R.string.error_loading_schedule));
                         }
                 );
@@ -69,8 +67,6 @@ public class BusStopSchedulePresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(busStopViewModels -> {
-                    Log.v("DEBUG", "SAVED. New list " + busStopViewModels);
-
                     // Ignored.
                 }, throwable -> {
                     // TODO handle error
@@ -78,20 +74,23 @@ public class BusStopSchedulePresenter {
                 });
     }
 
-    public void removeSavedBusStop(BusStopViewModel busStop) {
+    public void removeSavedBusStop(BusStopViewModel busStop, BusStopScheduleBottomSheet.OnFavStopRemovedListener onFavStopRemovedListener) {
         DisposableUtil.dispose(saveBusStopSubscription);
+
+        if (onFavStopRemovedListener == null) {
+            throw new IllegalStateException("OnFavStopRemovedListener must not be null");
+        }
 
         saveBusStopSubscription = busStopRepository.removeSavedStop(busStop)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(busStopViewModels -> {
-                    // Ignored.
-                    Log.v("DEBUG", "REMOVED. New list " + busStopViewModels);
-
-                }, throwable -> {
-                    // TODO handle error
-                    Log.e(TAG, "Error saving bus stop.", throwable);
-                });
+                .subscribe(
+                        busStopViewModels -> onFavStopRemovedListener.onFavStopRemoved(busStop),
+                        throwable -> {
+                            // TODO handle error
+                            Log.e(TAG, "Error saving bus stop.", throwable);
+                        }
+                );
     }
 
     public void tearDown() {
