@@ -18,7 +18,7 @@
     <dimen name="material_spacing_small">8dp</dimen>
     <dimen name="material_spacing_x_small">4dp</dimen>
 
-    <dimen name="text_toolbar_button">32sp</dimen>
+    <dimen name="bottom_nav_height">56dp</dimen>
     <dimen name="fab_size">56dp</dimen>
     <dimen name="toolbar_button_size">42dp</dimen>
 
@@ -39,5 +39,6 @@
     <dimen name="text_bus_route_mini">14sp</dimen>
     <dimen name="text_bus_route_large">32sp</dimen>
     <dimen name="text_loading">24sp</dimen>
+    <dimen name="text_toolbar_button">32sp</dimen>
 
 </resources>
