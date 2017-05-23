@@ -28,10 +28,11 @@ import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.ui.adapters.ScheduledStopAdapter;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
+import jessevivanco.com.pegcitytransit.ui.view_holders.NoResultsCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
-public class BusStopScheduleBottomSheet extends CoordinatorLayout implements BusStopSchedulePresenter.ViewContract {
+public class BusStopScheduleBottomSheet extends CoordinatorLayout implements BusStopSchedulePresenter.ViewContract, NoResultsCellViewHolder.OnRefreshButtonClickedListener {
 
     private static final String TAG = BusStopScheduleBottomSheet.class.getSimpleName();
 
@@ -85,7 +86,7 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
         this.onFavStopRemovedListener = onFavStopRemovedListener;
 
         stopSchedulePresenter = new BusStopSchedulePresenter(injector, this);
-        stopScheduleAdapter = new ScheduledStopAdapter(savedInstanceState);
+        stopScheduleAdapter = new ScheduledStopAdapter(savedInstanceState, this);
 
         stopScheduleRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         stopScheduleRecyclerView.addItemDecoration(new VerticalListItemDecoration(getResources().getDimensionPixelSize(R.dimen.material_spacing_small), getResources().getDimensionPixelSize(R.dimen.material_spacing_small)));
@@ -139,6 +140,11 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
     @Override
     public void showScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
         stopScheduleAdapter.setScheduledStops(scheduledStops);
+    }
+
+    @Override
+    public void onRefreshButtonClicked() {
+        stopSchedulePresenter.loadScheduleForBusStop(busStop.getKey());
     }
 
     @Override

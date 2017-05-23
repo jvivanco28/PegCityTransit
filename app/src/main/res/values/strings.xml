@@ -52,12 +52,14 @@
 
     <!-- Error states -->
     <string name="generic_error">Sorry. An error occurred.</string>
-    <string name="no_bus_stops_in_that_area">Sorry. There are no bus stops in that area.</string>
-    <string name="no_saved_stops">You don\'t seem to have any saved stops yet.</string>
     <string name="error_loading_bus_stops">Sorry. An error occurred while loading the bus stops in that area.</string>
     <string name="error_loading_bus_routes">Sorry. An error occurred while loading the bus routes.</string>
     <string name="error_loading_schedule">Sorry. An error occurred while loading the schedule for that bus stop.</string>
     <string name="error_finding_location">Unable to find your location.</string>
+
+    <string name="no_bus_stops_in_that_area">Sorry. There are no bus stops in that area.</string>
+    <string name="no_saved_stops">You don\'t seem to have any saved stops yet.</string>
+    <string name="no_schedule">No buses are scheduled to stop here at this time.</string>
 
     <string name="try_again">Try Again</string>
 
