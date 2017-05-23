@@ -49,8 +49,8 @@ dependencies {
     // Third-party dependencies:
 
     // Google Maps
-    compile 'com.google.android.gms:play-services-maps:10.2.1'
-    compile 'com.google.android.gms:play-services-location:10.2.1'
+    compile 'com.google.android.gms:play-services-maps:10.2.4'
+    compile 'com.google.android.gms:play-services-location:10.2.4'
 
     // Dagger 2 dependency injector
     // https://github.com/codepath/android_guides/wiki/Dependency-Injection-with-Dagger-2
