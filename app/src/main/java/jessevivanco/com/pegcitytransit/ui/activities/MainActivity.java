@@ -290,8 +290,8 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     }
 
     @Override
-    public void showBusStops(List<BusStopViewModel> busStops, long markerVisibilityDelayMillis) {
-        transitMapFragment.showBusStops(busStops, true, markerVisibilityDelayMillis);
+    public void showBusStops(List<BusStopViewModel> busStops, long markerVisibilityDelayMillis, boolean focusInMap) {
+        transitMapFragment.showBusStops(busStops, markerVisibilityDelayMillis, focusInMap);
     }
 
     @Override
@@ -333,8 +333,8 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     }
 
     @Override
-    public void showSearchRadius(Double latitude, Double longitude, Integer searchRadius) {
-        transitMapFragment.drawSearchRadius(latitude, longitude, mapSearchRadius);
+    public void showSearchRadius(Double latitude, Double longitude, Integer searchRadius, boolean focusInMap) {
+        transitMapFragment.drawSearchRadius(latitude, longitude, mapSearchRadius, focusInMap);
     }
 
     @Override

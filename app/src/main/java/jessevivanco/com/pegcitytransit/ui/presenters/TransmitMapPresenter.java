@@ -66,12 +66,14 @@ public class TransmitMapPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> {
                     viewContract.clearMarkers();
-                    viewContract.showSearchRadius(latitude, longitude, radius);
+                    // Imeediately focus on the drawn circle.
+                    viewContract.showSearchRadius(latitude, longitude, radius, true);
                 })
                 .subscribe(
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
-                                viewContract.showBusStops(busStops, SEARCH_AREA_MARKER_DELAY_MILLIS);
+                                // Don't need to focus on the area a second time. Just show the markers.
+                                viewContract.showBusStops(busStops, SEARCH_AREA_MARKER_DELAY_MILLIS, false);
                             } else {
                                 viewContract.showErrorMessage(context.getString(R.string.no_bus_stops_in_that_area));
                             }
@@ -111,7 +113,7 @@ public class TransmitMapPresenter {
                 })
                 .doFinally(() -> viewContract.showRouteLoadingIndicator(false))
                 .subscribe(
-                        busStops -> viewContract.showBusStops(busStops, 0),
+                        busStops -> viewContract.showBusStops(busStops, 0, true),
                         throwable -> {
                             // TODO handle error
                             viewContract.showErrorMessage(context.getString(R.string.generic_error));
@@ -132,7 +134,7 @@ public class TransmitMapPresenter {
                 .subscribe(
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
-                                viewContract.showBusStops(busStops, SEARCH_AREA_MARKER_DELAY_MILLIS);
+                                viewContract.showBusStops(busStops, SEARCH_AREA_MARKER_DELAY_MILLIS, true);
                             } else {
                                 viewContract.showErrorMessage(context.getString(R.string.no_saved_stops));
                             }
@@ -153,13 +155,13 @@ public class TransmitMapPresenter {
 
     public interface ViewContract extends BaseViewContract {
 
-        void showBusStops(List<BusStopViewModel> busStops, long delayMarkerVisibilityMillis);
+        void showBusStops(List<BusStopViewModel> busStops, long delayMarkerVisibilityMillis, boolean focusInMap);
 
         void showRouteLoadingIndicator(boolean visible);
 
         void showBusRoutesForStop(BusStopViewModel busStop);
 
-        void showSearchRadius(Double latitude, Double longitude, Integer searchRadius);
+        void showSearchRadius(Double latitude, Double longitude, Integer searchRadius, boolean focusInMap);
 
         void clearMarkers();
 

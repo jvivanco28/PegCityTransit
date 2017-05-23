@@ -168,10 +168,11 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     }
 
     /**
-     * Draws a circle on the map representing a search radius for bus stops, and pans the camera to
-     * focus on that circle.
+     * Draws a circle on the map representing a search radius for bus stops.
+     *
+     * @param focusOnArea Pans the camera to focus on the circle that was drawn.
      */
-    public void drawSearchRadius(@Nullable Double latitude, @Nullable Double longitude, int radius) {
+    public void drawSearchRadius(@Nullable Double latitude, @Nullable Double longitude, int radius, boolean focusOnArea) {
         // Remove previous search area circle
         clearSearchRadius();
 
@@ -190,6 +191,10 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
                 .strokeWidth(getResources().getDimensionPixelSize(R.dimen.map_search_border_width));
 
         searchArea = googleMap.addCircle(circleOptions);
+
+        if (focusOnArea) {
+            zoomToBounds(getLatLngBoundsOfCircle(searchArea.getCenter(), searchArea.getRadius()));
+        }
     }
 
     /**
@@ -198,6 +203,19 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     public void zoomToLocation(double lat, double lng, float zoomScale) {
 
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), zoomScale));
+    }
+
+    /**
+     * Zooms to the provided bounding box on the map. Zooms as close as possible to the bounding box
+     * such that the entire box is still visible.
+     */
+    public void zoomToBounds(LatLngBounds bounds) {
+
+        int width = getResources().getDisplayMetrics().widthPixels;
+        int height = getResources().getDisplayMetrics().heightPixels;
+        int padding = (int) (width * MARKER_PADDING_RATIO); // offset from edges of the map 10% of screen
+
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding));
     }
 
     /**
@@ -214,14 +232,14 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
      * Show the list of bus stops as markers on the map.
      *
      * @param busStops                    The list of bus stops to show as markers.
-     * @param animateCamera               If set to {@code true} then pans & zooms the camera such that it can fit
-     *                                    all markers on screen.
      * @param delayMarkerVisibilityMillis Number of milliseconds to delay when showing a marker as
      *                                    visible.
+     * @param animateCamera               If set to {@code true} then pans & zooms the camera such that it can fit
+     *                                    all markers on screen.
      */
     public void showBusStops(List<BusStopViewModel> busStops,
-                             boolean animateCamera,
-                             long delayMarkerVisibilityMillis) {
+                             long delayMarkerVisibilityMillis,
+                             boolean animateCamera) {
 
         clearMarkers();
 
@@ -235,11 +253,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
             if (searchArea != null) {
                 bounds = getLatLngBoundsOfCircle(searchArea.getCenter(), searchArea.getRadius());
             }
-            int width = getResources().getDisplayMetrics().widthPixels;
-            int height = getResources().getDisplayMetrics().heightPixels;
-            int padding = (int) (width * MARKER_PADDING_RATIO); // offset from edges of the map 10% of screen
-
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding));
+            zoomToBounds(bounds);
         }
     }
 
@@ -285,12 +299,13 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         if (restoredSearchAreaCoordinates != null) {
             drawSearchRadius(restoredSearchAreaCoordinates.latitude,
                     restoredSearchAreaCoordinates.longitude,
-                    getResources().getInteger(R.integer.default_map_search_radius));
+                    getResources().getInteger(R.integer.default_map_search_radius),
+                    false);
         }
         // Now that the map is ready, we can restore the state of the map as it was before the
         // the orientation change.
         if (busStopInfoWindowAdapter.getBusStops() != null) {
-            showBusStops(busStopInfoWindowAdapter.getBusStops(), false, 0);
+            showBusStops(busStopInfoWindowAdapter.getBusStops(), 0, false);
 
             // If we were displaying an info window prior to orientation change, then re-show that window.
             if (selectedBusStop != null) {
