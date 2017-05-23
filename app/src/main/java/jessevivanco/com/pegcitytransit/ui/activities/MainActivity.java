@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -70,6 +71,9 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
     @BindView(R.id.search_bus_stops_fab)
     FloatingActionButton searchBusStopsFab;
+
+    @BindView(R.id.map_loading_indicator)
+    ProgressBar mapLoadingIndicator;
 
     @BindView(R.id.tab_navigation)
     BottomNavigationView bottomNavigation;
@@ -410,7 +414,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     }
 
     @Override
-    public void onBusRouteSelected(@Nullable BusRouteViewModel busRoute) {
+    public void onBusRouteSelected(BusRouteViewModel busRoute) {
         busRouteCell.setVisibility(View.VISIBLE);
         busRouteCell.bind(busRoute);
 
@@ -421,6 +425,18 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         transmitMapPresenter.loadBusStopsForBusRoute(busRoute);
     }
 
+    /**
+     * Progress bar map overlay which tells us that we're searching for bus stops in a search radius.
+     */
+    @Override
+    public void showStopsLoadingIndicator(boolean visible) {
+        mapLoadingIndicator.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * Loading indicator in the bus route cell which tells us that we're loading all of the stops for
+     * some bus route.
+     */
     @Override
     public void showRouteLoadingIndicator(boolean visible) {
         busRouteCell.showLoadingIndicator(visible);

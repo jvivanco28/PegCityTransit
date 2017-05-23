@@ -2,6 +2,7 @@ package jessevivanco.com.pegcitytransit.ui.views;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
@@ -99,6 +100,6 @@ public class BusRouteCell extends CardView {
 
     public interface OnBusRouteSelectedListener {
 
-        void onBusRouteSelected(@Nullable BusRouteViewModel busRoute);
+        void onBusRouteSelected(BusRouteViewModel busRoute);
     }
 }

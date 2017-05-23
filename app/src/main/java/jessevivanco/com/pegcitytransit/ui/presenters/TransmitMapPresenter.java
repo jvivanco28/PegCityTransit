@@ -68,7 +68,9 @@ public class TransmitMapPresenter {
                     viewContract.clearMarkers();
                     // Imeediately focus on the drawn circle.
                     viewContract.showSearchRadius(latitude, longitude, radius, true);
+                    viewContract.showStopsLoadingIndicator(true);
                 })
+                .doFinally(() -> viewContract.showStopsLoadingIndicator(false))
                 .subscribe(
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
@@ -156,6 +158,8 @@ public class TransmitMapPresenter {
     public interface ViewContract extends BaseViewContract {
 
         void showBusStops(List<BusStopViewModel> busStops, long delayMarkerVisibilityMillis, boolean focusInMap);
+
+        void showStopsLoadingIndicator(boolean visible);
 
         void showRouteLoadingIndicator(boolean visible);
 
