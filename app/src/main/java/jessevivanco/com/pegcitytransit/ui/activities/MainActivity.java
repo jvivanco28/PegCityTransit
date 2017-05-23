@@ -14,6 +14,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
@@ -95,6 +96,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
         // TODO check service advisories on startup
         mapSearchRadius = getResources().getInteger(R.integer.default_map_search_radius);
+        setSearchFabMargin();
         setupMap(savedInstanceState);
         setupBusRouteCell(savedInstanceState);
         setupGoogleApiClient();
@@ -117,6 +119,18 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     public void onStop() {
         super.onStop();
         googleApiClient.disconnect();
+    }
+
+    private void setSearchFabMargin() {
+        ViewGroup.MarginLayoutParams searchFabLayoutParams = (ViewGroup.MarginLayoutParams) searchBusStopsFab.getLayoutParams();
+
+        // GPS Enabled.
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            searchFabLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.top_fab_margin_bottom_gps_enabled);
+        } else {
+            searchFabLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.top_fab_margin_bottom_gps_disabled);
+        }
+        searchBusStopsFab.setLayoutParams(searchFabLayoutParams);
     }
 
     private void setupMap(@Nullable Bundle savedInstanceState) {
@@ -381,6 +395,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         if (PermissionUtils.isPermissionGranted(permissions, grantResults,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
 
+            setSearchFabMargin();
             setupFabVisibility(bottomNavigation.getSelectedItemId());
             loadBusStopsAtUserLocationIfReady(true);
         } else {
