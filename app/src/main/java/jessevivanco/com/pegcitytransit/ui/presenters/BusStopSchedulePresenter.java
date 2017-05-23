@@ -1,6 +1,7 @@
 package jessevivanco.com.pegcitytransit.ui.presenters;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.List;
@@ -48,13 +49,22 @@ public class BusStopSchedulePresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> {
                     viewContract.showScheduledStops(null);
+                    viewContract.setNoScheduleStopsMessage(null);
                     viewContract.showLoadingScheduleIndicator(true);
                 })
                 .doFinally(() -> viewContract.showLoadingScheduleIndicator(false))
                 .subscribe(
-                        scheduledStops -> viewContract.showScheduledStops(scheduledStops), throwable -> {
+                        scheduledStops -> {
+                            if (scheduledStops.size() == 0) {
+                                viewContract.setNoScheduleStopsMessage(context.getString(R.string.no_schedule));
+                            } else {
+                                viewContract.showScheduledStops(scheduledStops);
+                            }
+                        },
+                        throwable -> {
                             // TODO handle error
                             Log.e(TAG, "Error loading bus stop schedule", throwable);
+                            viewContract.setNoScheduleStopsMessage(context.getString(R.string.error_loading_schedule));
                             viewContract.showErrorMessage(context.getString(R.string.error_loading_schedule));
                         }
                 );
@@ -103,5 +113,7 @@ public class BusStopSchedulePresenter {
         void showLoadingScheduleIndicator(boolean visible);
 
         void showScheduledStops(List<ScheduledStopViewModel> scheduledStops);
+
+        void setNoScheduleStopsMessage(@Nullable String message);
     }
 }

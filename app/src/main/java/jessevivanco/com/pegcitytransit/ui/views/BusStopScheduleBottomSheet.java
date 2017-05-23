@@ -156,6 +156,11 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
         }
     }
 
+    @Override
+    public void setNoScheduleStopsMessage(@Nullable String message) {
+        stopScheduleAdapter.setNoResultsMessage(message);
+    }
+
     @OnClick(R.id.toolbar_fav_stop)
     public void toggleFavStop() {
 
