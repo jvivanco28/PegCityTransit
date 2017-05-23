@@ -158,6 +158,16 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     }
 
     /**
+     * Shows the user's location on the map if we have permission to do so.
+     */
+    public void showUserLocationIfAllowed() {
+        // Show the user's location on the map if we have permission.
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
+        }
+    }
+
+    /**
      * Draws a circle on the map representing a search radius for bus stops, and pans the camera to
      * focus on that circle.
      */
@@ -261,10 +271,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         // Hide zoom controls.
         googleMap.getUiSettings().setZoomControlsEnabled(false);
 
-        // Show the user's location on the map if we have permission.
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            googleMap.setMyLocationEnabled(true);
-        }
+        showUserLocationIfAllowed();
 
         // Restore the camera position if we just changed orientation.
         if (restoredCameraPosition != null) {

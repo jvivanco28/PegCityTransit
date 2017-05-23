@@ -268,6 +268,8 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 (!initialLoadFinished || forceLoad)) {
 
+            transitMapFragment.showUserLocationIfAllowed();
+
             // Use the user's last known location if we have access to that information. Else just
             // defaults to downtown Winnipeg.
             Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
