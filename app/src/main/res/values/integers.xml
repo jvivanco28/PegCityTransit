@@ -3,7 +3,7 @@
     <integer name="default_map_search_radius">200</integer>
 
     <integer name="default_city_wide_map_zoom">11</integer>
-    <integer name="map_cover_image_zoom">18</integer>
+    <integer name="default_my_location_map_zoom">16</integer>
 
     <integer name="max_relative_minutes">20</integer>
     <integer name="search_area_marker_delay_millis">25</integer>

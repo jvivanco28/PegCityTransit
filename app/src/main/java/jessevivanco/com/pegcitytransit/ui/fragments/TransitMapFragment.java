@@ -158,7 +158,8 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     }
 
     /**
-     * Draws a circle on the map representing a search radius for bus stops.
+     * Draws a circle on the map representing a search radius for bus stops, and pans the camera to
+     * focus on that circle.
      */
     public void drawSearchRadius(@Nullable Double latitude, @Nullable Double longitude, int radius) {
         // Remove previous search area circle
@@ -179,6 +180,14 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
                 .strokeWidth(getResources().getDimensionPixelSize(R.dimen.map_search_border_width));
 
         searchArea = googleMap.addCircle(circleOptions);
+    }
+
+    /**
+     * Zooms to coordinates on the map.
+     */
+    public void zoomToLocation(double lat, double lng, float zoomScale) {
+
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), zoomScale));
     }
 
     /**
@@ -237,7 +246,13 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         googleMap.setOnInfoWindowClickListener(this);
         googleMap.setOnInfoWindowCloseListener(this);
 
-        googleMap.setPadding(0, ScreenUtil.getStatusBarHeight(getContext()), 0, 0);
+        // TODO See if there is a better solution for this
+        // The status bar occludes the compass unless we apply a top padding to the map view.
+        // However, applying only a top padding will mess up the camera origin (it will be off-center)
+        // so we also have to apply a bottom padding.
+        // See https://stackoverflow.com/questions/15043006/how-to-move-the-android-google-maps-api-compass-position
+        int statusBarHeight = ScreenUtil.getStatusBarHeight(getContext());
+        googleMap.setPadding(0, statusBarHeight, 0, statusBarHeight);
 
         // Hide the "my location" button.
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);

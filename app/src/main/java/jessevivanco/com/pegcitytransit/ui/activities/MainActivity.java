@@ -189,14 +189,6 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
             setupFabVisibility(item.getItemId());
             return true;
         });
-
-        bottomNavigation.setOnNavigationItemReselectedListener(item -> {
-
-            // Only re-selecting the bus routes tab will do something.
-            if (item.getItemId() == R.id.routes) {
-                showBusRoutesModal();
-            }
-        });
     }
 
     /**
@@ -206,14 +198,13 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     private void setupFabVisibility(int selectedTabItemId) {
         if (selectedTabItemId != R.id.search) {
             searchBusStopsFab.hide();
-            myLocationFab.hide();
         } else {
             searchBusStopsFab.show();
+        }
 
-            // We can only show "my location" button if we have permission to access the user's location.
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                myLocationFab.show();
-            }
+        // We can only show "my location" button if we have permission to access the user's location.
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            myLocationFab.show();
         }
     }
 
@@ -446,6 +437,18 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
     @OnClick(R.id.my_location_fab)
     public void goToMyLocation() {
-        loadBusStopsAtUserLocationIfReady(true);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            if (lastKnownLocation != null) {
+                transitMapFragment.zoomToLocation(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude(), getResources().getInteger(R.integer.default_my_location_map_zoom));
+            } else {
+                // TODO handle this
+                Log.e(TAG, "Last known location is null.");
+            }
+        } else {
+            // Shouldn't happen. The button should not be visible.
+            throw new IllegalStateException("Can't go to user's location. Permission is not granted.");
+        }
     }
 }
