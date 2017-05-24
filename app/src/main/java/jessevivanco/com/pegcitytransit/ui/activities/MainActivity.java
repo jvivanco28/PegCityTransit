@@ -418,10 +418,6 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         busRouteCell.setVisibility(View.VISIBLE);
         busRouteCell.bind(busRoute);
 
-        // Dismiss the dialog and load the route.
-        if (busRoutesModal != null) {
-            busRoutesModal.dismissAllowingStateLoss();
-        }
         transmitMapPresenter.loadBusStopsForBusRoute(busRoute);
     }
 

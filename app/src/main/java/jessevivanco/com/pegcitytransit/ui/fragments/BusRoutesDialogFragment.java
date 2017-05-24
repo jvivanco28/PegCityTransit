@@ -109,6 +109,8 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     @Override
     public void onBusRouteSelected(BusRouteViewModel busRoute) {
         listener.onBusRouteSelected(busRoute);
+
+        dismissAllowingStateLoss();
     }
 
     @Override
