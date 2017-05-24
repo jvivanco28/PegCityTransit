@@ -159,9 +159,11 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
 
         if (busStop != null) {
             if (busStop.isSavedStop()) {
+                favStopButton.setSpeed(2);
                 favStopButton.reverseAnimation();
                 stopSchedulePresenter.removeSavedBusStop(busStop, onFavStopRemovedListener);
             } else {
+                favStopButton.setSpeed(1);
                 favStopButton.playAnimation();
                 stopSchedulePresenter.saveBusStop(busStop);
             }

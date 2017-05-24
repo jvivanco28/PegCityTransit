@@ -36,11 +36,13 @@
 
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/toolbar_fav_stop"
-                    android:layout_width="@dimen/toolbar_button_size"
-                    android:layout_height="@dimen/toolbar_button_size"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
+                    android:foregroundGravity="center"
+                    android:scaleType="centerCrop"
                     app:lottie_fileName="star.json"/>
 
                 <TextView

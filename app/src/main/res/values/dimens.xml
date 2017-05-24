@@ -19,7 +19,6 @@
     <dimen name="material_spacing_x_small">4dp</dimen>
 
     <dimen name="bottom_nav_height">56dp</dimen>
-    <dimen name="toolbar_button_size">42dp</dimen>
 
     <dimen name="fab_size">56dp</dimen>
     <dimen name="top_fab_margin_bottom_gps_enabled">88dp</dimen>

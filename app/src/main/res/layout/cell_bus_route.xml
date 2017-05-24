@@ -43,6 +43,7 @@
             android:layout_marginLeft="@dimen/material_spacing_small"
             android:layout_marginRight="@dimen/material_spacing_small"
             android:layout_marginStart="@dimen/material_spacing_small"
+            android:scaleType="centerCrop"
             android:visibility="gone"
             app:lottie_fileName="loading.json"
             app:lottie_loop="true"/>
