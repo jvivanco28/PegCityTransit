@@ -25,6 +25,7 @@
     <color name="rapid_transit_route">#0072b9</color>
 
     <color name="search_circle">#5500796B</color>
+    <color name="crosshair">#7700796B</color>
 
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>
