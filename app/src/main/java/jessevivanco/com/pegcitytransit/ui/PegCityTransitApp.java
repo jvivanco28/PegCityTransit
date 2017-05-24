@@ -2,10 +2,12 @@ package jessevivanco.com.pegcitytransit.ui;
 
 import android.app.Application;
 
+import com.crashlytics.android.Crashlytics;
 import com.joanzapata.iconify.Iconify;
 import com.joanzapata.iconify.fonts.MaterialModule;
 import com.tspoon.traceur.Traceur;
 
+import io.fabric.sdk.android.Fabric;
 import jessevivanco.com.pegcitytransit.BuildConfig;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
@@ -25,16 +27,13 @@ public class PegCityTransitApp extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // TODO enable crash reporting (Fabric or Firebase?)
-//        if (BuildConfig.REPORT_CRASHES) {
-//            Fabric.with(this, new Crashlytics());
-//        }
-
+        if (!BuildConfig.DEBUG) {
+            Fabric.with(this, new Crashlytics());
+        }
         // Helpful tool for debugging Rx-related exceptions.
         if (BuildConfig.DEBUG) {
             Traceur.enableLogging();
         }
-
         initDaggerModules();
         initIconify();
         initFonts();

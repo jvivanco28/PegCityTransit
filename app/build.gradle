@@ -1,4 +1,14 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 25
@@ -18,15 +28,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     compileOptions {
-        // Going with Java 8
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    dataBinding {
-        enabled = true
     }
 }
 
@@ -116,6 +120,9 @@ dependencies {
     // A simple cache for Objects in Android (Thanks Iain!).
     // https://github.com/iainconnor/ObjectCache
     compile 'com.iainconnor:objectcache:0.0.19-SNAPSHOT'
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
+        transitive = true;
+    }
 }
 
 repositories {
@@ -123,4 +130,5 @@ repositories {
     maven {
         url 'https://raw.github.com/iainconnor/ObjectCache/master/maven/'
     }
+    maven { url 'https://maven.fabric.io/public' }
 }
