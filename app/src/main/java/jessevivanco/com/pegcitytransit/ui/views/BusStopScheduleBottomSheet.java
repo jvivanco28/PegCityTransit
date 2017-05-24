@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -31,6 +30,7 @@ import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.NoResultsCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
+import jessevivanco.com.pegcitytransit.ui.views.layout_manager.OneShotAnimatedLinearLayoutManager;
 
 public class BusStopScheduleBottomSheet extends CoordinatorLayout implements BusStopSchedulePresenter.ViewContract, NoResultsCellViewHolder.OnRefreshButtonClickedListener {
 
@@ -44,6 +44,7 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
 
     @BindView(R.id.schedule_recycler_view)
     RecyclerView stopScheduleRecyclerView;
+    OneShotAnimatedLinearLayoutManager layoutManager;
     ScheduledStopAdapter stopScheduleAdapter;
     BusStopSchedulePresenter stopSchedulePresenter;
 
@@ -88,8 +89,10 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
         stopSchedulePresenter = new BusStopSchedulePresenter(injector, this);
         stopScheduleAdapter = new ScheduledStopAdapter(savedInstanceState, this);
 
-        stopScheduleRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        layoutManager = new OneShotAnimatedLinearLayoutManager(getContext(), stopScheduleRecyclerView);
+        stopScheduleRecyclerView.setLayoutManager(layoutManager);
         stopScheduleRecyclerView.addItemDecoration(new VerticalListItemDecoration(getResources().getDimensionPixelSize(R.dimen.material_spacing_small), getResources().getDimensionPixelSize(R.dimen.material_spacing_small)));
+
         stopScheduleRecyclerView.setAdapter(stopScheduleAdapter);
 
         bottomSheetProgressBar.setVisibility(savedInstanceState != null ?
@@ -132,6 +135,7 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
 
     @Override
     public void showScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
+        layoutManager.setAllowAnimations(scheduledStops != null);
         stopScheduleAdapter.setList(scheduledStops);
     }
 

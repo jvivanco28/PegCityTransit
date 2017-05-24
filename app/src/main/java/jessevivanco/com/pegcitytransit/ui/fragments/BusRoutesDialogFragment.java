@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +22,7 @@ import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecor
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusRouteCell;
+import jessevivanco.com.pegcitytransit.ui.views.layout_manager.OneShotAnimatedLinearLayoutManager;
 
 public class BusRoutesDialogFragment extends BottomSheetDialogFragment implements BusRoutesPresenter.ViewContract, BusRoutesAdapter.BusRoutesAdapterCallbacks {
 
@@ -38,6 +38,7 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     @BindView(R.id.bus_routes_recycler_view)
     RecyclerView routesRecyclerView;
 
+    private OneShotAnimatedLinearLayoutManager layoutManager;
     private BusRoutesAdapter routesAdapter;
     private BusRoutesPresenter routesPresenter;
 
@@ -101,7 +102,8 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     }
 
     private void setupRecyclerView() {
-        routesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        layoutManager = new OneShotAnimatedLinearLayoutManager(getActivity(), routesRecyclerView);
+        routesRecyclerView.setLayoutManager(layoutManager);
         routesRecyclerView.addItemDecoration(new VerticalListItemDecoration(getResources().getDimensionPixelSize(R.dimen.material_spacing_small), getResources().getDimensionPixelSize(R.dimen.material_spacing_small)));
         routesRecyclerView.setAdapter(routesAdapter);
     }
@@ -130,6 +132,7 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
 
     @Override
     public void showAllBusRoutes(List<BusRouteViewModel> busRoutes) {
+        layoutManager.setAllowAnimations(busRoutes != null);
         routesAdapter.setList(busRoutes);
     }
 

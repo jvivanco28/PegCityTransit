@@ -7,4 +7,7 @@
 
     <integer name="max_relative_minutes">20</integer>
     <integer name="search_area_marker_delay_millis">25</integer>
+
+    <integer name="recycler_view_animation_inter_object_delay_millis">50</integer>
+    <integer name="recycler_view_animation_duration_millis">500</integer>
 </resources>

@@ -120,6 +120,12 @@ dependencies {
     // A simple cache for Objects in Android (Thanks Iain!).
     // https://github.com/iainconnor/ObjectCache
     compile 'com.iainconnor:objectcache:0.0.19-SNAPSHOT'
+
+    // Lightweight Animation Library
+    // https://github.com/willowtreeapps/spruce-android
+    compile 'com.willowtreeapps.spruce:spruce-android:1.0.0'
+
+    // Report crashes.
     compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
         transitive = true;
     }
