@@ -378,7 +378,6 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         transitMapCallbacks.showBusStopSchedule(busStopInfoWindowAdapter.getBusStopForMarker(marker));
     }
 
-    // TODO DOCUMENT THIS
     public interface TransitMapCallbacks {
 
         void onMapReady();

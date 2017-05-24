@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.iainconnor.objectcache.CacheManager;
 import com.iainconnor.objectcache.DiskCache;
 
@@ -36,11 +37,10 @@ public class DiskLruModule {
 
         DiskCache diskCache = null;
         try {
-            // TODO test if this fails
             diskCache = new DiskCache(cacheFile, BuildConfig.VERSION_CODE, CACHE_SIZE_KB);
         } catch (IOException e) {
-            // TODO REPORT THE ERROR TO CRASHLYTICS
             Log.e(TAG, "Error initializing Disk LRU Cache.", e);
+            Crashlytics.logException(e);
         }
         return diskCache != null ? CacheManager.getInstance(diskCache) : null;
     }

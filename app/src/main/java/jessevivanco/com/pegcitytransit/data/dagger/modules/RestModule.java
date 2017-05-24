@@ -51,6 +51,7 @@ public class RestModule {
     @Singleton
     Gson provideGson() {
 
+        // TODO there must be a better way to handle this.
         // NOTE: This isn't the actually GSON instance that we return from this method. This
         // instance is for the TypeAdapters only.
         Gson gsonForTypeAdapters = new GsonBuilder()

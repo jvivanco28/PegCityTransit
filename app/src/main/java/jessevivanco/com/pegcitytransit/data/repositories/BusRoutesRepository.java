@@ -74,7 +74,6 @@ public class BusRoutesRepository {
             throw new IllegalArgumentException("Bus stop key must not be null!");
         }
 
-        // TODO DO we want to cache this? See how much space this all takes over time.
         return Single.defer(() -> {
 
             // Grab the cached list of bus routes for the

@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.reflect.TypeToken;
 import com.iainconnor.objectcache.CacheManager;
 import com.squareup.phrase.Phrase;
@@ -59,7 +60,7 @@ public class BusStopRepository {
                 .subscribe(
                         busStopViewModelLongSparseArray -> this.savedStopsCacheMap = busStopViewModelLongSparseArray,
                         throwable -> {
-                            // TODO rethrow error?
+                            Crashlytics.logException(throwable);
                             Log.e(TAG, "Error loading saved stops from cache.", throwable);
                         }
                 );

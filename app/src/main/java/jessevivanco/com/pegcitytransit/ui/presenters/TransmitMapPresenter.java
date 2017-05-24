@@ -3,6 +3,9 @@ package jessevivanco.com.pegcitytransit.ui.presenters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
+
+import com.crashlytics.android.Crashlytics;
 
 import java.util.List;
 
@@ -20,6 +23,8 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 public class TransmitMapPresenter {
+
+    private static final String TAG = TransmitMapPresenter.class.getSimpleName();
 
     /**
      * Default lat and long will only be used if the user has GPS disabled.
@@ -81,7 +86,7 @@ public class TransmitMapPresenter {
                             }
                         },
                         throwable -> {
-                            // TODO handle error
+                            Log.e(TAG, "Error loading bus stops at location", throwable);
                             viewContract.showErrorMessage(context.getString(R.string.generic_error));
                         }
                 );
@@ -117,7 +122,7 @@ public class TransmitMapPresenter {
                 .subscribe(
                         busStops -> viewContract.showBusStops(busStops, 0, true),
                         throwable -> {
-                            // TODO handle error
+                            Log.e(TAG, "Error loading bus stops for bus route", throwable);
                             viewContract.showErrorMessage(context.getString(R.string.generic_error));
                         }
                 );
@@ -142,7 +147,9 @@ public class TransmitMapPresenter {
                             }
                         },
                         throwable -> {
-                            // TODO handle error
+                            // No REST calls for this, so maybe an I/O exception.
+                            Crashlytics.logException(throwable);
+                            Log.e(TAG, "Error loading saved bus stops", throwable);
                             viewContract.showErrorMessage(context.getString(R.string.generic_error));
                         }
                 );

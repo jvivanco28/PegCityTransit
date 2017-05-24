@@ -472,7 +472,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
             if (lastKnownLocation != null) {
                 transitMapFragment.zoomToLocation(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude(), getResources().getInteger(R.integer.default_my_location_map_zoom));
             } else {
-                // TODO handle this
+                showErrorMessage(getString(R.string.error_finding_location));
                 Log.e(TAG, "Last known location is null.");
             }
         } else {

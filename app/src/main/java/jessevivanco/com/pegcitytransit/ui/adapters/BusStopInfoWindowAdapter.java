@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -27,6 +28,7 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 
 public class BusStopInfoWindowAdapter {
 
+    private static final String TAG = BusStopInfoWindowAdapter.class.getSimpleName();
     private static final String STATE_BUS_STOPS = "bus_stops";
 
     private List<BusStopViewModel> busStops;
@@ -125,8 +127,8 @@ public class BusStopInfoWindowAdapter {
                     .subscribe(
                             marker -> marker.setVisible(visible),
                             throwable -> {
-                                // TODO report crash
-                                Log.e("DEBUG", "asdf", throwable);
+                                Crashlytics.logException(throwable);
+                                Log.e(TAG, "Error cascading map markers", throwable);
                             }
                     );
         }

@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -172,8 +171,7 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
                 stopSchedulePresenter.saveBusStop(busStop);
             }
         } else {
-            // TODO report error
-            Log.e(TAG, "Can't save a null bus stop!");
+            throw new IllegalStateException("Can't save a null bus stop!");
         }
     }
 

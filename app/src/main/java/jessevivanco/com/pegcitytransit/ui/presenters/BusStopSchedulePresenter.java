@@ -3,6 +3,8 @@ package jessevivanco.com.pegcitytransit.ui.presenters;
 import android.content.Context;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -61,7 +63,6 @@ public class BusStopSchedulePresenter {
                             }
                         },
                         throwable -> {
-                            // TODO handle error
                             Log.e(TAG, "Error loading bus stop schedule", throwable);
                             viewContract.showErrorMessage(context.getString(R.string.error_loading_schedule));
                         }
@@ -77,7 +78,7 @@ public class BusStopSchedulePresenter {
                 .subscribe(busStopViewModels -> {
                     // Ignored.
                 }, throwable -> {
-                    // TODO handle error
+                    Crashlytics.logException(throwable);
                     Log.e(TAG, "Error saving bus stop.", throwable);
                 });
     }
@@ -98,7 +99,7 @@ public class BusStopSchedulePresenter {
                             onFavStopRemovedListener.onFavStopRemoved(busStop);
                         },
                         throwable -> {
-                            // TODO handle error
+                            Crashlytics.logException(throwable);
                             Log.e(TAG, "Error saving bus stop.", throwable);
                         }
                 );

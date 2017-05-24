@@ -4,6 +4,7 @@ package jessevivanco.com.pegcitytransit.data.util;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.iainconnor.objectcache.CacheManager;
 
 import java.lang.reflect.Type;
@@ -32,9 +33,9 @@ public class CacheUtil {
             try {
                 cachedResult = (T) unformattedCachedResult;
             } catch (ClassCastException e) {
-                // TODO REPORT ERROR
 
                 // This should never happen, but if it does we need to be able to recover from this.
+                Crashlytics.logException(e);
                 Log.v(TAG, "Error getting data frmo cache.", e);
             }
         }
