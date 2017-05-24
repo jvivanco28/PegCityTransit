@@ -64,12 +64,13 @@
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 android:layout_gravity="bottom"
-                android:indeterminate="true"/>
+                android:indeterminate="true"
+                android:visibility="gone"/>
 
         </android.support.design.widget.CoordinatorLayout>
 
+        <!-- TODO STYLE -->
         <android.support.design.widget.BottomNavigationView
             android:id="@+id/tab_navigation"
             android:layout_width="match_parent"

@@ -187,7 +187,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         CircleOptions circleOptions = new CircleOptions()
                 .center(new LatLng(latitude, longitude))
                 .radius(radius)
-                .strokeColor(getResources().getColor(R.color.map_search_border))
+                .strokeColor(getResources().getColor(R.color.search_circle))
                 .strokeWidth(getResources().getDimensionPixelSize(R.dimen.map_search_border_width));
 
         searchArea = googleMap.addCircle(circleOptions);

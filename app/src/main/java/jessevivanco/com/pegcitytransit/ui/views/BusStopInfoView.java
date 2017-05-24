@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -20,6 +21,9 @@ public class BusStopInfoView extends LinearLayout {
 
     @BindView(R.id.bus_stop_key)
     TextView busStopKeyTextView;
+
+    @BindView(R.id.fav_icon)
+    View favIcon;
 
     @BindView(R.id.bus_stop_name)
     TextView busStopNameTextView;
@@ -57,6 +61,7 @@ public class BusStopInfoView extends LinearLayout {
     public void showBusStopInfo(@Nullable BusStopViewModel busStop) {
         if (busStop != null) {
             busStopKeyTextView.setText(String.valueOf(busStop.getKey()));
+            favIcon.setVisibility(busStop.isSavedStop() ? VISIBLE : GONE);
             busStopNameTextView.setText(busStop.getName());
 
             busRoutesFlowLayout.removeAllViews();
@@ -68,6 +73,7 @@ public class BusStopInfoView extends LinearLayout {
             }
         } else {
             busStopKeyTextView.setText(null);
+            favIcon.setVisibility(View.GONE);
             busStopNameTextView.setText(null);
             busRoutesFlowLayout.removeAllViews();
         }
