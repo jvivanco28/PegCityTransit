@@ -93,7 +93,10 @@ public class BusStopSchedulePresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        busStopViewModels -> onFavStopRemovedListener.onFavStopRemoved(busStop),
+                        busStopViewModels -> {
+                            busStop.setSavedStop(false);
+                            onFavStopRemovedListener.onFavStopRemoved(busStop);
+                        },
                         throwable -> {
                             // TODO handle error
                             Log.e(TAG, "Error saving bus stop.", throwable);
