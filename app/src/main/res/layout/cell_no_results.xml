@@ -15,8 +15,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/material_spacing_medium"
         android:gravity="center"
-        android:text="@string/no_schedule"
-        android:textSize="@dimen/text_medium"/>
+        android:textSize="@dimen/text_medium"
+        tools:text="@string/no_schedule"/>
 
     <Button
         android:id="@+id/try_again_button"

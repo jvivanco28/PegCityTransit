@@ -38,7 +38,10 @@ public class BusRoutesPresenter {
         loadBusRoutesSubscription = routesRepository.getAllBusRoutes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> viewContract.showLoadingIndicator(true))
+                .doOnSubscribe(disposable -> {
+                    viewContract.showErrorMessage(null);
+                    viewContract.showLoadingIndicator(true);
+                })
                 .doFinally(() -> viewContract.showLoadingIndicator(false))
                 .subscribe(
                         busRoutes -> viewContract.showAllBusRoutes(busRoutes),

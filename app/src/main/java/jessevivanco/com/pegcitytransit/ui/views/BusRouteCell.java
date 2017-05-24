@@ -2,7 +2,7 @@ package jessevivanco.com.pegcitytransit.ui.views;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
@@ -52,7 +52,7 @@ public class BusRouteCell extends CardView {
 
     private void setup(@Nullable AttributeSet attrs) {
 
-        LayoutInflater.from(getContext()).inflate(R.layout.cell_bus_route, this, true);
+        LayoutInflater.from(getContext()).inflate(getLayoutResId(), this, true);
         ButterKnife.bind(this);
 
         // If no layout attributes supplied, then default width should be MATCH_PARENT
@@ -96,6 +96,11 @@ public class BusRouteCell extends CardView {
             loadingView.cancelAnimation();
         }
         loadingView.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    @LayoutRes
+    public static int getLayoutResId() {
+        return R.layout.cell_bus_route;
     }
 
     public interface OnBusRouteSelectedListener {

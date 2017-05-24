@@ -131,15 +131,8 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
     }
 
     @Override
-    public void showErrorMessage(String msg) {
-
-        // TODO show error state in adapter
-        Log.e("DEBUG", msg);
-    }
-
-    @Override
     public void showScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
-        stopScheduleAdapter.setScheduledStops(scheduledStops);
+        stopScheduleAdapter.setList(scheduledStops);
     }
 
     @Override
@@ -157,8 +150,8 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
     }
 
     @Override
-    public void setNoScheduleStopsMessage(@Nullable String message) {
-        stopScheduleAdapter.setNoResultsMessage(message);
+    public void showErrorMessage(String msg) {
+        stopScheduleAdapter.setNoResultsMessage(msg);
     }
 
     @OnClick(R.id.toolbar_fav_stop)

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,7 +24,7 @@ import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusRouteCell;
 
-public class BusRoutesDialogFragment extends BottomSheetDialogFragment implements BusRoutesPresenter.ViewContract, BusRouteCell.OnBusRouteSelectedListener {
+public class BusRoutesDialogFragment extends BottomSheetDialogFragment implements BusRoutesPresenter.ViewContract, BusRoutesAdapter.BusRoutesAdapterCallbacks {
 
     public static final String TAG = BusRoutesDialogFragment.class.getSimpleName();
     private static final String STATE_KEY_LOADING_INDICATOR_VISIBILITY = "bus_route_loading_indicator_visibility";
@@ -113,19 +112,23 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     }
 
     @Override
+    public void onRefreshButtonClicked() {
+        routesPresenter.loadAllBusRoutes();
+    }
+
+    @Override
     public void showLoadingIndicator(boolean visible) {
         loadingIndicator.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void showErrorMessage(String msg) {
-        // TODO error state in adapter
-        Snackbar.make(rootContainer, msg, Snackbar.LENGTH_LONG).show();
+        routesAdapter.setNoResultsMessage(msg);
     }
 
     @Override
     public void showAllBusRoutes(List<BusRouteViewModel> busRoutes) {
-        routesAdapter.setBusRoutes(busRoutes);
+        routesAdapter.setList(busRoutes);
     }
 
     @OnClick(R.id.toolbar_close_button)
