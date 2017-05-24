@@ -253,7 +253,16 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
             if (searchArea != null) {
                 bounds = getLatLngBoundsOfCircle(searchArea.getCenter(), searchArea.getRadius());
             }
-            zoomToBounds(bounds);
+
+            if (searchArea != null || busStops.size() > 1) {
+                zoomToBounds(bounds);
+            } else {
+                // If there's only ony marker and no search area, then we definitely don't need to
+                // zoom to MAX.
+                zoomToLocation(busStops.get(0).getLatLng().latitude,
+                        busStops.get(0).getLatLng().longitude,
+                        getResources().getInteger(R.integer.default_my_location_map_zoom));
+            }
         }
     }
 
