@@ -30,7 +30,8 @@
     <string name="settings">Settings</string>
 
     <!--    UI Labels   -->
-    <string name="select_a_bus_route">Select a Bus Route</string>
+    <string name="select_a_bus_route">{md-directions-bus} Select a Bus Route</string>
+    <string name="settings_toolbar_title">{md-settings} Settings</string>
     <string name="departs_in">Departs in {time} {time_unit}</string>
     <string name="due">Due</string>
 

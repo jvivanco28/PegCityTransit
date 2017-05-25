@@ -40,8 +40,9 @@
                     android:layout_centerVertical="true"
                     android:text="{md-close}"/>
 
-                <TextView
+                <com.joanzapata.iconify.widget.IconTextView
                     style="@style/toolbar_title"
+                    fontPath="fonts/bariol_bold.ttf"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="@dimen/material_spacing_medium"
@@ -50,7 +51,7 @@
                     android:layout_marginStart="@dimen/material_spacing_medium"
                     android:layout_toEndOf="@id/bottom_sheet_toolbar_close_button"
                     android:layout_toRightOf="@id/bottom_sheet_toolbar_close_button"
-                    android:text="@string/settings"/>
+                    android:text="@string/settings_toolbar_title"/>
 
             </RelativeLayout>
 
