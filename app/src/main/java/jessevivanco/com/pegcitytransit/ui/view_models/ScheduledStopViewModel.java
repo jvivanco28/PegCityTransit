@@ -89,7 +89,11 @@ public class ScheduledStopViewModel {
                     hours,
                     minutes);
         } else {
-            return hours + ":" + minutes + " " + (cal.get(Calendar.AM_PM) == Calendar.AM ? "am" : "pm");
+            return String.format(Locale.getDefault(),
+                    "%2d:%02d %s",
+                    hours,
+                    minutes,
+                    cal.get(Calendar.AM_PM) == Calendar.AM ? "am" : "pm");
         }
     }
 
