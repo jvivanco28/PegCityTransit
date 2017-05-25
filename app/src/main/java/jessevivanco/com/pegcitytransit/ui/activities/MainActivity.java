@@ -377,8 +377,6 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         // If permission to get user's location has not yet been granted, then ask the user.
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            Log.v("DEBUG", "initialActivityLoadFinished ? " + (initialActivityLoadFinished));
-
             // We don't need to keep asking on every orientation change.
             if (!initialActivityLoadFinished) {
                 PermissionUtils.requestPermission(this,
