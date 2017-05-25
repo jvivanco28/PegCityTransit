@@ -134,7 +134,7 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
 
     @Override
     public void showScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
-        layoutManager.setAllowAnimations(scheduledStops != null);
+        layoutManager.setAnimateNextLayout(scheduledStops != null);
         stopScheduleAdapter.setList(scheduledStops);
     }
 

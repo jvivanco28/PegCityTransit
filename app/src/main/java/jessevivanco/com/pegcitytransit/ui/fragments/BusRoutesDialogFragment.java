@@ -132,7 +132,7 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
 
     @Override
     public void showAllBusRoutes(List<BusRouteViewModel> busRoutes) {
-        layoutManager.setAllowAnimations(busRoutes != null);
+        layoutManager.setAnimateNextLayout(busRoutes != null);
         routesAdapter.setList(busRoutes);
     }
 
