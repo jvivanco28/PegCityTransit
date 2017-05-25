@@ -99,6 +99,12 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        busStopInfoWindowAdapter.tearDown();
+        super.onDestroyView();
+    }
+
     private void setupMap(Bundle savedInstanceState) {
         mapFragment.getMapAsync(this);
 

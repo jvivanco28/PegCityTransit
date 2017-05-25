@@ -92,7 +92,8 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     private BusRoutesDialogFragment busRoutesModal;
     private SettingsDialogFragment settingsModal;
 
-    private boolean initialLoadFinished;
+    private boolean initialActivityLoadFinished;
+    private boolean initialMapLoadFinished;
     private boolean googleApiClientInitialized;
 
     @Override
@@ -101,6 +102,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         ButterKnife.bind(this);
 
         // TODO check service advisories on startup
+        initialActivityLoadFinished = savedInstanceState != null;
         mapSearchRadius = getResources().getInteger(R.integer.default_map_search_radius);
         setSearchFabMargin();
         setupMap(savedInstanceState);
@@ -127,6 +129,13 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         googleApiClient.disconnect();
     }
 
+    @Override
+    protected void onDestroy() {
+        transmitMapPresenter.tearDown();
+        stopScheduleBottomSheet.tearDown();
+        super.onDestroy();
+    }
+
     private void setSearchFabMargin() {
         ViewGroup.MarginLayoutParams searchFabLayoutParams = (ViewGroup.MarginLayoutParams) searchBusStopsFab.getLayoutParams();
 
@@ -145,7 +154,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
             transitMapFragment.setTransitMapCallbacks(this);
             getSupportFragmentManager().beginTransaction().add(R.id.map_fragment_container, transitMapFragment).commit();
         } else {
-            initialLoadFinished = savedInstanceState.getBoolean(STATE_KEY_INITIAL_LOAD_FINISHED, false);
+            initialMapLoadFinished = savedInstanceState.getBoolean(STATE_KEY_INITIAL_LOAD_FINISHED, false);
 
             transitMapFragment = (TransitMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment_container);
             transitMapFragment.setTransitMapCallbacks(this);
@@ -190,8 +199,6 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         }
 
         bottomNavigation.setOnNavigationItemSelectedListener(item -> {
-
-            transmitMapPresenter.tearDown();
 
             switch (item.getItemId()) {
                 case R.id.search:
@@ -282,7 +289,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         if (transitMapFragment.isMapReady() &&
                 googleApiClientInitialized &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                (!initialLoadFinished || forceLoad)) {
+                (!initialMapLoadFinished || forceLoad)) {
 
             transitMapFragment.showUserLocationIfAllowed();
 
@@ -295,7 +302,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                     mapSearchRadius);
 
             // Raise this flag. We don't need to search for bus stops on every orientation change.
-            initialLoadFinished = true;
+            initialMapLoadFinished = true;
         }
     }
 
@@ -343,7 +350,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         busRouteCell.onSaveInstanceState(outState);
 
         outState.putInt(STATE_KEY_ROUTE_CELL_VISIBILITY, busRouteCell.getVisibility());
-        outState.putBoolean(STATE_KEY_INITIAL_LOAD_FINISHED, initialLoadFinished);
+        outState.putBoolean(STATE_KEY_INITIAL_LOAD_FINISHED, initialMapLoadFinished);
         outState.putInt(STATE_KEY_SELECTED_TAB, bottomNavigation.getSelectedItemId());
         outState.putInt(STATE_KEY_BOTTOM_SHEET_STATE, bottomSheetBehavior.getState());
     }
@@ -370,12 +377,17 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         // If permission to get user's location has not yet been granted, then ask the user.
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            PermissionUtils.requestPermission(this,
-                    IntentRequestCodes.LOCATION_PERMISSION_REQUEST_CODE.ordinal(),
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    getString(R.string.location_permission_dialog_title),
-                    getString(R.string.location_permission_rational),
-                    PERMISSION_DIALOG_TAG);
+            Log.v("DEBUG", "initialActivityLoadFinished ? " + (initialActivityLoadFinished));
+
+            // We don't need to keep asking on every orientation change.
+            if (!initialActivityLoadFinished) {
+                PermissionUtils.requestPermission(this,
+                        IntentRequestCodes.LOCATION_PERMISSION_REQUEST_CODE.ordinal(),
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        getString(R.string.location_permission_dialog_title),
+                        getString(R.string.location_permission_rational),
+                        PERMISSION_DIALOG_TAG);
+            }
         } else {
             // Permission is already granted. We can show the "my location" button.
             setupFabVisibility(bottomNavigation.getSelectedItemId());

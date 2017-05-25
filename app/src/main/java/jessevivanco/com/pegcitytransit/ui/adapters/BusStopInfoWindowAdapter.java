@@ -45,7 +45,7 @@ public class BusStopInfoWindowAdapter {
         outState.putParcelable(STATE_BUS_STOPS, Parcels.wrap(busStops));
     }
 
-    public void onDestroy() {
+    public void tearDown() {
         DisposableUtil.dispose(showMarkerVisibilitySubscription);
     }
 

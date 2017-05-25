@@ -49,6 +49,10 @@ public class BusRoutesPresenter {
                 );
     }
 
+    public void tearDown() {
+        DisposableUtil.dispose(loadBusRoutesSubscription);
+    }
+
     public interface ViewContract extends BaseViewContract {
 
         void showLoadingIndicator(boolean visible);

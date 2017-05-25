@@ -175,6 +175,10 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
         }
     }
 
+    public void tearDown() {
+        stopSchedulePresenter.tearDown();
+    }
+
     /**
      * Listener invoked when a stop is removed from the user's list of saved stops.
      */
