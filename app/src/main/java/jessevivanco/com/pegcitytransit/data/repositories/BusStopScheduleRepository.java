@@ -25,7 +25,7 @@ public class BusStopScheduleRepository {
         this.MAX_RELATIVE_MINUTES = context.getResources().getInteger(R.integer.max_relative_minutes);
     }
 
-    public Single<List<ScheduledStopViewModel>> getBusStopSchedule(Long busStopKey) {
+    public Single<List<ScheduledStopViewModel>> getBusStopSchedule(Long busStopKey, boolean use24HourTime) {
 
         return restApi.getBusStopSchedule(busStopKey)
                 .map(WinnipegTransitResponse::getElement)
@@ -40,7 +40,8 @@ public class BusStopScheduleRepository {
                                 routeSchedule.getRoute().getNumber(),
                                 RouteCoverage.getCoverage(routeSchedule.getRoute().getCoverage(), routeSchedule.getRoute().getName()),
                                 scheduledStop,
-                                MAX_RELATIVE_MINUTES)
+                                MAX_RELATIVE_MINUTES,
+                                use24HourTime)
                         )
                 )
                 // Assemble into a list of view models sorted by departure time

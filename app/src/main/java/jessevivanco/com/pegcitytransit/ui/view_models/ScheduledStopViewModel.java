@@ -31,7 +31,8 @@ public class ScheduledStopViewModel {
                                                                  Integer routeNumber,
                                                                  RouteCoverage routeCoverage,
                                                                  ScheduledStop scheduledStop,
-                                                                 final int MAX_RELATIVE_MINUTES) {
+                                                                 final int MAX_RELATIVE_MINUTES,
+                                                                 boolean use24HourTime) {
         if (routeNumber == null || scheduledStop == null) {
             return null;
         } else {
@@ -55,7 +56,7 @@ public class ScheduledStopViewModel {
                                             .put("time_unit", context.getResources().getQuantityString(R.plurals.minutes, (int) minutes))
                                             .format()
                                             .toString() :
-                                    getTimeFormatted(scheduledStop.getTimes().getDeparture().getEstimated());
+                                    getTimeFormatted(scheduledStop.getTimes().getDeparture().getEstimated(), use24HourTime);
 
             if (scheduledStop.getTimes().getDeparture().getEstimated().getTime() > scheduledStop.getTimes().getDeparture().getScheduled().getTime()) {
                 status = context.getString(R.string.late);
@@ -75,16 +76,21 @@ public class ScheduledStopViewModel {
         }
     }
 
-    private static String getTimeFormatted(Date date) {
+    private static String getTimeFormatted(Date date, boolean use24HourTime) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        int hours = cal.get(Calendar.HOUR_OF_DAY);
+
+        int hours = cal.get(use24HourTime ? Calendar.HOUR_OF_DAY : Calendar.HOUR);
         int minutes = cal.get(Calendar.MINUTE);
 
-        return String.format(Locale.getDefault(),
-                "%02d:%02d",
-                hours,
-                minutes);
+        if (use24HourTime) {
+            return String.format(Locale.getDefault(),
+                    "%02d:%02d",
+                    hours,
+                    minutes);
+        } else {
+            return hours + ":" + minutes + " " + (cal.get(Calendar.AM_PM) == Calendar.AM ? "am" : "pm");
+        }
     }
 
     Integer routeNumber;

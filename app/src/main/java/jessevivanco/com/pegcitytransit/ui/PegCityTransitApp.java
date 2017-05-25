@@ -1,10 +1,12 @@
 package jessevivanco.com.pegcitytransit.ui;
 
 import android.app.Application;
+import android.content.ContextWrapper;
 
 import com.crashlytics.android.Crashlytics;
 import com.joanzapata.iconify.Iconify;
 import com.joanzapata.iconify.fonts.MaterialModule;
+import com.pixplicity.easyprefs.library.Prefs;
 import com.tspoon.traceur.Traceur;
 
 import io.fabric.sdk.android.Fabric;
@@ -37,6 +39,7 @@ public class PegCityTransitApp extends Application {
         initDaggerModules();
         initIconify();
         initFonts();
+        initEasyPrefs();
     }
 
     private void initDaggerModules() {
@@ -66,6 +69,15 @@ public class PegCityTransitApp extends Application {
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );
+    }
+
+    private void initEasyPrefs() {
+        new Prefs.Builder()
+                .setContext(this)
+                .setMode(ContextWrapper.MODE_PRIVATE)
+                .setPrefsName(getPackageName())
+                .setUseDefaultSharedPreference(true)
+                .build();
     }
 
     /**

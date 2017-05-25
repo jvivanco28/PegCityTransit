@@ -125,6 +125,10 @@ dependencies {
     // https://github.com/willowtreeapps/spruce-android
     compile 'com.willowtreeapps.spruce:spruce-android:1.0.0'
 
+    // Shared Preferences helper
+    // https://github.com/Pixplicity/EasyPreferences
+    compile 'com.pixplicity.easyprefs:library:1.8.1@aar'
+
     // Report crashes.
     compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
         transitive = true;
@@ -137,4 +141,5 @@ repositories {
         url 'https://raw.github.com/iainconnor/ObjectCache/master/maven/'
     }
     maven { url 'https://maven.fabric.io/public' }
+    maven { url "http://dl.bintray.com/pixplicity/maven" }
 }

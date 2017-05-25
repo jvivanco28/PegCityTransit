@@ -16,6 +16,7 @@ import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopScheduleRepository;
+import jessevivanco.com.pegcitytransit.data.repositories.PreferencesRepository;
 import jessevivanco.com.pegcitytransit.data.util.DisposableUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
@@ -29,6 +30,8 @@ public class BusStopSchedulePresenter {
     BusStopScheduleRepository scheduleRepository;
     @Inject
     BusStopRepository busStopRepository;
+    @Inject
+    PreferencesRepository preferencesRepository;
     @Inject
     Context context;
 
@@ -45,7 +48,7 @@ public class BusStopSchedulePresenter {
     public void loadScheduleForBusStop(Long busStopKey) {
         DisposableUtil.dispose(loadScheduleSubscription);
 
-        loadScheduleSubscription = scheduleRepository.getBusStopSchedule(busStopKey)
+        loadScheduleSubscription = scheduleRepository.getBusStopSchedule(busStopKey, preferencesRepository.isUsing24HourClock())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> {

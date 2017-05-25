@@ -7,6 +7,7 @@ import jessevivanco.com.pegcitytransit.data.dagger.modules.AppModule;
 import jessevivanco.com.pegcitytransit.data.dagger.modules.DiskLruModule;
 import jessevivanco.com.pegcitytransit.data.dagger.modules.RepositoriesModule;
 import jessevivanco.com.pegcitytransit.data.dagger.modules.RestModule;
+import jessevivanco.com.pegcitytransit.ui.fragments.SettingsDialogFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
@@ -33,5 +34,7 @@ public interface AppComponent {
     void injectInto(BusRoutesPresenter target);
 
     void injectInto(BusStopSchedulePresenter target);
+
+    void injectInto(SettingsDialogFragment target);
 
 }
