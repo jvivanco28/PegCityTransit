@@ -48,8 +48,8 @@
     <string name="loading_message_finding_schedule">Finding Schedule&#8230;</string>
 
     <string name="use_24_hour_time">Use 24-hour time</string>
-    <string name="send_feedback_blurb">Notice an issue with the app? Send a bug report so it can be looked into (please be as descriptive as possible).</string>
-    <string name="send_feedback">Report an Issue</string>
+    <string name="report_issue_blurb">Notice an issue with the app? Send a bug report so it can be looked into (please be as descriptive as possible).</string>
+    <string name="report_issue">Report an Issue</string>
     <string name="rate_blurb">Love it? Hate it? Rate it!</string>
     <string name="rate_app">Rate the App!</string>
 

@@ -117,16 +117,17 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/send_feedback_blurb"
+                        android:text="@string/report_issue_blurb"
                         android:textSize="@dimen/text_medium"/>
 
                     <Button
                         style="@style/button"
                         fontPath="fonts/bariol_bold.ttf"
+                        android:id="@+id/report_issue_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/material_spacing_small"
-                        android:text="@string/send_feedback"
+                        android:text="@string/report_issue"
                         android:textSize="@dimen/text_medium"/>
 
                 </LinearLayout>
@@ -156,6 +157,7 @@
                     <Button
                         style="@style/button"
                         fontPath="fonts/bariol_bold.ttf"
+                        android:id="@+id/rate_app_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/material_spacing_small"

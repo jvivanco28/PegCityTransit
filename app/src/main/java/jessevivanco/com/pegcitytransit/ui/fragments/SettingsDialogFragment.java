@@ -16,6 +16,7 @@ import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.repositories.PreferencesRepository;
 import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
+import jessevivanco.com.pegcitytransit.ui.util.IntentUtil;
 
 // TODO Dialog or normal fragment?
 public class SettingsDialogFragment extends BottomSheetDialogFragment {
@@ -58,5 +59,15 @@ public class SettingsDialogFragment extends BottomSheetDialogFragment {
     @OnClick(R.id.toolbar_close_button)
     public void closeModal() {
         dismissAllowingStateLoss();
+    }
+
+    @OnClick(R.id.report_issue_button)
+    public void reportIssue() {
+        // TODO
+    }
+
+    @OnClick(R.id.rate_app_button)
+    public void rateApp() {
+        getActivity().startActivity(IntentUtil.getAppIntent(getActivity()));
     }
 }
