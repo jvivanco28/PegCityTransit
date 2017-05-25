@@ -5,7 +5,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 
 import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
-import jessevivanco.com.pegcitytransit.ui.fragments.dialog.RationaleDialog;
+import jessevivanco.com.pegcitytransit.ui.fragments.RationaleDialog;
 
 /**
  * <b>NOTE: Some of this was taken from https://github.com/googlemaps/android-samples</b>

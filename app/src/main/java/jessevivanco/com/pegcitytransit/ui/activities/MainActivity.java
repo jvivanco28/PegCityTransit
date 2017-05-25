@@ -33,8 +33,9 @@ import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
 import jessevivanco.com.pegcitytransit.ui.fragments.BusRoutesDialogFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
+import jessevivanco.com.pegcitytransit.ui.fragments.PermissionDeniedDialog;
+import jessevivanco.com.pegcitytransit.ui.fragments.SettingsDialogFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment;
-import jessevivanco.com.pegcitytransit.ui.fragments.dialog.PermissionDeniedDialog;
 import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
@@ -89,6 +90,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     private TransmitMapPresenter transmitMapPresenter;
 
     private BusRoutesDialogFragment busRoutesModal;
+    private SettingsDialogFragment settingsModal;
 
     private boolean initialLoadFinished;
     private boolean googleApiClientInitialized;
@@ -203,6 +205,9 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                 case R.id.routes:
                     showBusRoutesModal();
                     break;
+                case R.id.settings:
+                    showSettings();
+                    break;
             }
             setupFabVisibility(item.getItemId());
             return true;
@@ -253,6 +258,13 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
             busRoutesModal = BusRoutesDialogFragment.newInstance();
         }
         busRoutesModal.show(getSupportFragmentManager(), BusRoutesDialogFragment.TAG);
+    }
+
+    private void showSettings() {
+        if (settingsModal == null) {
+            settingsModal = SettingsDialogFragment.newInstance();
+        }
+        settingsModal.show(getSupportFragmentManager(), SettingsDialogFragment.TAG);
     }
 
     /**

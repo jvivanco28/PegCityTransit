@@ -11,6 +11,7 @@
     <dimen name="cover_image_height">200dp</dimen>
 
     <dimen name="stroke_width">1dp</dimen>
+    <dimen name="card_elevation">3dp</dimen>
 
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="material_spacing_large">24dp</dimen>

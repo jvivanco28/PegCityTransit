@@ -27,6 +27,7 @@
     <string name="search_stops">Search Stops</string>
     <string name="my_stops">My Stops</string>
     <string name="routes">Routes</string>
+    <string name="settings">Settings</string>
 
     <!--    UI Labels   -->
     <string name="select_a_bus_route">Select a Bus Route</string>
@@ -44,6 +45,12 @@
 
     <string name="loading_message_finding_routes">Finding Routes&#8230;</string>
     <string name="loading_message_finding_schedule">Finding Schedule&#8230;</string>
+
+    <string name="use_military_time">Use 24-hour military time</string>
+    <string name="send_feedback_blurb">Notice an issue with the app? Send a bug report and it will be looked into as soon as possible (please be as descriptive as possible).</string>
+    <string name="send_feedback">Report an Issue</string>
+    <string name="rate_blurb">Love it? Hate it? Rate it!</string>
+    <string name="rate_app">Rate the App!</string>
 
     <!-- Cache keys -->
     <string name="cache_key_all_routes">ALL_ROUTES</string>

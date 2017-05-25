@@ -16,4 +16,9 @@
         android:icon="@drawable/ic_directions_bus_white_24dp"
         android:title="@string/routes"/>
 
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/ic_settings_white_24dp"
+        android:title="@string/settings"/>
+
 </menu>

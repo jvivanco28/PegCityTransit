@@ -28,7 +28,6 @@
 
             <FrameLayout
                 android:id="@+id/map_fragment_container"
-                android:name="jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:context="jessevivanco.com.pegcitytransit.ui.activities.MainActivity"/>
@@ -78,7 +77,7 @@
             android:background="@color/colorPrimary"
             app:itemIconTint="@color/bottom_nav_text"
             app:itemTextColor="@color/bottom_nav_text"
-            app:menu="@menu/navigation"/>
+            app:menu="@menu/bottom_navigation"/>
 
     </RelativeLayout>
 
