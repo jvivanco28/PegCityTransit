@@ -53,6 +53,9 @@
     <string name="rate_blurb">Love it? Hate it? Rate it!</string>
     <string name="rate_app">Rate the App!</string>
 
+    <string name="feedback_email">pegcitytransit@gmail.com</string>
+    <string name="feedback_email_subject">App Issue</string>
+
     <!-- Cache keys -->
     <string name="cache_key_all_routes">ALL_ROUTES</string>
     <string name="cache_key_stops_for_route">STOPS_FOR_{route}</string>

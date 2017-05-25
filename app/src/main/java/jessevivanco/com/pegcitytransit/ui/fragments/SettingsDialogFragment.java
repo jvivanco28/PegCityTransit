@@ -15,6 +15,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.repositories.PreferencesRepository;
+import jessevivanco.com.pegcitytransit.data.util.DeviceUtil;
 import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.ui.util.IntentUtil;
 
@@ -63,7 +64,7 @@ public class SettingsDialogFragment extends BottomSheetDialogFragment {
 
     @OnClick(R.id.report_issue_button)
     public void reportIssue() {
-        // TODO
+        getActivity().startActivity(IntentUtil.getSendEmailIntent(getString(R.string.feedback_email), getString(R.string.feedback_email_subject), DeviceUtil.getDebugInfo(getActivity())));
     }
 
     @OnClick(R.id.rate_app_button)
