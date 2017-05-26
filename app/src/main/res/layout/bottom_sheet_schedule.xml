@@ -3,74 +3,65 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
+    <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:background="@color/colorPrimary"
+        app:contentInsetEnd="@dimen/material_spacing_medium"
+        app:contentInsetLeft="@dimen/material_spacing_medium"
+        app:contentInsetRight="@dimen/material_spacing_medium"
+        app:contentInsetStart="@dimen/material_spacing_medium">
 
-        <android.support.v7.widget.Toolbar
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
-            app:contentInsetEnd="@dimen/material_spacing_medium"
-            app:contentInsetLeft="@dimen/material_spacing_medium"
-            app:contentInsetRight="@dimen/material_spacing_medium"
-            app:contentInsetStart="@dimen/material_spacing_medium">
+            android:layout_height="?attr/actionBarSize">
 
-            <RelativeLayout
+            <!-- Close button -->
+            <com.joanzapata.iconify.widget.IconButton
+                android:id="@+id/bottom_sheet_toolbar_close_button"
+                style="@style/toolbar_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="{md-close}"/>
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/toolbar_fav_stop"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:foregroundGravity="center"
+                android:scaleType="centerCrop"
+                app:lottie_fileName="star.json"/>
+
+            <TextView
+                android:id="@+id/bottom_sheet_toolbar_title"
+                style="@style/toolbar_title"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize">
+                android:layout_height="match_parent"
+                android:layout_marginEnd="@dimen/material_spacing_medium"
+                android:layout_marginLeft="@dimen/material_spacing_medium"
+                android:layout_marginRight="@dimen/material_spacing_medium"
+                android:layout_marginStart="@dimen/material_spacing_medium"
+                android:layout_toEndOf="@id/bottom_sheet_toolbar_close_button"
+                android:layout_toLeftOf="@id/toolbar_fav_stop"
+                android:layout_toRightOf="@id/bottom_sheet_toolbar_close_button"
+                android:layout_toStartOf="@id/toolbar_fav_stop"
+                tools:text="Southbound Main at Broadway (Union Station)"/>
 
-                <!-- Close button -->
-                <com.joanzapata.iconify.widget.IconButton
-                    android:id="@+id/bottom_sheet_toolbar_close_button"
-                    style="@style/toolbar_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:text="{md-close}"/>
+        </RelativeLayout>
 
-                <com.airbnb.lottie.LottieAnimationView
-                    android:id="@+id/toolbar_fav_stop"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:foregroundGravity="center"
-                    android:scaleType="centerCrop"
-                    app:lottie_fileName="star.json"/>
-
-                <TextView
-                    android:id="@+id/bottom_sheet_toolbar_title"
-                    style="@style/toolbar_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="@dimen/material_spacing_medium"
-                    android:layout_marginLeft="@dimen/material_spacing_medium"
-                    android:layout_marginRight="@dimen/material_spacing_medium"
-                    android:layout_marginStart="@dimen/material_spacing_medium"
-                    android:layout_toEndOf="@id/bottom_sheet_toolbar_close_button"
-                    android:layout_toLeftOf="@id/toolbar_fav_stop"
-                    android:layout_toRightOf="@id/bottom_sheet_toolbar_close_button"
-                    android:layout_toStartOf="@id/toolbar_fav_stop"
-                    tools:text="Southbound Main at Broadway (Union Station)"/>
-
-            </RelativeLayout>
-
-        </android.support.v7.widget.Toolbar>
-
-    </android.support.design.widget.AppBarLayout>
+    </android.support.v7.widget.Toolbar>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="match_parent"
+        android:background="@color/list_background"
+        android:orientation="vertical">
 
         <ProgressBar
             android:id="@+id/bottom_sheet_progress_bar"
@@ -82,7 +73,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/schedule_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent"/>
 
     </LinearLayout>
 

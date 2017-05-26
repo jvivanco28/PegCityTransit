@@ -3,6 +3,7 @@ package jessevivanco.com.pegcitytransit.ui.activities;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -244,11 +245,29 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         stopScheduleBottomSheet.setOnCloseButtonClickedListener(v -> {
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         });
-
         bottomSheetBehavior = BottomSheetBehavior.from(stopScheduleBottomSheet);
-        bottomSheetBehavior.setState(savedInstanceState != null ?
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                handleBottomSheetStateChanged(newState);
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                // Unused.
+            }
+        });
+
+        int restoredBottomSheetState = savedInstanceState != null ?
                 savedInstanceState.getInt(STATE_KEY_BOTTOM_SHEET_STATE, BottomSheetBehavior.STATE_HIDDEN) :
-                BottomSheetBehavior.STATE_HIDDEN);
+                BottomSheetBehavior.STATE_HIDDEN;
+
+        // Set the restored bottom sheet position. The default/initial state is for it to be hidden.
+        bottomSheetBehavior.setState(restoredBottomSheetState);
+
+        // For whatever reason, the bottomSheetBehavior callbacks don't get invoked from the above line,
+        // so we have explicitly restore the state of the "status bar".
+        handleBottomSheetStateChanged(restoredBottomSheetState);
 
         // Set the bottom sheet peek height to half the height of the map view.
         mapFragmentContainer.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -258,6 +277,27 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                 mapFragmentContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
+    }
+
+    /**
+     * NOTE: This was some serious headachery.
+     * If the bottom sheet is all the way open, then we set bottom sheet's background color. This,
+     * in effect, will create the illusion that we're changing the status bar color, but in truth
+     * we're not. There's just enough space above the bottom sheet content that changing that color
+     * makes it look like we tweaked the status bar. If the bottom sheet is NOT fully expanded, then
+     * we reset that color back to transparent.
+     */
+    private void handleBottomSheetStateChanged(int newState) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            // If the bottom sheet is all the way opened, then change the status bar color to something opaque.
+            if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                stopScheduleBottomSheet.setBackgroundResource(R.color.colorPrimary);
+            } else {
+                // Else we're back to a translucent status bar.
+                stopScheduleBottomSheet.setBackgroundResource(android.R.color.transparent);
+            }
+        }
     }
 
     private void showBusRoutesModal() {

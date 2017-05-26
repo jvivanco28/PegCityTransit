@@ -3,12 +3,12 @@ package jessevivanco.com.pegcitytransit.ui.views;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -31,7 +31,7 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.layout_manager.OneShotAnimatedLinearLayoutManager;
 
-public class BusStopScheduleBottomSheet extends CoordinatorLayout implements BusStopSchedulePresenter.ViewContract, NoResultsCellViewHolder.OnRefreshButtonClickedListener {
+public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopSchedulePresenter.ViewContract, NoResultsCellViewHolder.OnRefreshButtonClickedListener {
 
     private static final String TAG = BusStopScheduleBottomSheet.class.getSimpleName();
 
@@ -77,6 +77,7 @@ public class BusStopScheduleBottomSheet extends CoordinatorLayout implements Bus
     private void inflate() {
         LayoutInflater.from(getContext()).inflate(R.layout.bottom_sheet_schedule, this, true);
         ButterKnife.bind(this);
+        setOrientation(VERTICAL);
     }
 
     public void initialize(OnFavStopRemovedListener onFavStopRemovedListener,
