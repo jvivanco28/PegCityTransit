@@ -47,7 +47,7 @@ public class PegCityTransitApp extends Application {
                 .appModule(new AppModule(this))
                 .restModule(new RestModule(getApplicationContext(),
                         getString(R.string.api_base_url),
-                        getString(R.string.api_key), BuildConfig.DEBUG))
+                        getString(R.string.winnipeg_transit_api_key), BuildConfig.DEBUG))
                 .build();
     }
 
