@@ -21,6 +21,7 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -111,6 +112,17 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         setupGoogleApiClient();
         setupBottomNav(savedInstanceState);
         setupBottomSheet(savedInstanceState);
+
+        // If google play services aren't available, then just remove the bottom nav callbacks.
+        // It shouldn't matter that the above code has run; nothing will have busted.
+        if (!isGooglePlayServicesAvailable()) {
+            bottomNavigation.setOnNavigationItemSelectedListener(null);
+            Snackbar.make(mapFragmentContainer, getString(R.string.error_google_play_services_missing), Snackbar.LENGTH_INDEFINITE).show();
+        }
+    }
+
+    private boolean isGooglePlayServicesAvailable() {
+        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS;
     }
 
     @Override
