@@ -42,6 +42,9 @@ captures/
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
 
+# Google Maps API keys
+*google_maps_api.xml
+
 # Other things
 hidden_strings.xml
 app/release/
