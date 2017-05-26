@@ -43,7 +43,8 @@ captures/
 .externalNativeBuild
 
 # Google Maps API keys
-*google_maps_api.xml
+app/src/debug/res/values/google_maps_api.xml
+app/src/release/res/values/google_maps_api.xml
 
 # Other things
 hidden_strings.xml
