@@ -39,6 +39,7 @@ public class ScheduledStopCellViewHolder extends RecyclerView.ViewHolder {
             routeNumber.setBusRoute(scheduledStop.getRouteNumber(), scheduledStop.getRouteCoverage());
             routeName.setText(scheduledStop.getRouteName());
             status.setText(scheduledStop.getStatus());
+            status.setTextColor(scheduledStop.getStatusColor());
             departureTime.setText("{" + MaterialIcons.md_access_time.key() + "} " + scheduledStop.getDepartureTimeFormatted());
         } else {
             routeNumber.setText(null);

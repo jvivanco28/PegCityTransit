@@ -1,6 +1,7 @@
 package jessevivanco.com.pegcitytransit.ui.view_models;
 
 import android.content.Context;
+import android.support.annotation.ColorInt;
 
 import com.squareup.phrase.Phrase;
 
@@ -25,6 +26,7 @@ public class ScheduledStopViewModel {
         departureTimeFormatted = builder.departureTimeFormatted;
         departureTime = builder.departureTime;
         status = builder.status;
+        statusColor = builder.statusColor;
     }
 
     public static ScheduledStopViewModel createFromRouteSchedule(Context context,
@@ -40,6 +42,7 @@ public class ScheduledStopViewModel {
             String departureTimeFormatted;
             String status;
             Date departureTime;
+            @ColorInt int statusColor;
 
             // Set our departure time text.
             long timeDiffInMillis = scheduledStop.getTimes().getDeparture().getEstimated().getTime() - System.currentTimeMillis();
@@ -60,10 +63,13 @@ public class ScheduledStopViewModel {
 
             if (scheduledStop.getTimes().getDeparture().getEstimated().getTime() > scheduledStop.getTimes().getDeparture().getScheduled().getTime()) {
                 status = context.getString(R.string.late);
+                statusColor = context.getResources().getColor(R.color.late);
             } else if (scheduledStop.getTimes().getDeparture().getEstimated().getTime() < scheduledStop.getTimes().getDeparture().getScheduled().getTime()) {
                 status = context.getString(R.string.early);
+                statusColor = context.getResources().getColor(R.color.early);
             } else {
                 status = context.getString(R.string.on_time);
+                statusColor = context.getResources().getColor(R.color.text_primary);
             }
             return new Builder()
                     .routeNumber(routeNumber)
@@ -72,6 +78,7 @@ public class ScheduledStopViewModel {
                     .departureTimeFormatted(departureTimeFormatted)
                     .departureTime(departureTime)
                     .status(status)
+                    .statusColor(statusColor)
                     .build();
         }
     }
@@ -103,6 +110,8 @@ public class ScheduledStopViewModel {
     String departureTimeFormatted;
     Date departureTime;
     String status;
+    @ColorInt
+    int statusColor;
 
     public ScheduledStopViewModel() {
     }
@@ -131,6 +140,11 @@ public class ScheduledStopViewModel {
         return departureTime;
     }
 
+    @ColorInt
+    public int getStatusColor() {
+        return statusColor;
+    }
+
     public static final class Builder {
         private Integer routeNumber;
         private String routeName;
@@ -138,6 +152,8 @@ public class ScheduledStopViewModel {
         private String departureTimeFormatted;
         private String status;
         private Date departureTime;
+        @ColorInt
+        int statusColor;
 
         public Builder() {
         }
@@ -164,6 +180,11 @@ public class ScheduledStopViewModel {
 
         public Builder status(String val) {
             status = val;
+            return this;
+        }
+
+        public Builder statusColor(int val) {
+            statusColor = val;
             return this;
         }
 
