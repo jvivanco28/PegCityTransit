@@ -226,6 +226,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                     showBusRoutesModal();
                     break;
                 case R.id.settings:
+                    busRouteCell.setVisibility(View.GONE);
                     showSettings();
                     break;
             }
@@ -522,6 +523,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     @Override
     public void showRouteLoadingIndicator(boolean visible) {
         busRouteCell.showLoadingIndicator(visible);
+        mapLoadingIndicator.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     /**
