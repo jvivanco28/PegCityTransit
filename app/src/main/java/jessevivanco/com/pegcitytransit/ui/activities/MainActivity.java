@@ -313,6 +313,13 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     }
 
     private void showBusRoutesModal() {
+
+        // Clear the map.
+        if ( busRouteCell.getVisibility() != View.VISIBLE ) {
+            clearMarkers();
+        }
+        clearSearchRadius();
+
         if (busRoutesModal == null) {
             busRoutesModal = BusRoutesDialogFragment.newInstance();
         }
@@ -320,6 +327,11 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     }
 
     private void showSettings() {
+
+        // Clear the map.
+        clearMarkers();
+        clearSearchRadius();
+
         if (settingsModal == null) {
             settingsModal = SettingsDialogFragment.newInstance();
         }
