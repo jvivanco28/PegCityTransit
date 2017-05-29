@@ -97,6 +97,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     private boolean initialActivityLoadFinished;
     private boolean initialMapLoadFinished;
     private boolean googleApiClientInitialized;
+    private boolean showPermissionRationalDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -128,6 +129,19 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     @Override
     protected int getContentView() {
         return R.layout.activity_main;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (showPermissionRationalDialog) {
+            showPermissionRationalDialog = false;
+
+            FragmentUtils.showFragment(getSupportFragmentManager(),
+                    PermissionDeniedDialog.newInstance(getString(R.string.location_permission_denied)),
+                    PERMISSION_DIALOG_TAG);
+        }
     }
 
     @Override
@@ -494,9 +508,9 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         } else {
             // Permission was denied. Let's display a dialog explaining why we need location services, and how to grant
             // the permission if it's permanently denied.
-            FragmentUtils.showFragment(getSupportFragmentManager(),
-                    PermissionDeniedDialog.newInstance(getString(R.string.location_permission_denied)),
-                    PERMISSION_DIALOG_TAG);
+            // NOTE: We can't show the dialog until onResume has been called.
+            // See https://stackoverflow.com/questions/37164415/android-fatal-error-can-not-perform-this-action-after-onsaveinstancestate
+            showPermissionRationalDialog = true;
         }
     }
 
