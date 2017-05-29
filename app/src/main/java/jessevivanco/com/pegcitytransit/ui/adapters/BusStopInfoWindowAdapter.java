@@ -58,6 +58,7 @@ public class BusStopInfoWindowAdapter {
             markerToBusStopHashMap.clear();
             markerToBusStopHashMap = null;
         }
+        busStops = null;
     }
 
     /**

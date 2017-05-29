@@ -2,7 +2,6 @@
 <merge
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:padding="@dimen/material_spacing_medium"
     tools:ignore="MissingPrefix">
 
     <TextView

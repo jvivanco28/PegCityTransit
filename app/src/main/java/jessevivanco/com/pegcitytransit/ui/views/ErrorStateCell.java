@@ -44,6 +44,9 @@ public class ErrorStateCell extends RelativeLayout {
     private void setup() {
         LayoutInflater.from(getContext()).inflate(R.layout.cell_no_results, this, true);
         ButterKnife.bind(this);
+
+        int padding = getResources().getDimensionPixelSize(R.dimen.material_spacing_medium);
+        setPadding(padding, padding, padding, padding);
     }
 
     public void setNoResultsText(String text) {
