@@ -19,18 +19,18 @@
             android:layout_above="@+id/tab_navigation"
             android:orientation="vertical">
 
+            <FrameLayout
+                android:id="@+id/map_fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="jessevivanco.com.pegcitytransit.ui.activities.MainActivity"/>
+
             <jessevivanco.com.pegcitytransit.ui.views.BusRouteCell
                 android:id="@+id/bus_route_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/material_spacing_small"
                 android:visibility="gone"/>
-
-            <FrameLayout
-                android:id="@+id/map_fragment_container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context="jessevivanco.com.pegcitytransit.ui.activities.MainActivity"/>
 
             <!-- NOTE: We're programmatically setting this view's bottom margin. -->
             <android.support.design.widget.FloatingActionButton

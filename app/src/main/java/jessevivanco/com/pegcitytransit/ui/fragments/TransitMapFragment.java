@@ -290,7 +290,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         // However, applying only a top padding will mess up the camera origin (it will be off-center)
         // so we also have to apply a bottom padding.
         // See https://stackoverflow.com/questions/15043006/how-to-move-the-android-google-maps-api-compass-position
-        int statusBarHeight = ScreenUtil.getStatusBarHeight(getContext());
+        int statusBarHeight = ScreenUtil.getStatusBarHeightIfNeeded(getContext());
         googleMap.setPadding(0, statusBarHeight, 0, statusBarHeight);
 
         // Hide the "my location" button.

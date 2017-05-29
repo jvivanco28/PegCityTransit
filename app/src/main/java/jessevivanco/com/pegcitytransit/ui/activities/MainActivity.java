@@ -180,7 +180,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         // Adding a top margin so that we can avoid being occluded by the status bar.
         // NOTE: Was having issues getting fitsSystemWindow to work for this in the xml layout file.
         CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) busRouteCell.getLayoutParams();
-        lp.topMargin += ScreenUtil.getStatusBarHeight(this);
+        lp.topMargin += ScreenUtil.getStatusBarHeightIfNeeded(this);
         busRouteCell.setLayoutParams(lp);
 
         busRouteCell.onRestoreInstanceState(savedInstanceState);
@@ -316,7 +316,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     private void showBusRoutesModal() {
 
         // Clear the map.
-        if ( busRouteCell.getVisibility() != View.VISIBLE ) {
+        if (busRouteCell.getVisibility() != View.VISIBLE) {
             clearMarkers();
         }
         clearSearchRadius();
@@ -502,6 +502,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
     @Override
     public void onBusRouteSelected(BusRouteViewModel busRoute) {
+
         busRouteCell.setVisibility(View.VISIBLE);
         busRouteCell.bind(busRoute);
 
