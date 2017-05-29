@@ -10,8 +10,24 @@ buildscript {
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
+// Create a variable called keystorePropertiesFile, and initialize it to your
+// keystore.properties file, in the rootProject folder.
+def keystorePropertiesFile = rootProject.file("/Users/jessevivanco/Dev/keystores/PegCityTransit/keystore.properties")
+
+// Initialize a new Properties() object called keystoreProperties.
+def keystoreProperties = new Properties()
+
+// Load your keystore.properties file into the keystoreProperties object.
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
     signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
     }
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -28,6 +44,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -52,108 +69,86 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
-    // Third-party dependencies:
-
     // Google Maps
     compile 'com.google.android.gms:play-services-maps:10.2.6'
     compile 'com.google.android.gms:play-services-location:10.2.6'
 
     // Dagger 2 dependency injector
-
     // https://github.com/codepath/android_guides/wiki/Dependency-Injection-with-Dagger-2
     compile 'com.google.dagger:dagger:2.10'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.10'
 
     // REST API communication.
-
     // http://square.github.io/retrofit/
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.7.0'
 
     // RxJava2, RxAndroid (reactive bindings for Android), and RxJava2 CallAdapter for Retrofit
-
     // https://github.com/ReactiveX/RxJava
-
     // https://github.com/ReactiveX/RxAndroid
-
     // https://github.com/square/retrofit/tree/master/retrofit-adapters/rxjava2
     compile 'io.reactivex.rxjava2:rxjava:2.1.0'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
     compile 'com.squareup.retrofit2:adapter-rxjava2:2.2.0'
 
     // Image Loading
-
     // http://square.github.io/picasso/
     compile 'com.squareup.picasso:picasso:2.5.2'
 
     // Material design icons from https://materialdesignicons.com/.
-
     // https://github.com/JoanZapata/android-iconify
     compile 'com.joanzapata.iconify:android-iconify-material:2.2.2'
 
-    // (v2.0.0)
-
     // Custom fonts
-
     // https://github.com/chrisjenx/Calligraphy
     compile 'uk.co.chrisjenx:calligraphy:2.2.0'
 
     // Android string formatting
-
     // https://github.com/square/phrase
     compile 'com.squareup.phrase:phrase:1.1.0'
 
     // Butterknife View Binding
-
     // https://github.com/JakeWharton/butterknife
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 
     // FlowLayout
-
     // https://github.com/nex3z/FlowLayout
     compile 'com.nex3z:flow-layout:0.1.3'
 
     // Easier RxJava2 debugging with better stacktraces
-
     // https://github.com/T-Spoon/Traceur
     compile 'com.tspoon.traceur:traceur:1.0.1'
 
     // Android Parcelables made easy through code generation
-
     // https://github.com/johncarl81/parceler
     compile 'org.parceler:parceler-api:1.1.6'
     annotationProcessor 'org.parceler:parceler:1.1.6'
 
     // https://github.com/airbnb/lottie-android
-
     // Render After Effects animations natively on Android and iOS
     compile 'com.airbnb.android:lottie:2.0.0-rc1'
 
     // Handy extensions to the Google Maps Android API.
-
     // https://github.com/googlemaps/android-maps-utils
     compile 'com.google.maps.android:android-maps-utils:0.5'
 
     // A simple cache for Objects in Android (Thanks Iain!).
-
     // https://github.com/iainconnor/ObjectCache
     compile 'com.iainconnor:objectcache:0.0.19-SNAPSHOT'
 
     // Lightweight Animation Library
-
     // https://github.com/willowtreeapps/spruce-android
     compile 'com.willowtreeapps.spruce:spruce-android:1.0.0'
 
     // Shared Preferences helper
-
     // https://github.com/Pixplicity/EasyPreferences
     compile 'com.pixplicity.easyprefs:library:1.8.1@aar'
 
     // Report crashes.
     compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
-        transitive = true;
+        transitive = true
     }
 }
 
