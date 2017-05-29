@@ -7,4 +7,9 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus">true</item>
     </style>
+
+    <style name="secondary_horizontal_progress_bar" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:indeterminateTint">@color/progress_bar</item>
+    </style>
+
 </resources>

@@ -22,6 +22,8 @@
     <color name="early">#4CAF50</color>
     <color name="late">#F44336</color>
 
+    <color name="progress_bar">#FF4081</color>
+
     <color name="spirit_route">#008000</color>
     <color name="normal_route">@color/white</color>
     <color name="express_route">#ffff00</color>

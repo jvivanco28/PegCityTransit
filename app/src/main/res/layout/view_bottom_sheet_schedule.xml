@@ -81,7 +81,8 @@
             android:layout_height="wrap_content"
             android:visibility="gone"/>
 
-        <include layout="@layout/view_loading_indicator"
+        <include
+            layout="@layout/view_loading_indicator"
             android:visibility="gone"/>
 
     </LinearLayout>
