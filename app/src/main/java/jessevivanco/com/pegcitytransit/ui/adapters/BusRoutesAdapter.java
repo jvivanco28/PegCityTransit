@@ -6,32 +6,26 @@ import android.view.ViewGroup;
 
 import jessevivanco.com.pegcitytransit.ui.adapters.base.BaseAdapter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
-import jessevivanco.com.pegcitytransit.ui.view_holders.NoResultsCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusRouteCell;
 
 public class BusRoutesAdapter extends BaseAdapter<BusRouteViewModel, BusRouteCellViewHolder> {
 
-    private BusRoutesAdapterCallbacks callbacks;
+    private BusRouteCell.OnBusRouteSelectedListener onBusRouteSelectedListener;
 
     public BusRoutesAdapter(@Nullable Bundle savedInstanceState,
-                            BusRoutesAdapterCallbacks callbacks) {
-        super(savedInstanceState, callbacks);
-
-        this.callbacks = callbacks;
+                            BusRouteCell.OnBusRouteSelectedListener onBusRouteSelectedListener) {
+        super(savedInstanceState);
+        this.onBusRouteSelectedListener = onBusRouteSelectedListener;
     }
 
     @Override
     protected BusRouteCellViewHolder createListItemViewHolder(ViewGroup parent) {
-        return new BusRouteCellViewHolder(parent, callbacks);
+        return new BusRouteCellViewHolder(parent, onBusRouteSelectedListener);
     }
 
     @Override
     protected void bindListItemViewHolder(BusRouteViewModel item, BusRouteCellViewHolder holder) {
         holder.bind(item);
-    }
-
-    public interface BusRoutesAdapterCallbacks extends NoResultsCellViewHolder.OnRefreshButtonClickedListener, BusRouteCell.OnBusRouteSelectedListener {
-        // Just combining the two interfaces.
     }
 }

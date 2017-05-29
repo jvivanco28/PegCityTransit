@@ -5,14 +5,13 @@ import android.support.annotation.Nullable;
 import android.view.ViewGroup;
 
 import jessevivanco.com.pegcitytransit.ui.adapters.base.BaseAdapter;
-import jessevivanco.com.pegcitytransit.ui.view_holders.NoResultsCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_holders.ScheduledStopCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
 public class ScheduledStopAdapter extends BaseAdapter<ScheduledStopViewModel, ScheduledStopCellViewHolder> {
 
-    public ScheduledStopAdapter(@Nullable Bundle savedInstanceState, NoResultsCellViewHolder.OnRefreshButtonClickedListener onRefreshButtonClickedListener) {
-        super(savedInstanceState, onRefreshButtonClickedListener);
+    public ScheduledStopAdapter(@Nullable Bundle savedInstanceState) {
+        super(savedInstanceState);
     }
 
     @Override

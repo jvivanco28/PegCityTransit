@@ -18,7 +18,6 @@ import jessevivanco.com.pegcitytransit.R;
  */
 public class OneShotAnimatedLinearLayoutManager extends LinearLayoutManager {
 
-    private final int INTER_OBJECT_DELAY_MILLIS;
     private final int DURATION_MILLIS;
 
     private RecyclerView recyclerView;
@@ -27,10 +26,7 @@ public class OneShotAnimatedLinearLayoutManager extends LinearLayoutManager {
     public OneShotAnimatedLinearLayoutManager(Context context, RecyclerView recyclerView) {
         super(context);
         this.recyclerView = recyclerView;
-
         this.animateNextLayout = false;
-
-        INTER_OBJECT_DELAY_MILLIS = context.getResources().getInteger(R.integer.recycler_view_animation_inter_object_delay_millis);
         DURATION_MILLIS = context.getResources().getInteger(R.integer.recycler_view_animation_duration_millis);
     }
 
@@ -48,12 +44,11 @@ public class OneShotAnimatedLinearLayoutManager extends LinearLayoutManager {
             // Can't reuse the same spruce builder reference (nothing animates). So, we have to
             // re-instantiate on every animation.
             new Spruce.SpruceBuilder(recyclerView)
-                    .sortWith(new DefaultSort(INTER_OBJECT_DELAY_MILLIS))
+                    .sortWith(new DefaultSort(0))
                     .animateWith(DefaultAnimations.fadeInAnimator(recyclerView, DURATION_MILLIS),
                             // Slide in from the left.
                             ObjectAnimator.ofFloat(recyclerView, "translationX", -recyclerView.getWidth(), 0f).setDuration(DURATION_MILLIS))
                     .start();
-
             animateNextLayout = false;
         }
     }

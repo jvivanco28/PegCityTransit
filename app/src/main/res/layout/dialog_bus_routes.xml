@@ -70,4 +70,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <jessevivanco.com.pegcitytransit.ui.views.ErrorStateCell
+        android:id="@+id/error_state_cell"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+    <include
+        layout="@layout/view_loading_indicator"
+        android:visibility="gone"/>
+
 </LinearLayout>

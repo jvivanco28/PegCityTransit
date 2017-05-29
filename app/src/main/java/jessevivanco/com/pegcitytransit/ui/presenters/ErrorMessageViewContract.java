@@ -1,6 +1,6 @@
 package jessevivanco.com.pegcitytransit.ui.presenters;
 
-public interface BaseViewContract {
+public interface ErrorMessageViewContract {
 
     void showErrorMessage(String msg);
 }

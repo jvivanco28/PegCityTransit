@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,17 +27,18 @@ import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.ui.adapters.ScheduledStopAdapter;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
-import jessevivanco.com.pegcitytransit.ui.view_holders.NoResultsCellViewHolder;
+import jessevivanco.com.pegcitytransit.ui.presenters.ViewState;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.layout_manager.OneShotAnimatedLinearLayoutManager;
 
-public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopSchedulePresenter.ViewContract, NoResultsCellViewHolder.OnRefreshButtonClickedListener {
+public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopSchedulePresenter.ViewContract {
 
     private static final String TAG = BusStopScheduleBottomSheet.class.getSimpleName();
 
     private static final String STATE_KEY_PROGRESS_BAR_VISIBILITY = "progress_bar";
     private static final String STATE_KEY_BUS_STOP = "bus_stop";
+    private static final String STATE_KEY_VIEW_STATE = BusStopScheduleBottomSheet.class.getSimpleName() + "_view_state";
 
     @BindView(R.id.bottom_sheet_toolbar_close_button)
     Button closeButton;
@@ -56,6 +58,13 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
     @BindView(R.id.bottom_sheet_progress_bar)
     ProgressBar bottomSheetProgressBar;
 
+    @BindView(R.id.loading_view)
+    FrameLayout loadingCell;
+
+    @BindView(R.id.error_state_cell)
+    ErrorStateCell errorStateCell;
+
+    private ViewState viewState;
     private OnFavStopRemovedListener onFavStopRemovedListener;
     private BusStopViewModel busStop;
 
@@ -75,7 +84,7 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
     }
 
     private void inflate() {
-        LayoutInflater.from(getContext()).inflate(R.layout.bottom_sheet_schedule, this, true);
+        LayoutInflater.from(getContext()).inflate(R.layout.view_bottom_sheet_schedule, this, true);
         ButterKnife.bind(this);
         setOrientation(VERTICAL);
     }
@@ -86,8 +95,9 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
 
         this.onFavStopRemovedListener = onFavStopRemovedListener;
 
+        // Setup recycler view and adapter
         stopSchedulePresenter = new BusStopSchedulePresenter(injector, this);
-        stopScheduleAdapter = new ScheduledStopAdapter(savedInstanceState, this);
+        stopScheduleAdapter = new ScheduledStopAdapter(savedInstanceState);
 
         layoutManager = new OneShotAnimatedLinearLayoutManager(getContext(), stopScheduleRecyclerView);
         stopScheduleRecyclerView.setLayoutManager(layoutManager);
@@ -95,6 +105,10 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
 
         stopScheduleRecyclerView.setAdapter(stopScheduleAdapter);
 
+        // Setup refresh listener
+        errorStateCell.setOnRefreshButtonClickedListener(() -> stopSchedulePresenter.loadScheduleForBusStop(busStop.getKey()));
+
+        // Restore instance state
         bottomSheetProgressBar.setVisibility(savedInstanceState != null ?
                 savedInstanceState.getInt(STATE_KEY_PROGRESS_BAR_VISIBILITY, View.GONE) :
                 View.GONE);
@@ -102,8 +116,14 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
         busStop = savedInstanceState != null ?
                 Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_BUS_STOP)) :
                 null;
+        viewState = savedInstanceState != null ?
+                ViewState.values()[savedInstanceState.getInt(STATE_KEY_VIEW_STATE, ViewState.LIST.ordinal())] :
+                ViewState.LIST;
+
+        errorStateCell.onRestoreInstanceState(savedInstanceState);
 
         displayBusStopInfo(busStop);
+        showViewState(viewState);
     }
 
     private void displayBusStopInfo(@Nullable BusStopViewModel busStop) {
@@ -119,7 +139,9 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(STATE_KEY_PROGRESS_BAR_VISIBILITY, bottomSheetProgressBar.getVisibility());
         outState.putParcelable(STATE_KEY_BUS_STOP, Parcels.wrap(busStop));
+        outState.putInt(STATE_KEY_VIEW_STATE, viewState.ordinal());
         stopScheduleAdapter.onSaveInstanceState(outState);
+        errorStateCell.onSaveInstanceState(outState);
     }
 
     public void loadScheduleForBusStop(BusStopViewModel busStop) {
@@ -134,28 +156,24 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
     }
 
     @Override
-    public void showScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
+    public void setScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
         layoutManager.setAnimateNextLayout(scheduledStops != null);
         stopScheduleAdapter.setList(scheduledStops);
     }
 
     @Override
-    public void onRefreshButtonClicked() {
-        stopSchedulePresenter.loadScheduleForBusStop(busStop.getKey());
-    }
-
-    @Override
-    public void showLoadingScheduleIndicator(boolean visible) {
-        if (visible) {
-            bottomSheetProgressBar.setVisibility(View.VISIBLE);
-        } else {
-            bottomSheetProgressBar.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
     public void showErrorMessage(String msg) {
-        stopScheduleAdapter.setNoResultsMessage(msg);
+        errorStateCell.setNoResultsText(msg);
+    }
+
+    @Override
+    public void showViewState(ViewState viewState) {
+        this.viewState = viewState;
+
+        stopScheduleRecyclerView.setVisibility(viewState == ViewState.LIST ? VISIBLE : GONE);
+        errorStateCell.setVisibility(viewState == ViewState.ERROR ? VISIBLE : GONE);
+        bottomSheetProgressBar.setVisibility(viewState == ViewState.LOADING ? VISIBLE : GONE);
+        loadingCell.setVisibility(viewState == ViewState.LOADING ? VISIBLE : GONE);
     }
 
     @OnClick(R.id.toolbar_fav_stop)

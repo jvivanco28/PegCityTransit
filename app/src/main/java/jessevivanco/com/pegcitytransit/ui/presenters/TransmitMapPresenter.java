@@ -162,7 +162,7 @@ public class TransmitMapPresenter {
         DisposableUtil.dispose(subscription);
     }
 
-    public interface ViewContract extends BaseViewContract {
+    public interface ViewContract extends ErrorMessageViewContract {
 
         void showBusStops(List<BusStopViewModel> busStops, long delayMarkerVisibilityMillis, boolean focusInMap);
 

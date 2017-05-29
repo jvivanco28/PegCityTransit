@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import java.util.List;
@@ -20,29 +21,41 @@ import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusRoutesAdapter;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.ViewState;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusRouteCell;
+import jessevivanco.com.pegcitytransit.ui.views.ErrorStateCell;
 import jessevivanco.com.pegcitytransit.ui.views.layout_manager.OneShotAnimatedLinearLayoutManager;
 
-public class BusRoutesDialogFragment extends BottomSheetDialogFragment implements BusRoutesPresenter.ViewContract, BusRoutesAdapter.BusRoutesAdapterCallbacks {
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
+public class BusRoutesDialogFragment extends BottomSheetDialogFragment implements BusRoutesPresenter.ViewContract, BusRouteCell.OnBusRouteSelectedListener {
 
     public static final String TAG = BusRoutesDialogFragment.class.getSimpleName();
     private static final String STATE_KEY_LOADING_INDICATOR_VISIBILITY = "bus_route_loading_indicator_visibility";
+    private static final String STATE_KEY_VIEW_STATE = BusRoutesDialogFragment.class.getSimpleName() + "_view_state";
 
     @BindView(R.id.bus_routes_root_container)
     ViewGroup rootContainer;
 
-    @BindView(R.id.bus_routes_progress_bar)
-    ProgressBar loadingIndicator;
-
     @BindView(R.id.bus_routes_recycler_view)
     RecyclerView routesRecyclerView;
+
+    @BindView(R.id.bus_routes_progress_bar)
+    ProgressBar progressBar;
+
+    @BindView(R.id.loading_view)
+    FrameLayout loadingCell;
+
+    @BindView(R.id.error_state_cell)
+    ErrorStateCell errorStateCell;
 
     private OneShotAnimatedLinearLayoutManager layoutManager;
     private BusRoutesAdapter routesAdapter;
     private BusRoutesPresenter routesPresenter;
-
     private BusRouteCell.OnBusRouteSelectedListener listener;
+    private ViewState viewState;
 
     public static BusRoutesDialogFragment newInstance() {
         return new BusRoutesDialogFragment();
@@ -59,9 +72,10 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        restoreState(savedInstanceState);
         setupAdapter(savedInstanceState);
         setupRecyclerView();
+        setupNoResultsView();
+        setupViewState(savedInstanceState);
 
         if (savedInstanceState == null) {
             routesPresenter.loadAllBusRoutes();
@@ -86,14 +100,11 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_KEY_LOADING_INDICATOR_VISIBILITY, loadingIndicator.getVisibility());
-        routesAdapter.onSaveInstanceState(outState);
-    }
+        outState.putInt(STATE_KEY_LOADING_INDICATOR_VISIBILITY, progressBar.getVisibility());
+        outState.putInt(STATE_KEY_VIEW_STATE, viewState.ordinal());
 
-    private void restoreState(@Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            loadingIndicator.setVisibility(savedInstanceState.getInt(STATE_KEY_LOADING_INDICATOR_VISIBILITY, View.GONE));
-        }
+        routesAdapter.onSaveInstanceState(outState);
+        errorStateCell.onSaveInstanceState(outState);
     }
 
     private void setupAdapter(Bundle savedInstanceState) {
@@ -108,6 +119,27 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
         routesRecyclerView.setAdapter(routesAdapter);
     }
 
+    private void setupNoResultsView() {
+        errorStateCell.setOnRefreshButtonClickedListener(() -> routesPresenter.loadAllBusRoutes());
+    }
+
+    private void setupViewState(@Nullable Bundle savedInstanceState) {
+        viewState = savedInstanceState != null ?
+                ViewState.values()[savedInstanceState.getInt(STATE_KEY_VIEW_STATE, ViewState.LIST.ordinal())] :
+                ViewState.LIST;
+
+        progressBar.setVisibility(savedInstanceState != null ?
+                savedInstanceState.getInt(STATE_KEY_LOADING_INDICATOR_VISIBILITY, GONE) :
+                GONE);
+
+        errorStateCell.onRestoreInstanceState(savedInstanceState);
+
+        viewState = savedInstanceState != null ?
+                ViewState.values()[savedInstanceState.getInt(STATE_KEY_VIEW_STATE, ViewState.LIST.ordinal())] :
+                ViewState.LIST;
+        showViewState(viewState);
+    }
+
     @Override
     public void onBusRouteSelected(BusRouteViewModel busRoute) {
         listener.onBusRouteSelected(busRoute);
@@ -116,18 +148,18 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     }
 
     @Override
-    public void onRefreshButtonClicked() {
-        routesPresenter.loadAllBusRoutes();
-    }
-
-    @Override
-    public void showLoadingIndicator(boolean visible) {
-        loadingIndicator.setVisibility(visible ? View.VISIBLE : View.GONE);
-    }
-
-    @Override
     public void showErrorMessage(String msg) {
-        routesAdapter.setNoResultsMessage(msg);
+        errorStateCell.setNoResultsText(msg);
+    }
+
+    @Override
+    public void showViewState(ViewState viewState) {
+        this.viewState = viewState;
+
+        routesRecyclerView.setVisibility(viewState == ViewState.LIST ? VISIBLE : GONE);
+        errorStateCell.setVisibility(viewState == ViewState.ERROR ? VISIBLE : GONE);
+        progressBar.setVisibility(viewState == ViewState.LOADING ? VISIBLE : GONE);
+        loadingCell.setVisibility(viewState == ViewState.LOADING ? VISIBLE : GONE);
     }
 
     @Override

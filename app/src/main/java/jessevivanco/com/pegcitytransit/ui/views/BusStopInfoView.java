@@ -48,7 +48,7 @@ public class BusStopInfoView extends LinearLayout {
 
     private void setup() {
         setOrientation(VERTICAL);
-        LayoutInflater.from(getContext()).inflate(R.layout.info_window_bus_stop, this, true);
+        LayoutInflater.from(getContext()).inflate(R.layout.view_info_window_bus_stop, this, true);
         ButterKnife.bind(this);
 
         busStopKeyTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.text_small));

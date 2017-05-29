@@ -52,22 +52,24 @@ public class BusStopSchedulePresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> {
-                    viewContract.showScheduledStops(null);
+                    viewContract.setScheduledStops(null);
                     viewContract.showErrorMessage(null);
-                    viewContract.showLoadingScheduleIndicator(true);
+                    viewContract.showViewState(ViewState.LOADING);
                 })
-                .doFinally(() -> viewContract.showLoadingScheduleIndicator(false))
                 .subscribe(
                         scheduledStops -> {
                             if (scheduledStops.size() == 0) {
                                 viewContract.showErrorMessage(context.getString(R.string.no_schedule));
+                                viewContract.showViewState(ViewState.ERROR);
                             } else {
-                                viewContract.showScheduledStops(scheduledStops);
+                                viewContract.setScheduledStops(scheduledStops);
+                                viewContract.showViewState(ViewState.LIST);
                             }
                         },
                         throwable -> {
                             Log.e(TAG, "Error loading bus stop schedule", throwable);
                             viewContract.showErrorMessage(context.getString(R.string.error_loading_schedule));
+                            viewContract.showViewState(ViewState.ERROR);
                         }
                 );
     }
@@ -113,10 +115,8 @@ public class BusStopSchedulePresenter {
         DisposableUtil.dispose(saveBusStopSubscription);
     }
 
-    public interface ViewContract extends BaseViewContract {
+    public interface ViewContract extends ErrorMessageViewContract, BaseListViewContract {
 
-        void showLoadingScheduleIndicator(boolean visible);
-
-        void showScheduledStops(List<ScheduledStopViewModel> scheduledStops);
+        void setScheduledStops(List<ScheduledStopViewModel> scheduledStops);
     }
 }
