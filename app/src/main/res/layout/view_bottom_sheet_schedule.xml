@@ -70,20 +70,29 @@
             android:layout_height="wrap_content"
             android:indeterminate="true"/>
 
+        <include
+            layout="@layout/view_loading_indicator"
+            android:visibility="gone"/>
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/schedule_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-        <jessevivanco.com.pegcitytransit.ui.views.ErrorStateCell
-            android:id="@+id/error_state_cell"
+        <!-- This nested scroll view allows us to swipe down to dismiss the entire bottom sheet
+        (when the recycler view is not visible). -->
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/error_state_cell_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"/>
+            android:layout_height="match_parent"
+            android:visibility="gone">
 
-        <include
-            layout="@layout/view_loading_indicator"
-            android:visibility="gone"/>
+            <jessevivanco.com.pegcitytransit.ui.views.ErrorStateCell
+                android:id="@+id/error_state_cell"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </android.support.v4.widget.NestedScrollView>
 
     </LinearLayout>
 

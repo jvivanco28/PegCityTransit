@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -66,6 +67,9 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
 
     @BindView(R.id.error_state_cell)
     ErrorStateCell errorStateCell;
+
+    @BindView(R.id.error_state_cell_container)
+    ViewGroup errorCellContainer;
 
     private ViewState viewState;
     private OnFavStopRemovedListener onFavStopRemovedListener;
@@ -177,7 +181,7 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
         this.viewState = viewState;
 
         stopScheduleRecyclerView.setVisibility(viewState == ViewState.LIST ? VISIBLE : GONE);
-        errorStateCell.setVisibility(viewState == ViewState.ERROR ? VISIBLE : GONE);
+        errorCellContainer.setVisibility(viewState == ViewState.ERROR ? VISIBLE : GONE);
         bottomSheetProgressBar.setVisibility(viewState == ViewState.LOADING ? VISIBLE : GONE);
         loadingCell.setVisibility(viewState == ViewState.LOADING ? VISIBLE : GONE);
     }
