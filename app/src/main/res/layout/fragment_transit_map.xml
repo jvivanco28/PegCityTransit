@@ -14,6 +14,7 @@
 
     <!-- This is just an overlaid cross hair in the middle of the map -->
     <View
+        android:id="@+id/crosshair_overlay"
         android:layout_width="@dimen/material_spacing_small"
         android:layout_height="@dimen/material_spacing_small"
         android:layout_gravity="center"

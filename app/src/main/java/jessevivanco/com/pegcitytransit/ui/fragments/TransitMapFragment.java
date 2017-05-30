@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,6 +24,7 @@ import org.parceler.Parcels;
 
 import java.util.List;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusStopInfoWindowAdapter;
@@ -51,6 +53,9 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
 
     // Just re-use the same view and change its contents.
     private BusStopInfoView busStopInfoWindow;
+
+    @BindView(R.id.crosshair_overlay)
+    View crosshairOverlay;
 
     // Keeping track of ths selected marker/bus stop so we can retain the opened info window on
     // orientation change.
@@ -300,13 +305,17 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         googleMap.setOnInfoWindowClickListener(this);
         googleMap.setOnInfoWindowCloseListener(this);
 
-        // TODO See if there is a better solution for this
         // The status bar occludes the compass unless we apply a top padding to the map view.
         // However, applying only a top padding will mess up the camera origin (it will be off-center)
         // so we also have to apply a bottom padding.
         // See https://stackoverflow.com/questions/15043006/how-to-move-the-android-google-maps-api-compass-position
         int statusBarHeight = ScreenUtil.getStatusBarHeightIfNeeded(getContext());
-        googleMap.setPadding(0, statusBarHeight, 0, statusBarHeight);
+        if (statusBarHeight > 0) {
+            googleMap.setPadding(0, statusBarHeight, 0, 0);
+            ViewGroup.MarginLayoutParams crosshairLayoutParams = (ViewGroup.MarginLayoutParams) crosshairOverlay.getLayoutParams();
+            crosshairLayoutParams.topMargin = statusBarHeight / 2;
+            crosshairOverlay.setLayoutParams(crosshairLayoutParams);
+        }
 
         // Hide the "my location" button.
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
