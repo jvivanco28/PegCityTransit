@@ -240,6 +240,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         }
 
         // We can only show "my location" button if we have permission to access the user's location.
+        // We can only show "my location" button if we have permission to access the user's location
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             myLocationFab.show();
         }

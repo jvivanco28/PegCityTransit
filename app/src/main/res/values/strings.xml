@@ -77,8 +77,10 @@
     <string name="generic_error">Sorry. An error occurred.</string>
     <string name="error_loading_bus_stops">Sorry. An error occurred while loading the bus stops in that area.</string>
     <string name="error_loading_bus_routes">Sorry. An error occurred while loading the bus routes.</string>
+    <string name="error_loading_route">Sorry. An error occurred while loading bus route #{route}.</string>
     <string name="error_loading_schedule">Sorry. An error occurred while loading the schedule for that bus stop.</string>
-    <string name="error_finding_location">Unable to find your location.</string>
+    <string name="error_finding_location">Sorry. Unable to find your location.</string>
+    <string name="error_loading_saved_stops">Sorry. An error occurred loading your saved bus stops.</string>
     <string name="error_google_play_services_missing">Sorry. You need Google Play Services installed to use this app.</string>
 
     <string name="no_bus_stops_in_that_area">Sorry. There are no bus stops in that area.</string>

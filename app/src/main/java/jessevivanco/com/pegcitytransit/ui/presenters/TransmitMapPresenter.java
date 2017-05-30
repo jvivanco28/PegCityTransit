@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+import com.squareup.phrase.Phrase;
 
 import java.util.List;
 
@@ -88,8 +89,8 @@ public class TransmitMapPresenter {
                             }
                         },
                         throwable -> {
-                            Log.e(TAG, "Error loading bus stops at location", throwable);
-                            viewContract.showErrorMessage(context.getString(R.string.generic_error));
+                            Log.e(TAG, context.getString(R.string.error_loading_bus_stops), throwable);
+                            viewContract.showErrorMessage(context.getString(R.string.error_loading_bus_stops));
                         }
                 );
     }
@@ -125,7 +126,7 @@ public class TransmitMapPresenter {
                         busStops -> viewContract.showBusStops(busStops, 0, true),
                         throwable -> {
                             Log.e(TAG, "Error loading bus stops for bus route", throwable);
-                            viewContract.showErrorMessage(context.getString(R.string.generic_error));
+                            viewContract.showErrorMessage(Phrase.from(context, R.string.error_loading_route).put("route", route.getNumber()).format().toString());
                         }
                 );
     }
@@ -152,7 +153,7 @@ public class TransmitMapPresenter {
                             // No REST calls for this, so maybe an I/O exception.
                             Crashlytics.logException(throwable);
                             Log.e(TAG, "Error loading saved bus stops", throwable);
-                            viewContract.showErrorMessage(context.getString(R.string.generic_error));
+                            viewContract.showErrorMessage(context.getString(R.string.error_loading_saved_stops));
                         }
                 );
     }
