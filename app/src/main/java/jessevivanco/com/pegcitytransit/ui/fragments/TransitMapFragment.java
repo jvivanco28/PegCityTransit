@@ -38,7 +38,8 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         GoogleMap.InfoWindowAdapter {
 
     private static final String STATE_KEY_MAP_CAMERA = "camera_position";
-    private static final String STATE_KEY_SEARCH_AREA = "search_area_circle";
+    private static final String STATE_KEY_SEARCH_AREA_ORIGIN = "search_area_origin";
+    private static final String STATE_KEY_SEARCH_AREA_RADIUS = "search_area_radius";
     private static final String STATE_KEY_SELECTED_BUS_STOP = "selected_stop";
 
     private static final double MARKER_PADDING_RATIO = 0.12;
@@ -61,6 +62,9 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
 
     @Nullable
     private LatLng restoredSearchAreaCoordinates;
+
+    @Nullable
+    private Double restoredSearchAreaRadius;
 
     @Nullable
     private CameraPosition restoredCameraPosition;
@@ -89,7 +93,8 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         busStopInfoWindowAdapter.onSaveInstanceState(outState);
 
         if (searchArea != null) {
-            outState.putParcelable(STATE_KEY_SEARCH_AREA, searchArea.getCenter());
+            outState.putParcelable(STATE_KEY_SEARCH_AREA_ORIGIN, searchArea.getCenter());
+            outState.putDouble(STATE_KEY_SEARCH_AREA_RADIUS, searchArea.getRadius());
         }
         if (googleMap != null) {
             outState.putParcelable(STATE_KEY_MAP_CAMERA, googleMap.getCameraPosition());
@@ -113,7 +118,8 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
 
         if (savedInstanceState != null) {
             restoredCameraPosition = savedInstanceState.getParcelable(STATE_KEY_MAP_CAMERA);
-            restoredSearchAreaCoordinates = savedInstanceState.getParcelable(STATE_KEY_SEARCH_AREA);
+            restoredSearchAreaCoordinates = savedInstanceState.getParcelable(STATE_KEY_SEARCH_AREA_ORIGIN);
+            restoredSearchAreaRadius = savedInstanceState.getDouble(STATE_KEY_SEARCH_AREA_RADIUS);
             selectedBusStop = Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_SELECTED_BUS_STOP));
         }
     }
@@ -178,7 +184,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
      *
      * @param focusOnArea Pans the camera to focus on the circle that was drawn.
      */
-    public void drawSearchRadius(@Nullable Double latitude, @Nullable Double longitude, int radius, boolean focusOnArea) {
+    public void drawSearchRadius(@Nullable Double latitude, @Nullable Double longitude, double radius, boolean focusOnArea) {
         // Remove previous search area circle
         clearSearchRadius();
 
@@ -311,10 +317,10 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(downtownWinnipeg, getResources().getInteger(R.integer.default_city_wide_map_zoom)));
         }
         // Redraw the searched bus stop area if we just changed orientation
-        if (restoredSearchAreaCoordinates != null) {
+        if (restoredSearchAreaCoordinates != null && restoredSearchAreaRadius != null) {
             drawSearchRadius(restoredSearchAreaCoordinates.latitude,
                     restoredSearchAreaCoordinates.longitude,
-                    getResources().getInteger(R.integer.default_map_search_radius),
+                    restoredSearchAreaRadius,
                     false);
         }
         // Now that the map is ready, we can restore the state of the map as it was before the

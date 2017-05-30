@@ -6,6 +6,9 @@ import android.support.design.widget.BottomSheetDialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Switch;
 
 import javax.inject.Inject;
@@ -19,7 +22,6 @@ import jessevivanco.com.pegcitytransit.data.util.DeviceUtil;
 import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.ui.util.IntentUtil;
 
-// TODO Dialog or normal fragment?
 public class SettingsDialogFragment extends BottomSheetDialogFragment {
 
     public static final String TAG = SettingsDialogFragment.class.getSimpleName();
@@ -29,6 +31,11 @@ public class SettingsDialogFragment extends BottomSheetDialogFragment {
 
     @BindView(R.id.use_24_hour_time_switch)
     Switch use24HourTimeSwitch;
+
+    @BindView(R.id.search_radius_spinner)
+    Spinner searchRadiusSpinner;
+    ArrayAdapter<CharSequence> searchRadiusSpinnerAdapter;
+    String[] searchRadiusOptions;
 
     public static SettingsDialogFragment newInstance() {
         return new SettingsDialogFragment();
@@ -46,6 +53,7 @@ public class SettingsDialogFragment extends BottomSheetDialogFragment {
         ((PegCityTransitApp) getActivity().getApplication()).getInjector().injectInto(this);
 
         setup24TimeSwitch();
+        setupSearchRadiusSpinner();
     }
 
     private void setup24TimeSwitch() {
@@ -55,6 +63,39 @@ public class SettingsDialogFragment extends BottomSheetDialogFragment {
         use24HourTimeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferencesRepository.setUsing24HourClock(isChecked);
         });
+    }
+
+    private void setupSearchRadiusSpinner() {
+        searchRadiusOptions = getResources().getStringArray(R.array.map_search_radius);
+
+        searchRadiusSpinnerAdapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, R.id.spinner_item, getResources().getStringArray(R.array.map_search_radius));
+        searchRadiusSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        searchRadiusSpinner.setAdapter(searchRadiusSpinnerAdapter);
+
+        setCurrentSearchRadiusAdapterSelection();
+
+        searchRadiusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                preferencesRepository.setMapSearchRadius(Integer.parseInt(searchRadiusOptions[position]));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing.
+            }
+        });
+    }
+
+    private void setCurrentSearchRadiusAdapterSelection() {
+        String searchRadiusPreference = String.valueOf(preferencesRepository.getMapSearchRadius());
+
+        for (int i = 0; i < searchRadiusOptions.length; i++) {
+            if (searchRadiusPreference.equals(searchRadiusOptions[i])) {
+                searchRadiusSpinner.setSelection(i);
+                break;
+            }
+        }
     }
 
     @OnClick(R.id.toolbar_close_button)

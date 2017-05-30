@@ -18,6 +18,7 @@ import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
+import jessevivanco.com.pegcitytransit.data.repositories.PreferencesRepository;
 import jessevivanco.com.pegcitytransit.data.util.DisposableUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
@@ -31,13 +32,14 @@ public class TransmitMapPresenter {
      */
     private final double DEFAULT_LAT;
     private final double DEFAULT_LONG;
-    private final int DEFAULT_RADIUS;
     private final long SEARCH_AREA_MARKER_DELAY_MILLIS;
 
     @Inject
     BusStopRepository stopsRepository;
     @Inject
     BusRoutesRepository routesRepository;
+    @Inject
+    PreferencesRepository preferencesRepository;
     @Inject
     Context context;
 
@@ -53,26 +55,26 @@ public class TransmitMapPresenter {
         // Load out default lat and long values.
         DEFAULT_LAT = Double.parseDouble(context.getString(R.string.downtown_winnipeg_latitude));
         DEFAULT_LONG = Double.parseDouble(context.getString(R.string.downtown_winnipeg_longitude));
-        DEFAULT_RADIUS = context.getResources().getInteger(R.integer
-                .default_map_search_radius);
         SEARCH_AREA_MARKER_DELAY_MILLIS = context.getResources().getInteger(R.integer.search_area_marker_delay_millis);
     }
 
-    public void loadBusStopsAroundCoordinates(@Nullable Double latitude, @Nullable Double longitude, @Nullable Integer radius) {
+    public void loadBusStopsAroundCoordinates(@Nullable Double latitude, @Nullable Double longitude) {
 
         DisposableUtil.dispose(subscription);
+
+        int mapSearchRadius = preferencesRepository.getMapSearchRadius();
 
         // NOTE: If lat, long, and radius are not supplied, then we just resort to the default values.
         subscription = stopsRepository.getBusStopsNearLocation(
                 latitude != null ? latitude : DEFAULT_LAT,
                 longitude != null ? longitude : DEFAULT_LONG,
-                radius != null ? radius : DEFAULT_RADIUS)
+                mapSearchRadius)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> {
                     viewContract.clearMarkers();
                     // Imeediately focus on the drawn circle.
-                    viewContract.showSearchRadius(latitude, longitude, radius, true);
+                    viewContract.showSearchRadius(latitude, longitude, mapSearchRadius, true);
                     viewContract.showStopsLoadingIndicator(true);
                 })
                 .doFinally(() -> viewContract.showStopsLoadingIndicator(false))

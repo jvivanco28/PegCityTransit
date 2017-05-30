@@ -9,13 +9,13 @@ import org.parceler.Parcels;
 
 import java.util.List;
 
-abstract public class BaseAdapter<T, V extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+abstract public class SimpleBaseAdapter<T, V extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String STATE_KEY_LIST = "list";
 
     private List<T> list;
 
-    public BaseAdapter(@Nullable Bundle savedInstanceState) {
+    public SimpleBaseAdapter(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             list = Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_LIST));
         }

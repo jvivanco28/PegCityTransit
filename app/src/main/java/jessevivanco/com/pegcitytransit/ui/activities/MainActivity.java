@@ -86,7 +86,6 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     BottomSheetBehavior bottomSheetBehavior;
 
     private GoogleApiClient googleApiClient;
-    private int mapSearchRadius;
 
     private TransitMapFragment transitMapFragment;
     private TransmitMapPresenter transmitMapPresenter;
@@ -106,7 +105,6 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
         // TODO check service advisories on startup
         initialActivityLoadFinished = savedInstanceState != null;
-        mapSearchRadius = getResources().getInteger(R.integer.default_map_search_radius);
         setSearchFabMargin();
         setupMap(savedInstanceState);
         setupBusRouteCell(savedInstanceState);
@@ -377,8 +375,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
             Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
             transmitMapPresenter.loadBusStopsAroundCoordinates(lastKnownLocation != null ? lastKnownLocation.getLatitude() : null,
-                    lastKnownLocation != null ? lastKnownLocation.getLongitude() : null,
-                    mapSearchRadius);
+                    lastKnownLocation != null ? lastKnownLocation.getLongitude() : null);
 
             // Raise this flag. We don't need to search for bus stops on every orientation change.
             initialMapLoadFinished = true;
@@ -436,7 +433,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
     @Override
     public void showSearchRadius(Double latitude, Double longitude, Integer searchRadius, boolean focusInMap) {
-        transitMapFragment.drawSearchRadius(latitude, longitude, mapSearchRadius, focusInMap);
+        transitMapFragment.drawSearchRadius(latitude, longitude, searchRadius, focusInMap);
     }
 
     @Override
@@ -561,7 +558,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     public void searchForBusStops() {
         if (transitMapFragment.isMapReady()) {
             LatLng cameraPosition = transitMapFragment.getCameraPosition();
-            transmitMapPresenter.loadBusStopsAroundCoordinates(cameraPosition.latitude, cameraPosition.longitude, mapSearchRadius);
+            transmitMapPresenter.loadBusStopsAroundCoordinates(cameraPosition.latitude, cameraPosition.longitude);
         } else {
             Log.w(TAG, "Map not ready!");
         }

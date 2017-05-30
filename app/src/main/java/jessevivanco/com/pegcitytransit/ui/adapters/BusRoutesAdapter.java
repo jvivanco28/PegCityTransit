@@ -4,12 +4,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.ViewGroup;
 
-import jessevivanco.com.pegcitytransit.ui.adapters.base.BaseAdapter;
+import jessevivanco.com.pegcitytransit.ui.adapters.base.SimpleBaseAdapter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusRouteCell;
 
-public class BusRoutesAdapter extends BaseAdapter<BusRouteViewModel, BusRouteCellViewHolder> {
+public class BusRoutesAdapter extends SimpleBaseAdapter<BusRouteViewModel, BusRouteCellViewHolder> {
 
     private BusRouteCell.OnBusRouteSelectedListener onBusRouteSelectedListener;
 

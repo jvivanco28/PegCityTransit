@@ -4,11 +4,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.ViewGroup;
 
-import jessevivanco.com.pegcitytransit.ui.adapters.base.BaseAdapter;
+import jessevivanco.com.pegcitytransit.ui.adapters.base.SimpleBaseAdapter;
 import jessevivanco.com.pegcitytransit.ui.view_holders.ScheduledStopCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
-public class ScheduledStopAdapter extends BaseAdapter<ScheduledStopViewModel, ScheduledStopCellViewHolder> {
+public class ScheduledStopAdapter extends SimpleBaseAdapter<ScheduledStopViewModel, ScheduledStopCellViewHolder> {
 
     public ScheduledStopAdapter(@Nullable Bundle savedInstanceState) {
         super(savedInstanceState);

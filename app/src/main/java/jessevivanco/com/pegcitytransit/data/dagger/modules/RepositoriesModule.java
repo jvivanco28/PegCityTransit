@@ -44,6 +44,6 @@ public class RepositoriesModule {
     @Singleton
     @Inject
     PreferencesRepository providePreferenceRepository(Context context) {
-        return new PreferencesRepository();
+        return new PreferencesRepository(context);
     }
 }
