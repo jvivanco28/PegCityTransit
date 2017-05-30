@@ -51,6 +51,10 @@
                 android:layout_toLeftOf="@id/toolbar_fav_stop"
                 android:layout_toRightOf="@id/bottom_sheet_toolbar_close_button"
                 android:layout_toStartOf="@id/toolbar_fav_stop"
+                android:ellipsize="marquee"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:singleLine="true"
                 tools:text="Southbound Main at Broadway (Union Station)"/>
 
         </RelativeLayout>

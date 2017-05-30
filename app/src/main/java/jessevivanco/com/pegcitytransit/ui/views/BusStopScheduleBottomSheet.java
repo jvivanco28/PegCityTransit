@@ -139,6 +139,7 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
     private void displayBusStopInfo(@Nullable BusStopViewModel busStop) {
         if (busStop != null) {
             bottomSheetToolbarTitle.setText(busStop.getName());
+            bottomSheetToolbarTitle.setSelected(true);
             favStopButton.setProgress(busStop.isSavedStop() ? 1 : 0);
         } else {
             bottomSheetToolbarTitle.setText(null);
