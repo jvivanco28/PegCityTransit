@@ -232,8 +232,8 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
      * Displays the floating action buttons for the "Search" tab if it is selected. The "my location"
      * floating action button stays hidden if we don't have access to the user's location.
      */
-    private void setupFabVisibility() {
-        if (bottomNavigation.getSelectedItemId() != R.id.search) {
+    private void setupFabVisibility(int selectedTabItemId) {
+        if (selectedTabItemId != R.id.search) {
             searchBusStopsFab.hide();
         } else {
             searchBusStopsFab.show();
@@ -339,6 +339,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
      * 1. The map has loaded<br/>
      * 2. The google API client has been initialized.<br/>
      * 3. We have permission to access the user's location.<br/>
+     * 4. The user's last known location is not null.
      * <p>
      * If {@code forceLoad} is set to {@code false}, then we only
      * load once (additional calls will be ignored). Otherwise, we load as long as the map is
@@ -349,12 +350,11 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         if (transitMapFragment.isMapReady() &&
                 googleApiClientInitialized &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                (!initialMapLoadFinished || forceLoad)) {
+                (!initialMapLoadFinished || forceLoad) &&
+                LocationServices.FusedLocationApi.getLastLocation(googleApiClient) != null) {
 
             transitMapFragment.showUserLocationIfAllowed();
 
-            // Use the user's last known location if we have access to that information. Else just
-            // defaults to downtown Winnipeg.
             Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
             transmitMapPresenter.loadBusStopsAroundCoordinates(lastKnownLocation != null ? lastKnownLocation.getLatitude() : null,
@@ -384,7 +384,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 showSettings();
                 break;
         }
-        setupFabVisibility();
+        setupFabVisibility(item.getItemId());
         return true;
     }
 
@@ -454,6 +454,8 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        Log.v("DEBUG", "onConnected");
+
         googleApiClientInitialized = true;
 
         // If permission to get user's location has not yet been granted, then ask the user.
@@ -470,7 +472,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             }
         } else {
             // Permission is already granted. We can show the "my location" button.
-            setupFabVisibility();
+            setupFabVisibility(bottomNavigation.getSelectedItemId());
         }
         // Attempt to load near by bus stops regardless if the permission has been granted. If
         // permission isn't granted, we'll default to downtown Winnipeg.
@@ -480,10 +482,14 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     public void onConnectionSuspended(int i) {
         // Do nothing.
+        Log.v("DEBUG", "onConnectionSuspended");
+
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.v("DEBUG", "onConnectionFailed");
+
         // If this failed, then still raise the flag and let's continue on without the user's location.
         googleApiClientInitialized = true;
 
@@ -506,7 +512,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
 
             setSearchFabMargin();
-            setupFabVisibility();
+            setupFabVisibility(bottomNavigation.getSelectedItemId());
             loadBusStopsAtUserLocationIfReady(true);
         } else {
             // Permission was denied. Let's display a dialog explaining why we need location services, and how to grant
@@ -538,7 +544,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             bottomNavigation.setOnNavigationItemSelectedListener(this);
 
             onRoutesTabSelected(false);
-            setupFabVisibility();
+            setupFabVisibility(bottomNavigation.getSelectedItemId());
         }
 
         busRouteCell.setVisibility(View.VISIBLE);
