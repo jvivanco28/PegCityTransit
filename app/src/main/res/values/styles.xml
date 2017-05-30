@@ -39,6 +39,7 @@
         <item name="android:textSize">@dimen/text_toolbar_button</item>
         <item name="android:minWidth">0dp</item>
         <item name="android:minHeight">0dp</item>
+        <item name="android:padding">@dimen/material_spacing_x_small</item>
         <item name="android:maxLines">1</item>
     </style>
 

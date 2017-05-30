@@ -4,6 +4,7 @@ import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import jessevivanco.com.pegcitytransit.ui.callbacks.OnBusRouteSelectedListener;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusRouteCell;
 
@@ -11,7 +12,7 @@ public class BusRouteCellViewHolder extends RecyclerView.ViewHolder {
 
     private BusRouteCell busRouteCell;
 
-    public BusRouteCellViewHolder(ViewGroup parent, BusRouteCell.OnBusRouteSelectedListener onCellClickedListener) {
+    public BusRouteCellViewHolder(ViewGroup parent, OnBusRouteSelectedListener onCellClickedListener) {
         super(new BusRouteCell(parent.getContext()));
 
         this.busRouteCell = (BusRouteCell) itemView;

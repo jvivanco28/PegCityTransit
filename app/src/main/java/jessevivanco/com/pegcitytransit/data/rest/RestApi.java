@@ -81,4 +81,9 @@ public interface RestApi {
     @GET("routes.json")
     Single<WinnipegTransitResponse<List<BusRoute>>> getAllRoutes();
 
+    /**
+     * A bus route with the provided key/route-number.
+     */
+    @GET("routes/{route_key}.json")
+    Single<WinnipegTransitResponse<BusRoute>> getBusRoute(@Path("route_key") Long busRouteKey);
 }

@@ -10,14 +10,14 @@ import jessevivanco.com.pegcitytransit.R;
  */
 public enum RouteCoverage {
 
-    REGULAR("regular", R.drawable.regular_route, R.color.black),
-    EXPRESS("express", R.drawable.express_route, R.color.black),
-    SUPER_EXPRESS("super express", R.drawable.express_route, R.color.black),
-    RAPID_TRANSIT("rapid transit", R.drawable.rapid_transit_route, R.color.white),
+    REGULAR("regular", R.drawable.regular_route_button, R.color.black),
+    EXPRESS("express", R.drawable.express_route_button, R.color.black),
+    SUPER_EXPRESS("super express", R.drawable.express_route_button, R.color.black),
+    RAPID_TRANSIT("rapid transit", R.drawable.rapid_transit_route_button, R.color.white),
     // NOTE: These come back as "regular" but we know that the spirit routes are 1, 2, and 3
     // Also, the route names contain the string "spirit" in them; that might be the better indicator.
     // NOTE: Capital 'S' is intentional.
-    SPIRIT("Spirit", R.drawable.spirit_route, R.color.white);
+    SPIRIT("Spirit", R.drawable.spirit_route_button, R.color.white);
 
     private String apiValue;
 

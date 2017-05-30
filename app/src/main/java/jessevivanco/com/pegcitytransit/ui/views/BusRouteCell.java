@@ -17,9 +17,10 @@ import org.parceler.Parcels;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jessevivanco.com.pegcitytransit.R;
+import jessevivanco.com.pegcitytransit.ui.callbacks.OnBusRouteSelectedListener;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 
-public class BusRouteCell extends CardView {
+public class BusRouteCell extends CardView implements View.OnClickListener {
 
     private static final String STATE_KEY_BUS_ROUTE = "bus_route";
 
@@ -60,7 +61,9 @@ public class BusRouteCell extends CardView {
             this.setLayoutParams(new CardView.LayoutParams(CardView.LayoutParams.MATCH_PARENT, CardView.LayoutParams.WRAP_CONTENT));
         }
 
-        this.setOnClickListener(v -> onBusRouteSelected.onBusRouteSelected(busRoute));
+        this.setClickable(true);
+        this.setForeground(getResources().getDrawable(R.drawable.card_view_button));
+        this.setOnClickListener(this);
     }
 
     public void bind(BusRouteViewModel busRoute) {
@@ -69,9 +72,11 @@ public class BusRouteCell extends CardView {
         if (busRoute != null) {
             busRouteName.setText(busRoute.getName());
             busRouteTextView.setBusRoute(busRoute);
+            busRouteTextView.setOnClickListener(this);
         } else {
             busRouteName.setText(null);
             busRouteTextView.setBusRoute(null);
+            busRouteTextView.setOnClickListener(null);
         }
     }
 
@@ -98,13 +103,14 @@ public class BusRouteCell extends CardView {
         loadingView.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
+    @Override
+    public void onClick(View v) {
+        onBusRouteSelected.onBusRouteSelected(busRoute);
+    }
+
     @LayoutRes
     public static int getLayoutResId() {
         return R.layout.cell_bus_route;
     }
 
-    public interface OnBusRouteSelectedListener {
-
-        void onBusRouteSelected(BusRouteViewModel busRoute);
-    }
 }

@@ -14,6 +14,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -33,6 +34,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.activities.base.BaseActivity;
+import jessevivanco.com.pegcitytransit.ui.callbacks.OnBusRouteSelectedListener;
 import jessevivanco.com.pegcitytransit.ui.fragments.BusRoutesDialogFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
 import jessevivanco.com.pegcitytransit.ui.fragments.PermissionDeniedDialog;
@@ -47,11 +49,12 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusRouteCell;
 import jessevivanco.com.pegcitytransit.ui.views.BusStopScheduleBottomSheet;
 
-public class MainActivity extends BaseActivity implements TransmitMapPresenter.ViewContract,
+public class MainActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
+        TransmitMapPresenter.ViewContract,
         TransitMapFragment.TransitMapCallbacks,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        BusRouteCell.OnBusRouteSelectedListener,
+        OnBusRouteSelectedListener,
         BusStopScheduleBottomSheet.OnFavStopRemovedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -83,7 +86,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
     @BindView(R.id.bottom_sheet_container)
     BusStopScheduleBottomSheet stopScheduleBottomSheet;
-    BottomSheetBehavior bottomSheetBehavior;
+    BottomSheetBehavior bottomSheetScheduleBehavior;
 
     private GoogleApiClient googleApiClient;
 
@@ -201,7 +204,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                 View.GONE);
 
         // Just re-open the bus routes modal if we tap on this cell.
-        busRouteCell.setOnCellClickedListener(busRoute -> showBusRoutesModal());
+        busRouteCell.setOnCellClickedListener(busRoute -> onRoutesTabSelected(true));
     }
 
     private void setupGoogleApiClient() {
@@ -222,37 +225,15 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         } else {
             bottomNavigation.setSelectedItemId(savedInstanceState.getInt(STATE_KEY_SELECTED_TAB));
         }
-
-        bottomNavigation.setOnNavigationItemSelectedListener(item -> {
-
-            switch (item.getItemId()) {
-                case R.id.search:
-                    busRouteCell.setVisibility(View.GONE);
-                    loadBusStopsAtUserLocationIfReady(true);
-                    break;
-                case R.id.my_stops:
-                    busRouteCell.setVisibility(View.GONE);
-                    transmitMapPresenter.loadSavedBusStops();
-                    break;
-                case R.id.routes:
-                    showBusRoutesModal();
-                    break;
-                case R.id.settings:
-                    busRouteCell.setVisibility(View.GONE);
-                    showSettings();
-                    break;
-            }
-            setupFabVisibility(item.getItemId());
-            return true;
-        });
+        bottomNavigation.setOnNavigationItemSelectedListener(this);
     }
 
     /**
      * Displays the floating action buttons for the "Search" tab if it is selected. The "my location"
      * floating action button stays hidden if we don't have access to the user's location.
      */
-    private void setupFabVisibility(int selectedTabItemId) {
-        if (selectedTabItemId != R.id.search) {
+    private void setupFabVisibility() {
+        if (bottomNavigation.getSelectedItemId() != R.id.search) {
             searchBusStopsFab.hide();
         } else {
             searchBusStopsFab.show();
@@ -266,12 +247,12 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
     private void setupBottomSheet(@Nullable Bundle savedInstanceState) {
 
-        stopScheduleBottomSheet.initialize(this, savedInstanceState, getInjector());
+        stopScheduleBottomSheet.initialize(this, this, savedInstanceState, getInjector());
         stopScheduleBottomSheet.setOnCloseButtonClickedListener(v -> {
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            bottomSheetScheduleBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         });
-        bottomSheetBehavior = BottomSheetBehavior.from(stopScheduleBottomSheet);
-        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+        bottomSheetScheduleBehavior = BottomSheetBehavior.from(stopScheduleBottomSheet);
+        bottomSheetScheduleBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 handleBottomSheetStateChanged(newState);
@@ -288,9 +269,9 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                 BottomSheetBehavior.STATE_HIDDEN;
 
         // Set the restored bottom sheet position. The default/initial state is for it to be hidden.
-        bottomSheetBehavior.setState(restoredBottomSheetState);
+        bottomSheetScheduleBehavior.setState(restoredBottomSheetState);
 
-        // For whatever reason, the bottomSheetBehavior callbacks don't get invoked from the above line,
+        // For whatever reason, the bottomSheetScheduleBehavior callbacks don't get invoked from the above line,
         // so we have explicitly restore the state of the "status bar".
         handleBottomSheetStateChanged(restoredBottomSheetState);
 
@@ -298,7 +279,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         mapFragmentContainer.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                bottomSheetBehavior.setPeekHeight(mapFragmentContainer.getHeight() / 2);
+                bottomSheetScheduleBehavior.setPeekHeight(mapFragmentContainer.getHeight() / 2);
                 mapFragmentContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
@@ -325,7 +306,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         }
     }
 
-    private void showBusRoutesModal() {
+    private void onRoutesTabSelected(boolean showRoutesModal) {
 
         // Clear the map.
         if (busRouteCell.getVisibility() != View.VISIBLE) {
@@ -333,10 +314,12 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         }
         clearSearchRadius();
 
-        if (busRoutesModal == null) {
-            busRoutesModal = BusRoutesDialogFragment.newInstance();
+        if (showRoutesModal) {
+            if (busRoutesModal == null) {
+                busRoutesModal = BusRoutesDialogFragment.newInstance();
+            }
+            busRoutesModal.show(getSupportFragmentManager(), BusRoutesDialogFragment.TAG);
         }
-        busRoutesModal.show(getSupportFragmentManager(), BusRoutesDialogFragment.TAG);
     }
 
     private void showSettings() {
@@ -383,6 +366,29 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     }
 
     @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.search:
+                busRouteCell.setVisibility(View.GONE);
+                loadBusStopsAtUserLocationIfReady(true);
+                break;
+            case R.id.my_stops:
+                busRouteCell.setVisibility(View.GONE);
+                transmitMapPresenter.loadSavedBusStops();
+                break;
+            case R.id.routes:
+                onRoutesTabSelected(true);
+                break;
+            case R.id.settings:
+                busRouteCell.setVisibility(View.GONE);
+                showSettings();
+                break;
+        }
+        setupFabVisibility();
+        return true;
+    }
+
+    @Override
     public void showBusRoutesForStop(BusStopViewModel busStop) {
         // The BusStopViewModel should now contain the list of bus routes that stop at that bus stop.
         transitMapFragment.showInfoWindowForBusStop(busStop);
@@ -402,7 +408,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
     public void showBusStopSchedule(BusStopViewModel busStopViewModel) {
 
         // Slightly open the bottom sheet so that we can display the bus stop's schedule.
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        bottomSheetScheduleBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         // Load the schedule or the bus stop.
         stopScheduleBottomSheet.loadScheduleForBusStop(busStopViewModel);
@@ -428,7 +434,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         outState.putInt(STATE_KEY_ROUTE_CELL_VISIBILITY, busRouteCell.getVisibility());
         outState.putBoolean(STATE_KEY_INITIAL_LOAD_FINISHED, initialMapLoadFinished);
         outState.putInt(STATE_KEY_SELECTED_TAB, bottomNavigation.getSelectedItemId());
-        outState.putInt(STATE_KEY_BOTTOM_SHEET_STATE, bottomSheetBehavior.getState());
+        outState.putInt(STATE_KEY_BOTTOM_SHEET_STATE, bottomSheetScheduleBehavior.getState());
     }
 
     @Override
@@ -464,7 +470,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
             }
         } else {
             // Permission is already granted. We can show the "my location" button.
-            setupFabVisibility(bottomNavigation.getSelectedItemId());
+            setupFabVisibility();
         }
         // Attempt to load near by bus stops regardless if the permission has been granted. If
         // permission isn't granted, we'll default to downtown Winnipeg.
@@ -500,7 +506,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
 
             setSearchFabMargin();
-            setupFabVisibility(bottomNavigation.getSelectedItemId());
+            setupFabVisibility();
             loadBusStopsAtUserLocationIfReady(true);
         } else {
             // Permission was denied. Let's display a dialog explaining why we need location services, and how to grant
@@ -513,6 +519,27 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
 
     @Override
     public void onBusRouteSelected(BusRouteViewModel busRoute) {
+
+        // Close any open bottom sheets (this method can be called from both the routes bottom sheet and the schedule bottom sheet).
+        if (busRoutesModal != null) {
+            busRoutesModal.dismissAllowingStateLoss();
+        }
+        if (bottomSheetScheduleBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
+            bottomSheetScheduleBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        }
+
+        // If we're not on the "Routes" bottom tab, then select it now since we're switching the
+        // context over to displaying a bus route.
+        if (bottomNavigation.getSelectedItemId() != R.id.routes) {
+
+            // Temporarily disable the selection listener so that we don't re-open the bus routes modal.
+            bottomNavigation.setOnNavigationItemSelectedListener(null);
+            bottomNavigation.setSelectedItemId(R.id.routes);
+            bottomNavigation.setOnNavigationItemSelectedListener(this);
+
+            onRoutesTabSelected(false);
+            setupFabVisibility();
+        }
 
         busRouteCell.setVisibility(View.VISIBLE);
         busRouteCell.bind(busRoute);
@@ -547,7 +574,7 @@ public class MainActivity extends BaseActivity implements TransmitMapPresenter.V
         if (bottomNavigation.getSelectedItemId() == R.id.my_stops) {
             // Just Refresh the list.
             transmitMapPresenter.loadSavedBusStops();
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            bottomSheetScheduleBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         }
     }
 

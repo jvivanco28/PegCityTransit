@@ -7,10 +7,12 @@
 
     <color name="button">@color/colorAccent</color>
     <color name="button_pressed_prelollipop">#b94141</color>
-    <color name="button_ripple">@color/white_transparent_75</color>
+    <color name="button_ripple">@color/white_translucent</color>
 
     <color name="white">#FFFFFF</color>
-    <color name="white_transparent_75">#40ffffff</color>
+    <color name="white_translucent">#b0ffffff</color>
+    <color name="translucent_grey_x40">#40868686</color>
+    <color name="translucent_grey_x80">#80868686</color>
     <color name="black">#000000</color>
 
     <color name="grey_light">#F7F7F6</color>

@@ -25,14 +25,17 @@ import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.ui.adapters.ScheduledStopAdapter;
+import jessevivanco.com.pegcitytransit.ui.callbacks.OnBusRouteSelectedListener;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.ViewState;
+import jessevivanco.com.pegcitytransit.ui.view_holders.ScheduledStopCellViewHolder;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.layout_manager.OneShotAnimatedLinearLayoutManager;
 
-public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopSchedulePresenter.ViewContract {
+public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopSchedulePresenter.ViewContract, ScheduledStopCellViewHolder.OnBusRouteNumberClickedListener {
 
     private static final String TAG = BusStopScheduleBottomSheet.class.getSimpleName();
 
@@ -67,6 +70,7 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
     private ViewState viewState;
     private OnFavStopRemovedListener onFavStopRemovedListener;
     private BusStopViewModel busStop;
+    private OnBusRouteSelectedListener onBusRouteSelectedListener;
 
     public BusStopScheduleBottomSheet(Context context) {
         super(context);
@@ -90,14 +94,16 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
     }
 
     public void initialize(OnFavStopRemovedListener onFavStopRemovedListener,
+                           OnBusRouteSelectedListener onBusRouteSelectedListener,
                            @Nullable Bundle savedInstanceState,
                            AppComponent injector) {
 
         this.onFavStopRemovedListener = onFavStopRemovedListener;
+        this.onBusRouteSelectedListener = onBusRouteSelectedListener;
 
         // Setup recycler view and adapter
         stopSchedulePresenter = new BusStopSchedulePresenter(injector, this);
-        stopScheduleAdapter = new ScheduledStopAdapter(savedInstanceState);
+        stopScheduleAdapter = new ScheduledStopAdapter(this, savedInstanceState);
 
         layoutManager = new OneShotAnimatedLinearLayoutManager(getContext(), stopScheduleRecyclerView);
         stopScheduleRecyclerView.setLayoutManager(layoutManager);
@@ -174,6 +180,17 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
         errorStateCell.setVisibility(viewState == ViewState.ERROR ? VISIBLE : GONE);
         bottomSheetProgressBar.setVisibility(viewState == ViewState.LOADING ? VISIBLE : GONE);
         loadingCell.setVisibility(viewState == ViewState.LOADING ? VISIBLE : GONE);
+    }
+
+    @Override
+    public void onBusRouteNumberClicked(Integer busRouteNumber) {
+        // FYI: bus route keys and numbers and the same thing.
+        stopSchedulePresenter.loadBusRoute(Long.valueOf(busRouteNumber));
+    }
+
+    @Override
+    public void onBusRouteLoaded(BusRouteViewModel busRouteViewModel) {
+        onBusRouteSelectedListener.onBusRouteSelected(busRouteViewModel);
     }
 
     @OnClick(R.id.toolbar_fav_stop)

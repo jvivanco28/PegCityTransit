@@ -14,10 +14,12 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
+import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopScheduleRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.PreferencesRepository;
 import jessevivanco.com.pegcitytransit.data.util.DisposableUtil;
+import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusStopScheduleBottomSheet;
@@ -31,6 +33,8 @@ public class BusStopSchedulePresenter {
     @Inject
     BusStopRepository busStopRepository;
     @Inject
+    BusRoutesRepository busRoutesRepository;
+    @Inject
     PreferencesRepository preferencesRepository;
     @Inject
     Context context;
@@ -38,6 +42,7 @@ public class BusStopSchedulePresenter {
     private ViewContract viewContract;
     private Disposable loadScheduleSubscription;
     private Disposable saveBusStopSubscription;
+    private Disposable loadBusRouteSubscription;
 
     public BusStopSchedulePresenter(AppComponent injector,
                                     ViewContract viewContract) {
@@ -110,13 +115,31 @@ public class BusStopSchedulePresenter {
                 );
     }
 
+    public void loadBusRoute(Long busRouteKey) {
+        DisposableUtil.dispose(loadBusRouteSubscription);
+
+        loadBusRouteSubscription = busRoutesRepository.getBusRoute(busRouteKey)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        busRouteViewModel -> viewContract.onBusRouteLoaded(busRouteViewModel),
+                        throwable -> {
+                            Crashlytics.logException(throwable);
+                            Log.e(TAG, "Errow loading bus route.", throwable);
+                        }
+                );
+    }
+
     public void tearDown() {
         DisposableUtil.dispose(loadScheduleSubscription);
         DisposableUtil.dispose(saveBusStopSubscription);
+        DisposableUtil.dispose(loadBusRouteSubscription);
     }
 
     public interface ViewContract extends ErrorMessageViewContract, BaseListViewContract {
 
         void setScheduledStops(List<ScheduledStopViewModel> scheduledStops);
+
+        void onBusRouteLoaded(BusRouteViewModel busRouteViewModel);
     }
 }

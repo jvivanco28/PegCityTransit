@@ -98,4 +98,26 @@ public class BusRoutesRepository {
             }
         });
     }
+
+    public Single<BusRouteViewModel> getBusRoute(@NonNull Long busRouteKey) {
+
+        if (busRouteKey == null) {
+            throw new IllegalArgumentException("Bus route key must not be null!");
+        }
+
+        return getAllBusRoutes()
+                .flatMap(busRouteViewModels -> {
+                    // The route SHOULD already exist in the cache.
+                    for (BusRouteViewModel busRouteViewModel : busRouteViewModels) {
+                        if (busRouteViewModel.getKey().equals(busRouteKey)) {
+                            return Single.just(busRouteViewModel);
+                        }
+                    }
+                    // If not in the cache, then fetch it from the API.
+                    return restApi.getBusRoute(busRouteKey)
+                            .map(WinnipegTransitResponse::getElement)
+                            .map(BusRouteViewModel::createFromBusRoute);
+                });
+
+    }
 }

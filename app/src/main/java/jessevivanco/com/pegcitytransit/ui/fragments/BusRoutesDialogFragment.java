@@ -19,18 +19,18 @@ import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.ui.PegCityTransitApp;
 import jessevivanco.com.pegcitytransit.ui.adapters.BusRoutesAdapter;
+import jessevivanco.com.pegcitytransit.ui.callbacks.OnBusRouteSelectedListener;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.ViewState;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
-import jessevivanco.com.pegcitytransit.ui.views.BusRouteCell;
 import jessevivanco.com.pegcitytransit.ui.views.ErrorStateCell;
 import jessevivanco.com.pegcitytransit.ui.views.layout_manager.OneShotAnimatedLinearLayoutManager;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class BusRoutesDialogFragment extends BottomSheetDialogFragment implements BusRoutesPresenter.ViewContract, BusRouteCell.OnBusRouteSelectedListener {
+public class BusRoutesDialogFragment extends BottomSheetDialogFragment implements BusRoutesPresenter.ViewContract {
 
     public static final String TAG = BusRoutesDialogFragment.class.getSimpleName();
     private static final String STATE_KEY_LOADING_INDICATOR_VISIBILITY = "bus_route_loading_indicator_visibility";
@@ -54,7 +54,7 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     private OneShotAnimatedLinearLayoutManager layoutManager;
     private BusRoutesAdapter routesAdapter;
     private BusRoutesPresenter routesPresenter;
-    private BusRouteCell.OnBusRouteSelectedListener listener;
+    private OnBusRouteSelectedListener listener;
     private ViewState viewState;
 
     public static BusRoutesDialogFragment newInstance() {
@@ -90,10 +90,10 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (context instanceof BusRouteCell.OnBusRouteSelectedListener) {
-            listener = (BusRouteCell.OnBusRouteSelectedListener) context;
+        if (context instanceof OnBusRouteSelectedListener) {
+            listener = (OnBusRouteSelectedListener) context;
         } else {
-            throw new IllegalStateException("Hosting activity must implement " + BusRouteCell.OnBusRouteSelectedListener.class.getSimpleName());
+            throw new IllegalStateException("Hosting activity must implement " + OnBusRouteSelectedListener.class.getSimpleName());
         }
     }
 
@@ -109,7 +109,7 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
 
     private void setupAdapter(Bundle savedInstanceState) {
         routesPresenter = new BusRoutesPresenter(((PegCityTransitApp) getActivity().getApplication()).getInjector(), this);
-        routesAdapter = new BusRoutesAdapter(savedInstanceState, this);
+        routesAdapter = new BusRoutesAdapter(savedInstanceState, listener);
     }
 
     private void setupRecyclerView() {
@@ -138,13 +138,6 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
                 ViewState.values()[savedInstanceState.getInt(STATE_KEY_VIEW_STATE, ViewState.LIST.ordinal())] :
                 ViewState.LIST;
         showViewState(viewState);
-    }
-
-    @Override
-    public void onBusRouteSelected(BusRouteViewModel busRoute) {
-        listener.onBusRouteSelected(busRoute);
-
-        dismissAllowingStateLoss();
     }
 
     @Override

@@ -77,6 +77,10 @@ public class RestModule {
                 }.getType(), new WinnipegTransitResponseDeserializer<StopSchedule>("stop-schedule", new TypeToken<StopSchedule>() {
                 }.getType(), gsonForTypeAdapters))
 
+                .registerTypeAdapter(new TypeToken<WinnipegTransitResponse<BusRoute>>() {
+                }.getType(), new WinnipegTransitResponseDeserializer<BusRoute>("route", new TypeToken<BusRoute>() {
+                }.getType(), gsonForTypeAdapters))
+
                 .create();
     }
 

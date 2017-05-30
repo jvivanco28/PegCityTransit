@@ -10,13 +10,16 @@ import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 
 public class ScheduledStopAdapter extends SimpleBaseAdapter<ScheduledStopViewModel, ScheduledStopCellViewHolder> {
 
-    public ScheduledStopAdapter(@Nullable Bundle savedInstanceState) {
+    private ScheduledStopCellViewHolder.OnBusRouteNumberClickedListener onBusRouteClickedListener;
+
+    public ScheduledStopAdapter(ScheduledStopCellViewHolder.OnBusRouteNumberClickedListener onBusRouteClickedListener, @Nullable Bundle savedInstanceState) {
         super(savedInstanceState);
+        this.onBusRouteClickedListener = onBusRouteClickedListener;
     }
 
     @Override
     protected ScheduledStopCellViewHolder createListItemViewHolder(ViewGroup parent) {
-        return new ScheduledStopCellViewHolder(parent);
+        return new ScheduledStopCellViewHolder(parent, onBusRouteClickedListener);
     }
 
     @Override

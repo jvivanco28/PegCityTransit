@@ -29,20 +29,25 @@ public class ScheduledStopCellViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.departure_time)
     IconTextView departureTime;
 
-    public ScheduledStopCellViewHolder(ViewGroup parent) {
+    private OnBusRouteNumberClickedListener onBusRouteClickedListener;
+
+    public ScheduledStopCellViewHolder(ViewGroup parent, OnBusRouteNumberClickedListener onBusRouteClickedListener) {
         super(LayoutInflater.from(parent.getContext()).inflate(getLayoutResId(), parent, false));
         ButterKnife.bind(this, itemView);
+        this.onBusRouteClickedListener = onBusRouteClickedListener;
     }
 
     public void bind(ScheduledStopViewModel scheduledStop) {
         if (scheduledStop != null) {
             routeNumber.setBusRoute(scheduledStop.getRouteNumber(), scheduledStop.getRouteCoverage());
+            routeNumber.setOnClickListener(v -> onBusRouteClickedListener.onBusRouteNumberClicked(scheduledStop.getRouteNumber()));
             routeName.setText(scheduledStop.getRouteName());
             status.setText(scheduledStop.getStatus());
             status.setTextColor(scheduledStop.getStatusColor());
             departureTime.setText("{" + MaterialIcons.md_access_time.key() + "} " + scheduledStop.getDepartureTimeFormatted());
         } else {
             routeNumber.setText(null);
+            routeNumber.setOnClickListener(null);
             routeName.setText(null);
             status.setText(null);
             departureTime.setText(null);
@@ -52,5 +57,10 @@ public class ScheduledStopCellViewHolder extends RecyclerView.ViewHolder {
     @LayoutRes
     public static int getLayoutResId() {
         return R.layout.cell_scheduled_stop;
+    }
+
+    public interface OnBusRouteNumberClickedListener {
+
+        void onBusRouteNumberClicked(Integer busRouteNumber);
     }
 }

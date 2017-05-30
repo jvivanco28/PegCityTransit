@@ -40,6 +40,8 @@ public class BusRouteTextView extends AppCompatTextView {
     private void init(Size size) {
         CalligraphyUtils.applyFontToTextView(getContext(), this, "fonts/bariol_bold.ttf");
 
+        setClickable(true);
+
         setGravity(Gravity.CENTER);
 
         int padding = size != null && size == Size.MINI ?
@@ -68,7 +70,7 @@ public class BusRouteTextView extends AppCompatTextView {
 
         setBackgroundResource(coverage != null ?
                 coverage.getBackgroundDrawableResId() :
-                R.drawable.regular_route);
+                R.drawable.regular_route_button);
 
         int textColorRes = coverage != null ?
                 coverage.getTextColorResId() :

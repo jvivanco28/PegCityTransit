@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Pressed -->
-    <item android:drawable="@color/button_pressed_prelollipop" android:state_pressed="true"/>
+    <item android:drawable="@color/translucent_grey_x80" android:state_pressed="true"/>
     <!-- Default -->
-    <item android:drawable="@color/button"/>
+    <item android:drawable="@drawable/rapid_transit_route"/>
 </selector>
