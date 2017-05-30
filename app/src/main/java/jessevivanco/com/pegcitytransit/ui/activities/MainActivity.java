@@ -455,8 +455,6 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.v("DEBUG", "onConnected");
-
         googleApiClientInitialized = true;
 
         // If permission to get user's location has not yet been granted, then ask the user.
@@ -483,14 +481,11 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     public void onConnectionSuspended(int i) {
         // Do nothing.
-        Log.v("DEBUG", "onConnectionSuspended");
 
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.v("DEBUG", "onConnectionFailed");
-
         // If this failed, then still raise the flag and let's continue on without the user's location.
         googleApiClientInitialized = true;
 
