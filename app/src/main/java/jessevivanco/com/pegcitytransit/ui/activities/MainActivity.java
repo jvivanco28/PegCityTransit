@@ -604,7 +604,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
             Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (lastKnownLocation != null) {
-                transitMapFragment.zoomToLocation(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude(), getResources().getInteger(R.integer.default_my_location_map_zoom));
+                transitMapFragment.zoomAndReorientToLocation(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude(), getResources().getInteger(R.integer.default_my_location_map_zoom), lastKnownLocation.getBearing());
             } else {
                 showErrorMessage(getString(R.string.error_finding_location));
                 Log.e(TAG, "Last known location is null.");

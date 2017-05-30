@@ -218,6 +218,15 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     }
 
     /**
+     * Zooms to coordinates on the map.
+     */
+    public void zoomAndReorientToLocation(double lat, double lng, float zoomScale, float bearing) {
+
+        CameraPosition cameraPosition = new CameraPosition(new LatLng(lat, lng), zoomScale, 0, bearing);
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    /**
      * Zooms to the provided bounding box on the map. Zooms as close as possible to the bounding box
      * such that the entire box is still visible.
      */
