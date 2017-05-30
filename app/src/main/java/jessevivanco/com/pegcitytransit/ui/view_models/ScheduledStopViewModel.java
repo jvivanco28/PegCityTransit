@@ -69,7 +69,7 @@ public class ScheduledStopViewModel {
                 statusColor = context.getResources().getColor(R.color.early);
             } else {
                 status = context.getString(R.string.on_time);
-                statusColor = context.getResources().getColor(R.color.text_primary);
+                statusColor = context.getResources().getColor(R.color.text_secondary);
             }
             return new Builder()
                     .routeNumber(routeNumber)
