@@ -27,16 +27,28 @@
                 android:layout_centerVertical="true"
                 android:text="{md-close}"/>
 
+            <!-- Fav button -->
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/toolbar_fav_stop"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
+                android:layout_width="@dimen/fav_button_size"
+                android:layout_height="@dimen/fav_button_size"
                 android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/bottom_sheet_toolbar_refresh_button"
+                android:layout_toStartOf="@+id/bottom_sheet_toolbar_refresh_button"
                 android:foregroundGravity="center"
                 android:scaleType="centerCrop"
                 app:lottie_fileName="star.json"/>
+
+            <!-- Refresh button -->
+            <com.joanzapata.iconify.widget.IconButton
+                android:id="@+id/bottom_sheet_toolbar_refresh_button"
+                style="@style/toolbar_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:text="{md-refresh}"/>
 
             <TextView
                 android:id="@+id/bottom_sheet_toolbar_title"

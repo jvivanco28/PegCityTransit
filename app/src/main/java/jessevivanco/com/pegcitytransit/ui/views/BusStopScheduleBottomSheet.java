@@ -116,7 +116,7 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
         stopScheduleRecyclerView.setAdapter(stopScheduleAdapter);
 
         // Setup refresh listener
-        errorStateCell.setOnRefreshButtonClickedListener(() -> stopSchedulePresenter.loadScheduleForBusStop(busStop.getKey()));
+        errorStateCell.setOnRefreshButtonClickedListener(this::refresh);
 
         // Restore instance state
         bottomSheetProgressBar.setVisibility(savedInstanceState != null ?
@@ -214,6 +214,11 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
         } else {
             throw new IllegalStateException("Can't save a null bus stop!");
         }
+    }
+
+    @OnClick(R.id.bottom_sheet_toolbar_refresh_button)
+    public void refresh() {
+        stopSchedulePresenter.loadScheduleForBusStop(busStop.getKey());
     }
 
     public void tearDown() {
