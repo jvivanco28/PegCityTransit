@@ -12,6 +12,7 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.MenuItem;
@@ -99,7 +100,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     private boolean initialActivityLoadFinished;
     private boolean initialMapLoadFinished;
     private boolean googleApiClientInitialized;
-    private boolean showPermissionRationalDialog;
+    private boolean showPermissionRationaleDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,7 +109,6 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
         // TODO check service advisories on startup
         initialActivityLoadFinished = savedInstanceState != null;
-        setSearchFabMargin();
         setupMap(savedInstanceState);
         setupBusRouteCell(savedInstanceState);
         setupGoogleApiClient();
@@ -136,11 +136,11 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     protected void onResume() {
         super.onResume();
 
-        if (showPermissionRationalDialog) {
-            showPermissionRationalDialog = false;
+        if (showPermissionRationaleDialog) {
+            showPermissionRationaleDialog = false;
 
             FragmentUtils.showFragment(getSupportFragmentManager(),
-                    PermissionDeniedDialog.newInstance(getString(R.string.location_permission_denied)),
+                    PermissionDeniedDialog.newInstance(getString(R.string.location_permission_rationale)),
                     PERMISSION_DIALOG_TAG);
         }
     }
@@ -165,12 +165,19 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     }
 
     private void setSearchFabMargin() {
+        Log.v("DEBUG", "Called setSearchFabMargin");
+
         ViewGroup.MarginLayoutParams searchFabLayoutParams = (ViewGroup.MarginLayoutParams) searchBusStopsFab.getLayoutParams();
 
-        // GPS Enabled.
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        // GPS Enabled and user's last known location is not null.
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                LocationServices.FusedLocationApi.getLastLocation(googleApiClient) != null) {
+
+            Log.v("DEBUG", "BIG margin");
             searchFabLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.top_fab_margin_bottom_gps_enabled);
         } else {
+            Log.v("DEBUG", "little margin");
+
             searchFabLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.top_fab_margin_bottom_gps_disabled);
         }
         searchBusStopsFab.setLayoutParams(searchFabLayoutParams);
@@ -241,9 +248,10 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             searchBusStopsFab.show();
         }
 
-        // We can only show "my location" button if we have permission to access the user's location.
         // We can only show "my location" button if we have permission to access the user's location
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        // AND the user's last known locatin is not null.
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                LocationServices.FusedLocationApi.getLastLocation(googleApiClient) != null) {
             myLocationFab.show();
         }
     }
@@ -476,17 +484,16 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
             // We don't need to keep asking on every orientation change.
             if (!initialActivityLoadFinished) {
-                PermissionUtils.requestPermission(this,
-                        IntentRequestCodes.LOCATION_PERMISSION_REQUEST_CODE.ordinal(),
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        getString(R.string.location_permission_dialog_title),
-                        getString(R.string.location_permission_rational),
-                        PERMISSION_DIALOG_TAG);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, IntentRequestCodes.LOCATION_PERMISSION_REQUEST_CODE.ordinal());
             }
-        } else {
-            // Permission is already granted. We can show the "my location" button.
-            setupFabVisibility(bottomNavigation.getSelectedItemId());
         }
+
+        // Setup the FAB buttons that the google API client is connected. The FAB buttons' layout
+        // depends on GPS permission and the last known location not being null (just explaining
+        // the delayed setup process).
+        setupFabVisibility(bottomNavigation.getSelectedItemId());
+        setSearchFabMargin();
+
         // Attempt to load near by bus stops regardless if the permission has been granted. If
         // permission isn't granted, we'll default to downtown Winnipeg.
         loadBusStopsAtUserLocationIfReady(false);
@@ -525,11 +532,11 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             setupFabVisibility(bottomNavigation.getSelectedItemId());
             loadBusStopsAtUserLocationIfReady(true);
         } else {
-            // Permission was denied. Let's display a dialog explaining why we need location services, and how to grant
-            // the permission if it's permanently denied.
+            // Permission was denied. Let's display a dialog explaining why we need location services,
+            // and how to grant the permission if it's been permanently denied.
             // NOTE: We can't show the dialog until onResume has been called.
             // See https://stackoverflow.com/questions/37164415/android-fatal-error-can-not-perform-this-action-after-onsaveinstancestate
-            showPermissionRationalDialog = true;
+            showPermissionRationaleDialog = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION);
         }
     }
 
