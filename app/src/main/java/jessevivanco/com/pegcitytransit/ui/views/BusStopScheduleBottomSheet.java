@@ -167,9 +167,9 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
     }
 
     @Override
-    public void setScheduledStops(List<ScheduledStopViewModel> scheduledStops) {
+    public void setScheduledStops(List<ScheduledStopViewModel> scheduledStops, String queryTime) {
         layoutManager.setAnimateNextLayout(scheduledStops != null);
-        stopScheduleAdapter.setList(scheduledStops);
+        stopScheduleAdapter.setList(scheduledStops, queryTime);
     }
 
     @Override

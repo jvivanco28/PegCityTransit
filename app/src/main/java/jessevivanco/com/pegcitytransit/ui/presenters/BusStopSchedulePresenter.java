@@ -4,7 +4,9 @@ import android.content.Context;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+import com.squareup.phrase.Phrase;
 
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -19,6 +21,7 @@ import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopScheduleRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.PreferencesRepository;
 import jessevivanco.com.pegcitytransit.data.util.DisposableUtil;
+import jessevivanco.com.pegcitytransit.data.util.TimeUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
@@ -57,7 +60,7 @@ public class BusStopSchedulePresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> {
-                    viewContract.setScheduledStops(null);
+                    viewContract.setScheduledStops(null, null);
                     viewContract.showErrorMessage(null);
                     viewContract.showViewState(ViewState.LOADING);
                 })
@@ -67,7 +70,12 @@ public class BusStopSchedulePresenter {
                                 viewContract.showErrorMessage(context.getString(R.string.no_schedule));
                                 viewContract.showViewState(ViewState.ERROR);
                             } else {
-                                viewContract.setScheduledStops(scheduledStops);
+                                String queryTimeFormatted = Phrase.from(context.getString(R.string.checked_at))
+                                        .put("time", TimeUtil.getTimeFormatted(Calendar.getInstance(), preferencesRepository.isUsing24HourClock()))
+                                        .format()
+                                        .toString();
+
+                                viewContract.setScheduledStops(scheduledStops, queryTimeFormatted);
                                 viewContract.showViewState(ViewState.LIST);
                             }
                         },
@@ -138,7 +146,7 @@ public class BusStopSchedulePresenter {
 
     public interface ViewContract extends ErrorMessageViewContract, BaseListViewContract {
 
-        void setScheduledStops(List<ScheduledStopViewModel> scheduledStops);
+        void setScheduledStops(List<ScheduledStopViewModel> scheduledStops, String queryTime);
 
         void onBusRouteLoaded(BusRouteViewModel busRouteViewModel);
     }

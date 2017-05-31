@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/query_time"
+    fontPath="fonts/bariol_bold.ttf"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/material_spacing_x_small"
+    android:background="@color/colorAccent"
+    android:maxLines="1"
+    android:textColor="@color/white"
+    android:textSize="@dimen/text_medium"
+    tools:ignore="MissingPrefix"
+    tools:text="Hello"/>

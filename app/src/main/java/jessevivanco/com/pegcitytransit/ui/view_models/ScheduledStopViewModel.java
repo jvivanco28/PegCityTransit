@@ -7,13 +7,12 @@ import com.squareup.phrase.Phrase;
 
 import org.parceler.Parcel;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.rest.models.ScheduledStop;
+import jessevivanco.com.pegcitytransit.data.util.TimeUtil;
 import jessevivanco.com.pegcitytransit.ui.util.RouteCoverage;
 
 @Parcel
@@ -59,7 +58,7 @@ public class ScheduledStopViewModel {
                                             .put("time_unit", context.getResources().getQuantityString(R.plurals.minutes, (int) minutes))
                                             .format()
                                             .toString() :
-                                    getTimeFormatted(scheduledStop.getTimes().getDeparture().getEstimated(), use24HourTime);
+                                    TimeUtil.getTimeFormatted(scheduledStop.getTimes().getDeparture().getEstimated(), use24HourTime);
 
             if (scheduledStop.getTimes().getDeparture().getEstimated().getTime() > scheduledStop.getTimes().getDeparture().getScheduled().getTime()) {
                 status = context.getString(R.string.late);
@@ -80,27 +79,6 @@ public class ScheduledStopViewModel {
                     .status(status)
                     .statusColor(statusColor)
                     .build();
-        }
-    }
-
-    private static String getTimeFormatted(Date date, boolean use24HourTime) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-
-        int hours = cal.get(use24HourTime ? Calendar.HOUR_OF_DAY : Calendar.HOUR);
-        int minutes = cal.get(Calendar.MINUTE);
-
-        if (use24HourTime) {
-            return String.format(Locale.getDefault(),
-                    "%02d:%02d",
-                    hours,
-                    minutes);
-        } else {
-            return String.format(Locale.getDefault(),
-                    "%2d:%02d %s",
-                    hours,
-                    minutes,
-                    cal.get(Calendar.AM_PM) == Calendar.AM ? "am" : "pm");
         }
     }
 
