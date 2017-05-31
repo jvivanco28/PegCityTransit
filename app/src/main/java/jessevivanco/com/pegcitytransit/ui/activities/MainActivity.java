@@ -165,19 +165,14 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     }
 
     private void setSearchFabMargin() {
-        Log.v("DEBUG", "Called setSearchFabMargin");
-
         ViewGroup.MarginLayoutParams searchFabLayoutParams = (ViewGroup.MarginLayoutParams) searchBusStopsFab.getLayoutParams();
 
         // GPS Enabled and user's last known location is not null.
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 LocationServices.FusedLocationApi.getLastLocation(googleApiClient) != null) {
 
-            Log.v("DEBUG", "BIG margin");
             searchFabLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.top_fab_margin_bottom_gps_enabled);
         } else {
-            Log.v("DEBUG", "little margin");
-
             searchFabLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.top_fab_margin_bottom_gps_disabled);
         }
         searchBusStopsFab.setLayoutParams(searchFabLayoutParams);
