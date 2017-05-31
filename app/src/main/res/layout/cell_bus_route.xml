@@ -12,7 +12,7 @@
         <jessevivanco.com.pegcitytransit.ui.views.BusRouteTextView
             android:id="@+id/bus_route_number"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"/>
 

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -101,6 +102,14 @@ public class BusRouteCell extends CardView implements View.OnClickListener {
             loadingView.cancelAnimation();
         }
         loadingView.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    public void setMarqueeEnabled(boolean enabled) {
+        busRouteName.setSingleLine(enabled);
+        busRouteName.setFocusable(enabled);
+        busRouteName.setFocusableInTouchMode(enabled);
+        busRouteName.setEllipsize(enabled ? TextUtils.TruncateAt.MARQUEE : null);
+        busRouteName.setSelected(enabled);
     }
 
     @Override

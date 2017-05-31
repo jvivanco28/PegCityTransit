@@ -192,6 +192,8 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
     private void setupBusRouteCell(@Nullable Bundle savedInstanceState) {
 
+        busRouteCell.setMarqueeEnabled(true);
+
         // Adding a top margin so that we can avoid being occluded by the status bar.
         // NOTE: Was having issues getting fitsSystemWindow to work for this in the xml layout file.
         CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) busRouteCell.getLayoutParams();
@@ -366,22 +368,34 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         }
     }
 
+    private void setBusRouteCellVisibility(boolean visible) {
+        busRouteCell.setVisibility(visible ?
+                View.VISIBLE :
+                View.GONE);
+
+        // We'll need to shift the top map elements downward so that they're not occluded by the
+        // bus route cell at the top.
+        transitMapFragment.setMapPaddingTop(visible ?
+                getResources().getDimensionPixelSize(R.dimen.map_padding_top_offset) :
+                0);
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.search:
-                busRouteCell.setVisibility(View.GONE);
+                setBusRouteCellVisibility(false);
                 loadBusStopsAtUserLocationIfReady(true);
                 break;
             case R.id.my_stops:
-                busRouteCell.setVisibility(View.GONE);
+                setBusRouteCellVisibility(false);
                 transmitMapPresenter.loadSavedBusStops();
                 break;
             case R.id.routes:
                 onRoutesTabSelected(true);
                 break;
             case R.id.settings:
-                busRouteCell.setVisibility(View.GONE);
+                setBusRouteCellVisibility(false);
                 showSettings();
                 break;
         }
@@ -543,7 +557,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             setupFabVisibility(bottomNavigation.getSelectedItemId());
         }
 
-        busRouteCell.setVisibility(View.VISIBLE);
+        setBusRouteCellVisibility(true);
         busRouteCell.bind(busRoute);
 
         transmitMapPresenter.loadBusStopsForBusRoute(busRoute);
@@ -599,7 +613,10 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
             Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (lastKnownLocation != null) {
-                transitMapFragment.zoomAndReorientToLocation(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude(), getResources().getInteger(R.integer.default_my_location_map_zoom), lastKnownLocation.getBearing());
+                transitMapFragment.zoomAndReorientToLocation(lastKnownLocation.getLatitude(),
+                        lastKnownLocation.getLongitude(),
+                        getResources().getInteger(R.integer.default_my_location_map_zoom),
+                        lastKnownLocation.getBearing());
             } else {
                 showErrorMessage(getString(R.string.error_finding_location));
                 Log.e(TAG, "Last known location is null.");

@@ -227,8 +227,21 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
      */
     public void zoomAndReorientToLocation(double lat, double lng, float zoomScale, float bearing) {
 
+        // NOTE: We're actually doing two separate camera animations here. When the camera is tilted,
+        // and we try to reset the camera, the origin seems to be slightly off. There's probably a
+        // reason, but I haven't been able to figure it out. Using this hacky solution for the time being.
         CameraPosition cameraPosition = new CameraPosition(new LatLng(lat, lng), zoomScale, 0, bearing);
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), new GoogleMap.CancelableCallback() {
+            @Override
+            public void onFinish() {
+                zoomToLocation(lat, lng, zoomScale);
+            }
+
+            @Override
+            public void onCancel() {
+                // Do nothing.
+            }
+        });
     }
 
     /**
@@ -292,6 +305,22 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         }
     }
 
+    /**
+     * Shifts all map UI elements downward by the provided offset.
+     */
+    public void setMapPaddingTop(int offset) {
+        // The status bar occludes the compass unless we apply a top padding to the map view.
+        // However, applying only a top padding will mess up the camera origin (it will be off-center)
+        // so we also have to apply a bottom padding.
+        // See https://stackoverflow.com/questions/15043006/how-to-move-the-android-google-maps-api-compass-position
+        offset += ScreenUtil.getStatusBarHeightIfNeeded(getContext());
+        googleMap.setPadding(0, offset, 0, 0);
+
+        ViewGroup.MarginLayoutParams crosshairLayoutParams = (ViewGroup.MarginLayoutParams) crosshairOverlay.getLayoutParams();
+        crosshairLayoutParams.topMargin = offset > 0 ? offset / 2 : 0;
+        crosshairOverlay.setLayoutParams(crosshairLayoutParams);
+    }
+
     @Override
     public void onMapReady(final GoogleMap googleMap) {
 
@@ -305,17 +334,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         googleMap.setOnInfoWindowClickListener(this);
         googleMap.setOnInfoWindowCloseListener(this);
 
-        // The status bar occludes the compass unless we apply a top padding to the map view.
-        // However, applying only a top padding will mess up the camera origin (it will be off-center)
-        // so we also have to apply a bottom padding.
-        // See https://stackoverflow.com/questions/15043006/how-to-move-the-android-google-maps-api-compass-position
-        int statusBarHeight = ScreenUtil.getStatusBarHeightIfNeeded(getContext());
-        if (statusBarHeight > 0) {
-            googleMap.setPadding(0, statusBarHeight, 0, 0);
-            ViewGroup.MarginLayoutParams crosshairLayoutParams = (ViewGroup.MarginLayoutParams) crosshairOverlay.getLayoutParams();
-            crosshairLayoutParams.topMargin = statusBarHeight / 2;
-            crosshairOverlay.setLayoutParams(crosshairLayoutParams);
-        }
+        setMapPaddingTop(0);
 
         // Hide the "my location" button.
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
