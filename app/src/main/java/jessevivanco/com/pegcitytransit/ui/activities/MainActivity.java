@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
@@ -50,8 +51,10 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.BusRouteCell;
 import jessevivanco.com.pegcitytransit.ui.views.BusStopScheduleBottomSheet;
+import jessevivanco.com.pegcitytransit.ui.views.SearchStopsView;
 
 public class MainActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
+        BottomNavigationView.OnNavigationItemReselectedListener,
         TransmitMapPresenter.ViewContract,
         TransitMapFragment.TransitMapCallbacks,
         GoogleApiClient.ConnectionCallbacks,
@@ -64,12 +67,14 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     private static final String STATE_KEY_INITIAL_LOAD_FINISHED = "initial_load_finished";
     private static final String STATE_KEY_SELECTED_TAB = "selected_tab";
     private static final String STATE_KEY_BOTTOM_SHEET_STATE = "bottom_sheet_state";
-    private static final String STATE_KEY_ROUTE_CELL_VISIBILITY = "route_cell_visibility";
 
     private static final String PERMISSION_DIALOG_TAG = "dialog";
 
     @BindView(R.id.map_fragment_container)
     FrameLayout mapFragmentContainer;
+
+    @BindView(R.id.search_stops)
+    SearchStopsView searchStopsView;
 
     @BindView(R.id.bus_route_info)
     BusRouteCell busRouteCell;
@@ -110,10 +115,14 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
         initialActivityLoadFinished = savedInstanceState != null;
         setupMap(savedInstanceState);
-        setupBusRouteCell(savedInstanceState);
         setupGoogleApiClient();
         setupBottomNav(savedInstanceState);
         setupBottomSheet(savedInstanceState);
+        setupSearchStopsView();
+        setupBusRouteCell(savedInstanceState);
+
+        adjustViewMarginTop(searchStopsView);
+        adjustViewMarginTop(busRouteCell);
 
         // If google play services aren't available, then just remove the bottom nav callbacks.
         // It shouldn't matter that the above code has run; nothing will have busted.
@@ -193,23 +202,28 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         transmitMapPresenter = new TransmitMapPresenter(getInjector(), this);
     }
 
+    private void setupSearchStopsView() {
+
+        // TODO STUFF
+    }
+
     private void setupBusRouteCell(@Nullable Bundle savedInstanceState) {
 
         busRouteCell.setMarqueeEnabled(true);
-
-        // Adding a top margin so that we can avoid being occluded by the status bar.
-        // NOTE: Was having issues getting fitsSystemWindow to work for this in the xml layout file.
-        CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) busRouteCell.getLayoutParams();
-        lp.topMargin += ScreenUtil.getStatusBarHeightIfNeeded(this);
-        busRouteCell.setLayoutParams(lp);
-
+        busRouteCell.useEmptyStateView(true);
         busRouteCell.onRestoreInstanceState(savedInstanceState);
-        busRouteCell.setVisibility(savedInstanceState != null ?
-                savedInstanceState.getInt(STATE_KEY_ROUTE_CELL_VISIBILITY, View.GONE) :
-                View.GONE);
 
         // Just re-open the bus routes modal if we tap on this cell.
         busRouteCell.setOnCellClickedListener(busRoute -> onRoutesTabSelected(true));
+    }
+
+    private void adjustViewMarginTop(View v) {
+
+        // Adding a top margin so that we can avoid being occluded by the status bar.
+        // NOTE: Was having issues getting fitsSystemWindow to work for this in the xml layout file.
+        CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) v.getLayoutParams();
+        lp.topMargin += ScreenUtil.getStatusBarHeightIfNeeded(this);
+        v.setLayoutParams(lp);
     }
 
     private void setupGoogleApiClient() {
@@ -231,6 +245,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             bottomNavigation.setSelectedItemId(savedInstanceState.getInt(STATE_KEY_SELECTED_TAB));
         }
         bottomNavigation.setOnNavigationItemSelectedListener(this);
+        bottomNavigation.setOnNavigationItemReselectedListener(this);
     }
 
     /**
@@ -372,14 +387,18 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         }
     }
 
-    private void setBusRouteCellVisibility(boolean visible) {
-        busRouteCell.setVisibility(visible ?
+    private void showHeaderViewForTab(@IdRes int bottomTabId) {
+        searchStopsView.setVisibility(bottomTabId == R.id.search ?
                 View.VISIBLE :
                 View.GONE);
 
-        // We'll need to shift the top map elements downward so that they're not occluded by the
-        // bus route cell at the top.
-        transitMapFragment.setMapPaddingTop(visible ?
+        busRouteCell.setVisibility(bottomTabId == R.id.routes ?
+                View.VISIBLE :
+                View.GONE);
+
+        transitMapFragment.setMapPaddingTop(searchStopsView.getVisibility() == View.VISIBLE || busRouteCell.getVisibility() == View.VISIBLE ?
+                // We'll need to shift the top map elements downward so that they're not occluded
+                // by any of the header views.
                 getResources().getDimensionPixelSize(R.dimen.map_padding_top_offset) :
                 0);
     }
@@ -398,23 +417,34 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.search:
-                setBusRouteCellVisibility(false);
                 loadBusStopsAtUserLocationIfReady(true);
                 break;
             case R.id.my_stops:
-                setBusRouteCellVisibility(false);
                 transmitMapPresenter.loadSavedBusStops();
                 break;
             case R.id.routes:
+                // Reset the selected bus route.
+                busRouteCell.bind(null);
                 onRoutesTabSelected(true);
                 break;
             case R.id.settings:
-                setBusRouteCellVisibility(false);
                 showSettings();
                 break;
         }
+        showHeaderViewForTab(item.getItemId());
         setupFabVisibility(item.getItemId());
         return true;
+    }
+
+    @Override
+    public void onNavigationItemReselected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.routes) {
+            // If we've reselected the routes tab, then don't clear the current bus route.
+            onRoutesTabSelected(true);
+        } else {
+            // Reselecting any other tab works as expected.
+            onNavigationItemSelected(item);
+        }
     }
 
     @Override
@@ -430,6 +460,8 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
     @Override
     public void onMapReady() {
+        showHeaderViewForTab(bottomNavigation.getSelectedItemId());
+
         loadBusStopsAtUserLocationIfReady(false);
     }
 
@@ -460,7 +492,6 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         stopScheduleBottomSheet.onSaveInstanceState(outState);
         busRouteCell.onSaveInstanceState(outState);
 
-        outState.putInt(STATE_KEY_ROUTE_CELL_VISIBILITY, busRouteCell.getVisibility());
         outState.putBoolean(STATE_KEY_INITIAL_LOAD_FINISHED, initialMapLoadFinished);
         outState.putInt(STATE_KEY_SELECTED_TAB, bottomNavigation.getSelectedItemId());
         outState.putInt(STATE_KEY_BOTTOM_SHEET_STATE, bottomSheetScheduleBehavior.getState());
@@ -569,9 +600,8 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             onRoutesTabSelected(false);
             setupFabVisibility(bottomNavigation.getSelectedItemId());
         }
-
-        setBusRouteCellVisibility(true);
         busRouteCell.bind(busRoute);
+        showHeaderViewForTab(bottomNavigation.getSelectedItemId());
 
         transmitMapPresenter.loadBusStopsForBusRoute(busRoute);
     }

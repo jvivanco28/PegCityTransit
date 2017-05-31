@@ -7,6 +7,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <jessevivanco.com.pegcitytransit.ui.views.BusRouteTextView
@@ -30,6 +32,22 @@
             android:layout_toRightOf="@id/bus_route_number"
             android:layout_toStartOf="@+id/loading_view"
             android:textSize="@dimen/text_title"
+            tools:ignore="MissingPrefix"/>
+
+        <TextView
+            android:id="@+id/empty_state_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:paddingEnd="@dimen/material_spacing_medium"
+            android:paddingLeft="@dimen/material_spacing_medium"
+            android:paddingRight="@dimen/material_spacing_medium"
+            android:paddingStart="@dimen/material_spacing_medium"
+            android:text="@string/bus_route_empty_state"
+            android:textColor="?android:textColorHint"
+            android:textSize="@dimen/text_title"
+            android:visibility="gone"
             tools:ignore="MissingPrefix"/>
 
         <com.airbnb.lottie.LottieAnimationView

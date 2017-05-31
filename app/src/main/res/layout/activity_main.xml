@@ -25,6 +25,13 @@
                 android:layout_height="match_parent"
                 tools:context="jessevivanco.com.pegcitytransit.ui.activities.MainActivity"/>
 
+            <jessevivanco.com.pegcitytransit.ui.views.SearchStopsView
+                android:id="@+id/search_stops"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/bus_route_cell_height"
+                android:layout_margin="@dimen/material_spacing_small"
+                android:visibility="visible"/>
+
             <jessevivanco.com.pegcitytransit.ui.views.BusRouteCell
                 android:id="@+id/bus_route_info"
                 android:layout_width="match_parent"

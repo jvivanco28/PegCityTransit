@@ -34,8 +34,12 @@ public class BusRouteCell extends CardView implements View.OnClickListener {
     @BindView(R.id.loading_view)
     LottieAnimationView loadingView;
 
+    @BindView(R.id.empty_state_text)
+    TextView emptyStateView;
+
     private BusRouteViewModel busRoute;
     private OnBusRouteSelectedListener onBusRouteSelected;
+    private boolean useEmptyStateView;
 
     public BusRouteCell(Context context) {
         super(context);
@@ -50,6 +54,10 @@ public class BusRouteCell extends CardView implements View.OnClickListener {
     public BusRouteCell(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setup(attrs);
+    }
+
+    public void useEmptyStateView(boolean useEmptyStateView) {
+        this.useEmptyStateView = useEmptyStateView;
     }
 
     private void setup(@Nullable AttributeSet attrs) {
@@ -71,6 +79,8 @@ public class BusRouteCell extends CardView implements View.OnClickListener {
         this.busRoute = busRoute;
 
         if (busRoute != null) {
+            showEmptyStateView(false);
+
             busRouteName.setText(busRoute.getName());
             busRouteTextView.setBusRoute(busRoute);
             busRouteTextView.setOnClickListener(this);
@@ -78,6 +88,22 @@ public class BusRouteCell extends CardView implements View.OnClickListener {
             busRouteName.setText(null);
             busRouteTextView.setBusRoute(null);
             busRouteTextView.setOnClickListener(null);
+
+            if (useEmptyStateView) {
+                showEmptyStateView(true);
+            }
+        }
+    }
+
+    private void showEmptyStateView(boolean showEmptyStateView) {
+        if (showEmptyStateView) {
+            busRouteName.setVisibility(GONE);
+            busRouteTextView.setVisibility(GONE);
+            emptyStateView.setVisibility(VISIBLE);
+        } else {
+            busRouteName.setVisibility(VISIBLE);
+            busRouteTextView.setVisibility(VISIBLE);
+            emptyStateView.setVisibility(GONE);
         }
     }
 

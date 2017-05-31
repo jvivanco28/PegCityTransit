@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
+        android:paddingBottom="@dimen/material_spacing_x_small"
+        android:paddingEnd="@dimen/material_spacing_medium"
+        android:paddingLeft="@dimen/material_spacing_medium"
+        android:paddingRight="@dimen/material_spacing_medium"
+        android:paddingStart="@dimen/material_spacing_medium"
+        android:paddingTop="@dimen/material_spacing_x_small">
+
+        <com.joanzapata.iconify.widget.IconTextView
+            android:id="@+id/iconTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="{md-search}"
+            android:textColor="?android:textColorHint"
+            android:textSize="@dimen/text_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/search_field"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <EditText
+            android:id="@+id/search_field"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:hint="@string/stop_search_hint"
+            android:imeOptions="actionSearch|flagNoExtractUi"
+            android:inputType="textNoSuggestions"
+            android:maxLines="1"
+            android:paddingEnd="@dimen/material_spacing_small"
+            android:paddingLeft="@dimen/material_spacing_small"
+            android:paddingRight="@dimen/material_spacing_small"
+            android:paddingStart="@dimen/material_spacing_small"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/search_loading_view"
+            app:layout_constraintStart_toEndOf="@+id/iconTextView"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/search_loading_view"
+            android:layout_width="@dimen/lottie_loading_view_size"
+            android:layout_height="@dimen/lottie_loading_view_size"
+            android:layout_marginEnd="@dimen/material_spacing_small"
+            android:layout_marginRight="@dimen/material_spacing_small"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/clear_search"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_fileName="loading.json"
+            app:lottie_loop="true"/>
+
+        <com.joanzapata.iconify.widget.IconButton
+            android:id="@+id/clear_search"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/card_view_button"
+            android:gravity="center"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:text="{md-close}"
+            android:textSize="@dimen/text_title"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingPrefix"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</merge>
