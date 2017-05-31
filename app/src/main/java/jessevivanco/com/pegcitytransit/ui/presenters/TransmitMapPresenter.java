@@ -103,7 +103,7 @@ public class TransmitMapPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> {
                     viewContract.clearMarkers();
-                    // Imeediately focus on the drawn circle.
+                    // Immediately focus on the drawn circle.
                     viewContract.showSearchRadius(latitude, longitude, mapSearchRadius, true);
                     viewContract.showStopsLoadingIndicator(true);
                 })

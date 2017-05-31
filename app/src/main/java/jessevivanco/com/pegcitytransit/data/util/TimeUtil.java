@@ -34,6 +34,4 @@ final public class TimeUtil {
                     cal.get(Calendar.AM_PM) == Calendar.AM ? "am" : "pm");
         }
     }
-
-
 }
