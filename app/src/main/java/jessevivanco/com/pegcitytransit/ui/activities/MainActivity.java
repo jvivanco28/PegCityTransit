@@ -620,7 +620,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
             Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (lastKnownLocation != null) {
-                transitMapFragment.zoomAndReorientToLocation(lastKnownLocation.getLatitude(),
+                transitMapFragment.resetBearingAndZoomToLocation(lastKnownLocation.getLatitude(),
                         lastKnownLocation.getLongitude(),
                         getResources().getInteger(R.integer.default_my_location_map_zoom),
                         lastKnownLocation.getBearing());

@@ -225,23 +225,41 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     /**
      * Zooms to coordinates on the map.
      */
-    public void zoomAndReorientToLocation(double lat, double lng, float zoomScale, float bearing) {
+    public void resetBearingAndZoomToLocation(double lat, double lng, float zoomScale, float bearing) {
 
-        // NOTE: We're actually doing two separate camera animations here. When the camera is tilted,
-        // and we try to reset the camera, the origin seems to be slightly off. There's probably a
-        // reason, but I haven't been able to figure it out. Using this hacky solution for the time being.
-        CameraPosition cameraPosition = new CameraPosition(new LatLng(lat, lng), zoomScale, 0, bearing);
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), new GoogleMap.CancelableCallback() {
-            @Override
-            public void onFinish() {
-                zoomToLocation(lat, lng, zoomScale);
-            }
+        // NOTE: We're actually doing two separate camera animations here.
+        // If the camera is tilted or rotated (or both), the map origin will be slightly off. This
+        // is because the rotate and tilt axis are in the direct middle of the map with disregard
+        // to the padding that might be applied. Thus, we may need to do TWO camera updates:
+        // 1: Reset bearing and tilt.
+        // 2: Move to the coordinates and adjust zoom scale.
+        if (googleMap.getCameraPosition().bearing != 0 || googleMap.getCameraPosition().tilt != 0) {
+            CameraPosition cameraPosition = new CameraPosition(googleMap.getCameraPosition().target,
+                    googleMap.getCameraPosition().zoom,
+                    0,
+                    bearing);
 
-            @Override
-            public void onCancel() {
-                // Do nothing.
-            }
-        });
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
+                    getResources().getInteger(R.integer.reset_bearing_duration_millis),
+                    new GoogleMap.CancelableCallback() {
+
+                        @Override
+                        public void onFinish() {
+                            zoomToLocation(lat, lng, zoomScale);
+                        }
+
+                        @Override
+                        public void onCancel() {
+                            // Do nothing.
+                        }
+                    });
+        } else {
+            CameraPosition cameraPosition = new CameraPosition(new LatLng(lat, lng),
+                    zoomScale,
+                    0,
+                    bearing);
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        }
     }
 
     /**
