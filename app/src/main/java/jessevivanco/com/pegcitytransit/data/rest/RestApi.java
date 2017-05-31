@@ -23,14 +23,12 @@ import retrofit2.http.Query;
  */
 public interface RestApi {
 
+    /**
+     * Check service advisory. If "value" is "blue" or "red" then any results received through the
+     * Open Data Web Service may not be reliable.
+     */
     @GET("statuses/schedule.json")
     Single<ScheduleStatus> getScheduleStatus();
-
-    // TODO service-advisories.json?api-key=Y8zxUk0g73hxmlkHoDh
-    // getServiceAdvisories
-
-    // TODO https://api.winnipegtransit.com/v2/locations:quincy.json?api-key=Y8zxUk0g73hxmlkHoDh
-    // Search street name or landmark
 
     /**
      * Retrieves a list of bus stops at a location (given <code>longitude</code> and <code>latitude</code>) within

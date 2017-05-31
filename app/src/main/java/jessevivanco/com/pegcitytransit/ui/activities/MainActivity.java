@@ -1,6 +1,7 @@
 package jessevivanco.com.pegcitytransit.ui.activities;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -107,7 +108,6 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
 
-        // TODO check service advisories on startup
         initialActivityLoadFinished = savedInstanceState != null;
         setupMap(savedInstanceState);
         setupBusRouteCell(savedInstanceState);
@@ -121,6 +121,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             bottomNavigation.setOnNavigationItemSelectedListener(null);
             Snackbar.make(mapFragmentContainer, getString(R.string.error_google_play_services_missing), Snackbar.LENGTH_INDEFINITE).show();
         }
+        transmitMapPresenter.checkServiceAdvisories();
     }
 
     private boolean isGooglePlayServicesAvailable() {
@@ -381,6 +382,16 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         transitMapFragment.setMapPaddingTop(visible ?
                 getResources().getDimensionPixelSize(R.dimen.map_padding_top_offset) :
                 0);
+    }
+
+    @Override
+    public void showServiceAdvisoryWarningDialog(String title, String message) {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, null)
+                .create()
+                .show();
     }
 
     @Override

@@ -20,6 +20,7 @@ import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.data.repositories.BusRoutesRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.PreferencesRepository;
+import jessevivanco.com.pegcitytransit.data.rest.RestApi;
 import jessevivanco.com.pegcitytransit.data.util.DisposableUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
@@ -27,6 +28,9 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 public class TransmitMapPresenter {
 
     private static final String TAG = TransmitMapPresenter.class.getSimpleName();
+
+    private static final String SERVICE_ADVISORY_CODE_BLUE = "blue";
+    private static final String SERVICE_ADVISORY_CODE_RED = "red";
 
     /**
      * Default lat and long will only be used if the user has GPS disabled.
@@ -42,10 +46,13 @@ public class TransmitMapPresenter {
     @Inject
     PreferencesRepository preferencesRepository;
     @Inject
+    RestApi restApi;
+    @Inject
     Context context;
 
     private ViewContract viewContract;
 
+    private Disposable serviceAdvisorySubscription;
     private Disposable subscription;
 
     public TransmitMapPresenter(AppComponent injector, ViewContract viewContract) {
@@ -57,6 +64,28 @@ public class TransmitMapPresenter {
         DEFAULT_LAT = Double.parseDouble(context.getString(R.string.downtown_winnipeg_latitude));
         DEFAULT_LONG = Double.parseDouble(context.getString(R.string.downtown_winnipeg_longitude));
         SEARCH_AREA_MARKER_DELAY_MILLIS = context.getResources().getInteger(R.integer.search_area_marker_delay_millis);
+    }
+
+    public void checkServiceAdvisories() {
+
+        DisposableUtil.dispose(serviceAdvisorySubscription);
+
+        serviceAdvisorySubscription = restApi.getScheduleStatus()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        scheduleStatus -> {
+                            String statusCode = scheduleStatus.getStatus().getValue();
+
+                            // TODO Shoud we show the message from the status?
+                            if (statusCode.equals(SERVICE_ADVISORY_CODE_BLUE) || statusCode.equals(SERVICE_ADVISORY_CODE_RED)) {
+                                viewContract.showServiceAdvisoryWarningDialog(context.getString(R.string.warning),
+                                        Phrase.from(context.getString(R.string.service_advisory_warning)).put("code", statusCode).format().toString());
+                            }
+                        }, throwable -> {
+                            Log.e(TAG, "An error occurred while checking service advisory.", throwable);
+                        }
+                );
     }
 
     public void loadBusStopsAroundCoordinates(@Nullable Double latitude, @Nullable Double longitude) {
@@ -89,7 +118,7 @@ public class TransmitMapPresenter {
                             }
                         },
                         throwable -> {
-                            Log.e(TAG, context.getString(R.string.error_loading_bus_stops), throwable);
+                            Log.e(TAG, "An error occurred while searching bus stops.", throwable);
                             viewContract.showErrorMessage(context.getString(R.string.error_loading_bus_stops));
                         }
                 );
@@ -106,7 +135,10 @@ public class TransmitMapPresenter {
                             busStopFilter.setRoutes(busRoutes);
                             viewContract.showBusRoutesForStop(busStopFilter);
                         },
-                        throwable -> viewContract.showErrorMessage(context.getString(R.string.error_loading_bus_routes))
+                        throwable -> {
+                            Log.e(TAG, "An error occurred while loading the bus routes", throwable);
+                            viewContract.showErrorMessage(context.getString(R.string.error_loading_bus_routes));
+                        }
                 );
     }
 
@@ -163,9 +195,12 @@ public class TransmitMapPresenter {
      */
     public void tearDown() {
         DisposableUtil.dispose(subscription);
+        DisposableUtil.dispose(serviceAdvisorySubscription);
     }
 
     public interface ViewContract extends ErrorMessageViewContract {
+
+        void showServiceAdvisoryWarningDialog(String title, String message);
 
         void showBusStops(List<BusStopViewModel> busStops, long delayMarkerVisibilityMillis, boolean focusInMap);
 

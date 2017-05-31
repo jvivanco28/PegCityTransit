@@ -85,6 +85,9 @@
     <string name="no_saved_stops">You don\'t seem to have any saved stops yet.</string>
     <string name="no_schedule">No buses are scheduled to stop here at this time.</string>
 
+    <string name="warning">Warning!</string>
+    <string name="service_advisory_warning">Winnipeg Transit is reporting that code {code} priority service is currently in effect. Schedules may not be reliable at this time.</string>
+
     <string name="try_again">Try Again</string>
 
 </resources>
