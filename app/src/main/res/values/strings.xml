@@ -15,8 +15,7 @@
     <string name="default_font_path">fonts/bariol_regular.ttf</string>
 
     <!--    URLs    -->
-    <!--    See https://developers.google.com/maps/documentation/static-maps/intro  -->
-    <string name="static_map_url">https://maps.googleapis.com/maps/api/staticmap?center={center}&amp;zoom={zoom}&amp;size={width}x{height}&amp;markers={markers}&amp;scale=2&amp;key={key}</string>
+    <string name="search_stops_url">https://api.winnipegtransit.com/v2/stops:{query}.json</string>
 
     <!--    Permissions    -->
     <string name="location_permission_rationale">This app uses location services to find bus stops near your location. If the permission has been permanently denied, it can be enabled from System Settings &gt; Apps &gt; \'PegCityTransit\'.</string>
@@ -77,6 +76,7 @@
     <string name="generic_error">Sorry. An error occurred.</string>
     <string name="error_loading_bus_stops">Sorry. An error occurred while loading the bus stops in that area.</string>
     <string name="error_loading_bus_routes">Sorry. An error occurred while loading the bus routes.</string>
+    <string name="error_searching_for_bus_stops">Sorry. An error occurred while searching for bus stops.</string>
     <string name="error_loading_route">Sorry. An error occurred while loading bus route #{route}.</string>
     <string name="error_loading_schedule">Sorry. An error occurred while loading the schedule for that bus stop.</string>
     <string name="error_finding_location">Sorry. Unable to find your location.</string>
@@ -86,6 +86,7 @@
     <string name="no_bus_stops_in_that_area">Sorry. There are no bus stops in that area.</string>
     <string name="no_saved_stops">You don\'t seem to have any saved stops yet.</string>
     <string name="no_schedule">No buses are scheduled to stop here at this time.</string>
+    <string name="no_search_results">Sorry. Could not find any stops with the search query \"{query}\".</string>
 
     <string name="warning">Warning!</string>
     <string name="service_advisory_warning">Winnipeg Transit is reporting that code {code} priority service is currently in effect. Schedules may not be reliable at this time.</string>

@@ -194,4 +194,13 @@ public class BusStopRepository {
             }
         });
     }
+
+    public Single<List<BusStopViewModel>> searchBusStops(String query) {
+        return restApi.searchBusStops(Phrase.from(context.getString(R.string.search_stops_url)).put("query", query).format().toString())
+                .map(WinnipegTransitResponse::getElement)
+                .flatMapObservable(Observable::fromIterable)
+                // Create the view model. We're also setting a flag which tells us if the bus stop saved under "my stops".
+                .map(busStop -> BusStopViewModel.createFromBusStop(busStop, isBusStopSaved(busStop.getKey())))
+                .toList();
+    }
 }

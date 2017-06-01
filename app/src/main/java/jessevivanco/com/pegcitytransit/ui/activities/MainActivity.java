@@ -43,6 +43,7 @@ import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
 import jessevivanco.com.pegcitytransit.ui.fragments.PermissionDeniedDialog;
 import jessevivanco.com.pegcitytransit.ui.fragments.SettingsDialogFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment;
+import jessevivanco.com.pegcitytransit.ui.presenters.SearchStopsPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
 import jessevivanco.com.pegcitytransit.ui.util.PermissionUtils;
@@ -60,7 +61,8 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         OnBusRouteSelectedListener,
-        BusStopScheduleBottomSheet.OnFavStopRemovedListener {
+        BusStopScheduleBottomSheet.OnFavStopRemovedListener,
+        SearchStopsPresenter.ViewContract {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -171,6 +173,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     protected void onDestroy() {
         transmitMapPresenter.tearDown();
         stopScheduleBottomSheet.tearDown();
+        searchStopsView.tearDown();
         super.onDestroy();
     }
 
@@ -203,8 +206,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     }
 
     private void setupSearchStopsView() {
-
-        // TODO STUFF
+        searchStopsView.initialize(getInjector(), this);
     }
 
     private void setupBusRouteCell(@Nullable Bundle savedInstanceState) {
@@ -635,6 +637,19 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             transmitMapPresenter.loadSavedBusStops();
             bottomSheetScheduleBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         }
+    }
+
+    @Override
+    public void showSearchStopResults(List<BusStopViewModel> results) {
+        clearSearchRadius();
+        clearMarkers();
+        showBusStops(results, 0, true);
+    }
+
+
+    @Override
+    public void showSearchBarProgressIndicator(boolean visible) {
+        searchStopsView.showLoadingIndicator(visible);
     }
 
     /**

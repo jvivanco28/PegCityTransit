@@ -11,6 +11,7 @@ import jessevivanco.com.pegcitytransit.ui.fragments.SettingsDialogFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusRoutesPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
+import jessevivanco.com.pegcitytransit.ui.presenters.SearchStopsPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 
 /**
@@ -37,4 +38,5 @@ public interface AppComponent {
 
     void injectInto(SettingsDialogFragment target);
 
+    void injectInto(SearchStopsPresenter target);
 }

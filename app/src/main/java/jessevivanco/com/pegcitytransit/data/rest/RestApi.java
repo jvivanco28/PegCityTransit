@@ -15,6 +15,7 @@ import jessevivanco.com.pegcitytransit.data.rest.models.base.WinnipegTransitResp
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.Url;
 
 /**
  * Winnipeg Transits' open API.
@@ -59,6 +60,14 @@ public interface RestApi {
      */
     @GET("stops/{bus_stop}/schedule.json")
     Single<WinnipegTransitResponse<StopSchedule>> getBusStopSchedule(@Path("bus_stop") Long busStopKey);
+
+    /**
+     * Search for a list of bus stops. The query can be the bus stop number, street name, or landmark.
+     * SPECIAL NOTE: We'll get an error if we use the query path @GET("stops:{query}.json") b/c
+     * that's an invalid format. We can get around this by using dynamic URLs in Retrofit though.
+     */
+    @GET
+    Single<WinnipegTransitResponse<List<BusStop>>> searchBusStops(@Url String searchUrl);
 
     /**
      * Retrieves a list of bus routes for a given bus stop.
