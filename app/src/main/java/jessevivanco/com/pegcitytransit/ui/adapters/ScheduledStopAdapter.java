@@ -16,6 +16,7 @@ import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 public class ScheduledStopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String STATE_KEY_LIST = ScheduledStopAdapter.class.getSimpleName() + "_list";
+    private static final String STATE_KEY_QUERY_TIME = ScheduledStopAdapter.class.getSimpleName() + "_checked_time";
 
     private static final int VIEW_TYPE_QUERY_TIME = QueryTimeCellViewHolder.getLayoutResId();
     private static final int VIEW_TYPE_SCHEDULE = ScheduledStopCellViewHolder.getLayoutResId();
@@ -29,6 +30,7 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         if (savedInstanceState != null) {
             list = Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_LIST));
+            queryTime = savedInstanceState.getString(STATE_KEY_QUERY_TIME);
         }
     }
 
@@ -71,6 +73,7 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void onSaveInstanceState(Bundle outState) {
         if (list != null) {
             outState.putParcelable(STATE_KEY_LIST, Parcels.wrap(list));
+            outState.putString(STATE_KEY_QUERY_TIME, queryTime);
         }
     }
 
