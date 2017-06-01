@@ -376,8 +376,11 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         googleMap.setOnInfoWindowClickListener(this);
         googleMap.setOnInfoWindowCloseListener(this);
 
+
         setMapPaddingTop(0);
 
+        // Remove indoor maps
+        googleMap.setIndoorEnabled(false);
         // Hide the "my location" button.
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         // Hide the "toolbar" buttons
