@@ -651,6 +651,11 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     public void showSearchBarProgressIndicator(boolean visible) {
         searchStopsView.showLoadingIndicator(visible);
+
+        // We're also going to dismiss the bottom sheet if its open b/c it should not longer apply
+        if (visible) {
+            bottomSheetScheduleBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        }
     }
 
     /**
