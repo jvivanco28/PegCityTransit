@@ -419,6 +419,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.search:
+                searchStopsView.clearSearch();
                 loadBusStopsAtUserLocationIfReady(true);
                 break;
             case R.id.my_stops:
@@ -658,6 +659,9 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @OnClick(R.id.search_bus_stops_fab)
     public void searchForBusStops() {
         if (transitMapFragment.isMapReady()) {
+
+            searchStopsView.clearSearch();
+
             LatLng cameraPosition = transitMapFragment.getCameraPosition();
             transmitMapPresenter.loadBusStopsAroundCoordinates(cameraPosition.latitude, cameraPosition.longitude);
         } else {
@@ -673,8 +677,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             if (lastKnownLocation != null) {
                 transitMapFragment.resetBearingAndZoomToLocation(lastKnownLocation.getLatitude(),
                         lastKnownLocation.getLongitude(),
-                        getResources().getInteger(R.integer.default_my_location_map_zoom),
-                        lastKnownLocation.getBearing());
+                        getResources().getInteger(R.integer.default_my_location_map_zoom));
             } else {
                 showErrorMessage(getString(R.string.error_finding_location));
                 Log.e(TAG, "Last known location is null.");

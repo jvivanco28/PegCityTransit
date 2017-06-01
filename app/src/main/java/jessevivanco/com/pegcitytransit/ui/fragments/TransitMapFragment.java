@@ -225,7 +225,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     /**
      * Zooms to coordinates on the map.
      */
-    public void resetBearingAndZoomToLocation(double lat, double lng, float zoomScale, float bearing) {
+    public void resetBearingAndZoomToLocation(double lat, double lng, float zoomScale) {
 
         // NOTE: We're actually doing two separate camera animations here.
         // If the camera is tilted or rotated (or both), the map origin will be slightly off. This
@@ -237,7 +237,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
             CameraPosition cameraPosition = new CameraPosition(googleMap.getCameraPosition().target,
                     googleMap.getCameraPosition().zoom,
                     0,
-                    bearing);
+                    0);
 
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
                     getResources().getInteger(R.integer.reset_bearing_duration_millis),
@@ -257,7 +257,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
             CameraPosition cameraPosition = new CameraPosition(new LatLng(lat, lng),
                     zoomScale,
                     0,
-                    bearing);
+                    0);
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }

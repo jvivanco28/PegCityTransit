@@ -27,6 +27,9 @@ final public class TimeUtil {
                     hours,
                     minutes);
         } else {
+            // If hours == 0, make sure we change that to 12.
+            if (hours == 0) hours = 12;
+
             return String.format(Locale.getDefault(),
                     "%2d:%02d %s",
                     hours,
