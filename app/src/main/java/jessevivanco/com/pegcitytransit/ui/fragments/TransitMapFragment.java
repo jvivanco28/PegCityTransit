@@ -149,6 +149,34 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     }
 
     /**
+     * Zooms to coordinates on the map.
+     */
+    private void zoomToLocation(double lat, double lng, float zoomScale) {
+
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), zoomScale));
+    }
+
+    private void zoomToBounds(LatLngBounds bounds) {
+        int width = getResources().getDisplayMetrics().widthPixels;
+        int height = getResources().getDisplayMetrics().heightPixels;
+        int padding = (int) (width * MARKER_PADDING_RATIO); // offset from edges of the map 10% of screen
+
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding));
+    }
+
+    private void resetBearingAndTilt(GoogleMap.CancelableCallback cameraMoveCallback) {
+
+        CameraPosition cameraPosition = new CameraPosition(googleMap.getCameraPosition().target,
+                googleMap.getCameraPosition().zoom,
+                0,
+                0);
+
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
+                getResources().getInteger(R.integer.reset_bearing_duration_millis),
+                cameraMoveCallback);
+    }
+
+    /**
      * Clears all markers on the map.
      */
     public void clearMarkers() {
@@ -210,16 +238,37 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         searchArea = googleMap.addCircle(circleOptions);
 
         if (focusOnArea) {
-            zoomToBounds(getLatLngBoundsOfCircle(searchArea.getCenter(), searchArea.getRadius()));
+            resetBearingAndZoomToBounds(getLatLngBoundsOfCircle(searchArea.getCenter(), searchArea.getRadius()));
         }
     }
 
     /**
-     * Zooms to coordinates on the map.
+     * Zooms to the provided bounding box on the map. Zooms as close as possible to the bounding box
+     * such that the entire box is still visible.
      */
-    public void zoomToLocation(double lat, double lng, float zoomScale) {
+    public void resetBearingAndZoomToBounds(final LatLngBounds bounds) {
 
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), zoomScale));
+        // NOTE: We're actually doing two separate camera animations here.
+        // If the camera is tilted or rotated (or both), the map origin will be slightly off. This
+        // is because the rotate and tilt axis are in the direct middle of the map with disregard
+        // to the padding that might be applied. Thus, we may need to do TWO camera updates:
+        // 1: Reset bearing and tilt.
+        // 2: Move to the bounds and adjust zoom scale.
+        if (googleMap.getCameraPosition().bearing != 0 || googleMap.getCameraPosition().tilt != 0) {
+            resetBearingAndTilt(new GoogleMap.CancelableCallback() {
+                @Override
+                public void onFinish() {
+                    zoomToBounds(bounds);
+                }
+
+                @Override
+                public void onCancel() {
+                    // Do nothing.
+                }
+            });
+        } else {
+            zoomToBounds(bounds);
+        }
     }
 
     /**
@@ -234,45 +283,20 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         // 1: Reset bearing and tilt.
         // 2: Move to the coordinates and adjust zoom scale.
         if (googleMap.getCameraPosition().bearing != 0 || googleMap.getCameraPosition().tilt != 0) {
-            CameraPosition cameraPosition = new CameraPosition(googleMap.getCameraPosition().target,
-                    googleMap.getCameraPosition().zoom,
-                    0,
-                    0);
+            resetBearingAndTilt(new GoogleMap.CancelableCallback() {
+                @Override
+                public void onFinish() {
+                    zoomToLocation(lat, lng, zoomScale);
+                }
 
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
-                    getResources().getInteger(R.integer.reset_bearing_duration_millis),
-                    new GoogleMap.CancelableCallback() {
-
-                        @Override
-                        public void onFinish() {
-                            zoomToLocation(lat, lng, zoomScale);
-                        }
-
-                        @Override
-                        public void onCancel() {
-                            // Do nothing.
-                        }
-                    });
+                @Override
+                public void onCancel() {
+                    // Do nothing.
+                }
+            });
         } else {
-            CameraPosition cameraPosition = new CameraPosition(new LatLng(lat, lng),
-                    zoomScale,
-                    0,
-                    0);
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            zoomToLocation(lat, lng, zoomScale);
         }
-    }
-
-    /**
-     * Zooms to the provided bounding box on the map. Zooms as close as possible to the bounding box
-     * such that the entire box is still visible.
-     */
-    public void zoomToBounds(LatLngBounds bounds) {
-
-        int width = getResources().getDisplayMetrics().widthPixels;
-        int height = getResources().getDisplayMetrics().heightPixels;
-        int padding = (int) (width * MARKER_PADDING_RATIO); // offset from edges of the map 10% of screen
-
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding));
     }
 
     /**
@@ -312,7 +336,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
             }
 
             if (searchArea != null || busStops.size() > 1) {
-                zoomToBounds(bounds);
+                resetBearingAndZoomToBounds(bounds);
             } else {
                 // If there's only ony marker and no search area, then we definitely don't need to
                 // zoom to MAX.
