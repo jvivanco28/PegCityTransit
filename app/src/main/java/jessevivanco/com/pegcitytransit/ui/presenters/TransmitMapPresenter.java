@@ -38,6 +38,7 @@ public class TransmitMapPresenter {
     private final double DEFAULT_LAT;
     private final double DEFAULT_LONG;
     private final long SEARCH_AREA_MARKER_DELAY_MILLIS;
+    private final int MAX_MARKERS_WITH_DELAY;
 
     @Inject
     BusStopRepository stopsRepository;
@@ -64,6 +65,7 @@ public class TransmitMapPresenter {
         DEFAULT_LAT = Double.parseDouble(context.getString(R.string.downtown_winnipeg_latitude));
         DEFAULT_LONG = Double.parseDouble(context.getString(R.string.downtown_winnipeg_longitude));
         SEARCH_AREA_MARKER_DELAY_MILLIS = context.getResources().getInteger(R.integer.search_area_marker_delay_millis);
+        MAX_MARKERS_WITH_DELAY = context.getResources().getInteger(R.integer.max_markers_with_delay);
     }
 
     public void checkServiceAdvisories() {
@@ -112,7 +114,7 @@ public class TransmitMapPresenter {
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
                                 // Don't need to focus on the area a second time. Just show the markers.
-                                viewContract.showBusStops(busStops, SEARCH_AREA_MARKER_DELAY_MILLIS, false);
+                                viewContract.showBusStops(busStops, getMarkerDelayMillis(busStops.size()), false);
                             } else {
                                 viewContract.showErrorMessage(context.getString(R.string.no_bus_stops_in_that_area));
                             }
@@ -176,7 +178,7 @@ public class TransmitMapPresenter {
                 .subscribe(
                         busStops -> {
                             if (busStops != null && busStops.size() > 0) {
-                                viewContract.showBusStops(busStops, SEARCH_AREA_MARKER_DELAY_MILLIS, true);
+                                viewContract.showBusStops(busStops, getMarkerDelayMillis(busStops.size()), true);
                             } else {
                                 viewContract.showErrorMessage(context.getString(R.string.no_saved_stops));
                             }
@@ -196,6 +198,15 @@ public class TransmitMapPresenter {
     public void tearDown() {
         DisposableUtil.dispose(subscription);
         DisposableUtil.dispose(serviceAdvisorySubscription);
+    }
+
+    /**
+     * @return
+     */
+    private long getMarkerDelayMillis(int stopCount) {
+        return stopCount <= MAX_MARKERS_WITH_DELAY ?
+                SEARCH_AREA_MARKER_DELAY_MILLIS :
+                0;
     }
 
     public interface ViewContract extends ErrorMessageViewContract {
