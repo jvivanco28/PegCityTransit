@@ -46,7 +46,7 @@
             android:paddingStart="@dimen/material_spacing_medium"
             android:text="@string/bus_route_empty_state"
             android:textColor="?android:textColorHint"
-            android:textSize="@dimen/text_title"
+            android:textSize="@dimen/text_medium"
             android:visibility="gone"
             tools:ignore="MissingPrefix"/>
 

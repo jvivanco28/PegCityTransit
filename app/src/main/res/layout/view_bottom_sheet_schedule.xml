@@ -48,8 +48,8 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:textColor="@color/colorPrimaryLight"
-                android:text="{md-refresh}"/>
+                android:text="{md-refresh}"
+                android:textColor="@color/colorPrimaryLight"/>
 
             <TextView
                 android:id="@+id/bottom_sheet_toolbar_title"

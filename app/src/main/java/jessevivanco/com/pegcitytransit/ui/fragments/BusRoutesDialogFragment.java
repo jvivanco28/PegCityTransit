@@ -1,11 +1,12 @@
 package jessevivanco.com.pegcitytransit.ui.fragments;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -54,23 +55,20 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
     private OneShotAnimatedLinearLayoutManager layoutManager;
     private BusRoutesAdapter routesAdapter;
     private BusRoutesPresenter routesPresenter;
-    private OnBusRouteSelectedListener listener;
+    private OnBusRouteSelectedListener onBusRouteSelectedListener;
     private ViewState viewState;
 
     public static BusRoutesDialogFragment newInstance() {
         return new BusRoutesDialogFragment();
     }
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.dialog_bus_routes, container, false);
-    }
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
+        View contentView = View.inflate(getContext(), R.layout.dialog_bus_routes, null);
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
+        dialog.setContentView(contentView);
+        ButterKnife.bind(this, contentView);
 
         setupAdapter(savedInstanceState);
         setupRecyclerView();
@@ -80,6 +78,7 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
         if (savedInstanceState == null) {
             routesPresenter.loadAllBusRoutes();
         }
+        return dialog;
     }
 
     /**
@@ -91,7 +90,7 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
         super.onAttach(context);
 
         if (context instanceof OnBusRouteSelectedListener) {
-            listener = (OnBusRouteSelectedListener) context;
+            onBusRouteSelectedListener = (OnBusRouteSelectedListener) context;
         } else {
             throw new IllegalStateException("Hosting activity must implement " + OnBusRouteSelectedListener.class.getSimpleName());
         }
@@ -109,7 +108,7 @@ public class BusRoutesDialogFragment extends BottomSheetDialogFragment implement
 
     private void setupAdapter(Bundle savedInstanceState) {
         routesPresenter = new BusRoutesPresenter(((PegCityTransitApp) getActivity().getApplication()).getInjector(), this);
-        routesAdapter = new BusRoutesAdapter(savedInstanceState, listener);
+        routesAdapter = new BusRoutesAdapter(savedInstanceState, onBusRouteSelectedListener);
     }
 
     private void setupRecyclerView() {

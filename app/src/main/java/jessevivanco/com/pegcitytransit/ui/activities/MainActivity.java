@@ -11,10 +11,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.MenuItem;
@@ -269,6 +271,13 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         }
     }
 
+    /**
+     * Displays the crosshair overlay on the map if the selected bottom nav tab is the "Search" tab.
+     */
+    private void setCrosshairOverlay(int selectedTabItemId) {
+        transitMapFragment.showCrosshairOverlay(selectedTabItemId == R.id.search);
+    }
+
     private void setupBottomSheet(@Nullable Bundle savedInstanceState) {
 
         stopScheduleBottomSheet.initialize(this, this, savedInstanceState, getInjector());
@@ -417,10 +426,12 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
         switch (item.getItemId()) {
             case R.id.search:
                 searchStopsView.clearSearch();
-                loadBusStopsAtUserLocationIfReady(true);
+                clearMarkers();
+                clearSearchRadius();
                 break;
             case R.id.my_stops:
                 transmitMapPresenter.loadSavedBusStops();
@@ -436,6 +447,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         }
         showHeaderViewForTab(item.getItemId());
         setupFabVisibility(item.getItemId());
+        setCrosshairOverlay(item.getItemId());
         return true;
     }
 
@@ -444,6 +456,10 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         if (item.getItemId() == R.id.routes) {
             // If we've reselected the routes tab, then don't clear the current bus route.
             onRoutesTabSelected(true);
+        } else if (item.getItemId() == R.id.search) {
+            // If we've reselected the search tab, then search for bus stops around the user's location.
+            searchStopsView.clearSearch();
+            loadBusStopsAtUserLocationIfReady(true);
         } else {
             // Reselecting any other tab works as expected.
             onNavigationItemSelected(item);
@@ -464,6 +480,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     public void onMapReady() {
         showHeaderViewForTab(bottomNavigation.getSelectedItemId());
+        setCrosshairOverlay(bottomNavigation.getSelectedItemId());
 
         loadBusStopsAtUserLocationIfReady(false);
     }
@@ -586,7 +603,15 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         // Close any open bottom sheets (this method can be called from both the routes bottom sheet and the schedule bottom sheet).
         if (busRoutesModal != null) {
             busRoutesModal.dismissAllowingStateLoss();
+        } else {
+            // If we rotated the devices, our local reference to the modal will be null, but it might
+            // actually still be visible on screen. Find the modal by its tag and dismiss it that way.
+            Fragment modal = getSupportFragmentManager().findFragmentByTag(BusRoutesDialogFragment.TAG);
+            if (modal != null && modal instanceof BottomSheetDialogFragment) {
+                ((BottomSheetDialogFragment) modal).dismissAllowingStateLoss();
+            }
         }
+
         if (bottomSheetScheduleBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
             bottomSheetScheduleBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         }
@@ -605,7 +630,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         }
         busRouteCell.bind(busRoute);
         showHeaderViewForTab(bottomNavigation.getSelectedItemId());
-
+        setCrosshairOverlay(bottomNavigation.getSelectedItemId());
         transmitMapPresenter.loadBusStopsForBusRoute(busRoute);
     }
 

@@ -363,6 +363,10 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         crosshairOverlay.setLayoutParams(crosshairLayoutParams);
     }
 
+    public void showCrosshairOverlay(boolean visible) {
+        crosshairOverlay.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
     @Override
     public void onMapReady(final GoogleMap googleMap) {
 
