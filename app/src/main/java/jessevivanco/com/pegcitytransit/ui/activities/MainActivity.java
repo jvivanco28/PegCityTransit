@@ -390,9 +390,11 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
             Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
-            transmitMapPresenter.loadBusStopsAroundCoordinates(lastKnownLocation != null ? lastKnownLocation.getLatitude() : null,
-                    lastKnownLocation != null ? lastKnownLocation.getLongitude() : null);
-
+            if (lastKnownLocation != null) {
+                transmitMapPresenter.loadBusStopsAroundCoordinates(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+            } else {
+                showErrorMessage(getString(R.string.error_finding_location));
+            }
             // Raise this flag. We don't need to search for bus stops on every orientation change.
             initialMapLoadFinished = true;
         }

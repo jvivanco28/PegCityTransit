@@ -2,7 +2,6 @@ package jessevivanco.com.pegcitytransit.ui.presenters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -32,11 +31,6 @@ public class TransmitMapPresenter {
     private static final String SERVICE_ADVISORY_CODE_BLUE = "blue";
     private static final String SERVICE_ADVISORY_CODE_RED = "red";
 
-    /**
-     * Default lat and long will only be used if the user has GPS disabled.
-     */
-    private final double DEFAULT_LAT;
-    private final double DEFAULT_LONG;
     private final long SEARCH_AREA_MARKER_DELAY_MILLIS;
     private final int MAX_MARKERS_WITH_DELAY;
 
@@ -61,9 +55,6 @@ public class TransmitMapPresenter {
 
         this.viewContract = viewContract;
 
-        // Load out default lat and long values.
-        DEFAULT_LAT = Double.parseDouble(context.getString(R.string.downtown_winnipeg_latitude));
-        DEFAULT_LONG = Double.parseDouble(context.getString(R.string.downtown_winnipeg_longitude));
         SEARCH_AREA_MARKER_DELAY_MILLIS = context.getResources().getInteger(R.integer.search_area_marker_delay_millis);
         MAX_MARKERS_WITH_DELAY = context.getResources().getInteger(R.integer.max_markers_with_delay);
     }
@@ -90,7 +81,7 @@ public class TransmitMapPresenter {
                 );
     }
 
-    public void loadBusStopsAroundCoordinates(@Nullable Double latitude, @Nullable Double longitude) {
+    public void loadBusStopsAroundCoordinates(@NonNull Double latitude, @NonNull Double longitude) {
 
         DisposableUtil.dispose(subscription);
 
@@ -98,8 +89,8 @@ public class TransmitMapPresenter {
 
         // NOTE: If lat, long, and radius are not supplied, then we just resort to the default values.
         subscription = stopsRepository.getBusStopsNearLocation(
-                latitude != null ? latitude : DEFAULT_LAT,
-                longitude != null ? longitude : DEFAULT_LONG,
+                latitude,
+                longitude,
                 mapSearchRadius)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
