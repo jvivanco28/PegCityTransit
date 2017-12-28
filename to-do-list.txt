@@ -1,2 +1,3 @@
 * Increase GET timeout for fetching stops for a bus route.
 * make bottom sheets consume all swipes so that the touches don’t get delegated to the maps behind it.
+* Rate widget.
