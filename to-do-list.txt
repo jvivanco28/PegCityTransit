@@ -1,3 +1,5 @@
 * Increase GET timeout for fetching stops for a bus route.
 * make bottom sheets consume all swipes so that the touches don’t get delegated to the maps behind it.
 * Rate widget.
+* Show wifi icon on scheduled stop if that bus has wifi
+* Use request query time instead of System time.
