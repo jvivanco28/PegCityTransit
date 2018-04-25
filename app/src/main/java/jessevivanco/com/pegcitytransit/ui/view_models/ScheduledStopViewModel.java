@@ -35,7 +35,8 @@ public class ScheduledStopViewModel {
                                                                  RouteCoverage routeCoverage,
                                                                  ScheduledStop scheduledStop,
                                                                  final int MAX_RELATIVE_MINUTES,
-                                                                 boolean use24HourTime) {
+                                                                 boolean use24HourTime,
+                                                                 Date queryTime) {
 
         if (routeNumber == null || scheduledStop == null) {
             return null;
@@ -47,7 +48,7 @@ public class ScheduledStopViewModel {
             @ColorInt int statusColor;
 
             // Set our departure time text.
-            long timeDiffInMillis = scheduledStop.getTimes().getDeparture().getEstimated().getTime() - System.currentTimeMillis();
+            long timeDiffInMillis = scheduledStop.getTimes().getDeparture().getEstimated().getTime() - queryTime.getTime();
             long minutes = TimeUnit.MILLISECONDS.toMinutes(timeDiffInMillis);
 
             departureTime = scheduledStop.getTimes().getDeparture().getEstimated();

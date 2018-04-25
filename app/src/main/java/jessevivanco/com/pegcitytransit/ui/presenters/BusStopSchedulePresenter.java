@@ -4,9 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
-import com.squareup.phrase.Phrase;
 
-import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -21,7 +19,6 @@ import jessevivanco.com.pegcitytransit.data.repositories.BusStopRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.BusStopScheduleRepository;
 import jessevivanco.com.pegcitytransit.data.repositories.PreferencesRepository;
 import jessevivanco.com.pegcitytransit.data.util.DisposableUtil;
-import jessevivanco.com.pegcitytransit.data.util.TimeUtil;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusRouteViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
@@ -65,17 +62,12 @@ public class BusStopSchedulePresenter {
                     viewContract.showViewState(ViewState.LOADING);
                 })
                 .subscribe(
-                        scheduledStops -> {
-                            if (scheduledStops.size() == 0) {
+                        busStopScheduleViewModel -> {
+                            if (busStopScheduleViewModel.getScheduledStops().size() == 0) {
                                 viewContract.showErrorMessage(context.getString(R.string.no_schedule));
                                 viewContract.showViewState(ViewState.ERROR);
                             } else {
-                                String queryTimeFormatted = Phrase.from(context.getString(R.string.checked_at))
-                                        .put("time", TimeUtil.getTimeFormatted(Calendar.getInstance(), preferencesRepository.isUsing24HourClock()))
-                                        .format()
-                                        .toString();
-
-                                viewContract.setScheduledStops(scheduledStops, queryTimeFormatted);
+                                viewContract.setScheduledStops(busStopScheduleViewModel.getScheduledStops(), busStopScheduleViewModel.getQueryTime());
                                 viewContract.showViewState(ViewState.LIST);
                             }
                         },
