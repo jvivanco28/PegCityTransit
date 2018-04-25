@@ -2,6 +2,7 @@ package jessevivanco.com.pegcitytransit.ui.view_models;
 
 import android.content.Context;
 import android.support.annotation.ColorInt;
+import android.util.Log;
 
 import com.squareup.phrase.Phrase;
 
@@ -26,6 +27,7 @@ public class ScheduledStopViewModel {
         departureTime = builder.departureTime;
         status = builder.status;
         statusColor = builder.statusColor;
+        hasWifi = builder.hasWifi;
     }
 
     public static ScheduledStopViewModel createFromRouteSchedule(Context context,
@@ -34,6 +36,7 @@ public class ScheduledStopViewModel {
                                                                  ScheduledStop scheduledStop,
                                                                  final int MAX_RELATIVE_MINUTES,
                                                                  boolean use24HourTime) {
+
         if (routeNumber == null || scheduledStop == null) {
             return null;
         } else {
@@ -60,6 +63,7 @@ public class ScheduledStopViewModel {
                                             .toString() :
                                     TimeUtil.getTimeFormatted(scheduledStop.getTimes().getDeparture().getEstimated(), use24HourTime);
 
+
             if (scheduledStop.getTimes().getDeparture().getEstimated().getTime() > scheduledStop.getTimes().getDeparture().getScheduled().getTime()) {
                 status = context.getString(R.string.late);
                 statusColor = context.getResources().getColor(R.color.late);
@@ -78,6 +82,7 @@ public class ScheduledStopViewModel {
                     .departureTime(departureTime)
                     .status(status)
                     .statusColor(statusColor)
+                    .hasWifi(scheduledStop.getBus() != null && scheduledStop.getBus().hasWifi())
                     .build();
         }
     }
@@ -90,6 +95,7 @@ public class ScheduledStopViewModel {
     String status;
     @ColorInt
     int statusColor;
+    boolean hasWifi;
 
     public ScheduledStopViewModel() {
     }
@@ -118,6 +124,10 @@ public class ScheduledStopViewModel {
         return departureTime;
     }
 
+    public boolean isHasWifi() {
+        return hasWifi;
+    }
+
     @ColorInt
     public int getStatusColor() {
         return statusColor;
@@ -132,6 +142,7 @@ public class ScheduledStopViewModel {
         private Date departureTime;
         @ColorInt
         int statusColor;
+        boolean hasWifi;
 
         public Builder() {
         }
@@ -168,6 +179,11 @@ public class ScheduledStopViewModel {
 
         public Builder departureTime(Date val) {
             departureTime = val;
+            return this;
+        }
+
+        public Builder hasWifi(boolean val) {
+            hasWifi = val;
             return this;
         }
 

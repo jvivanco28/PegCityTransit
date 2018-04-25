@@ -7,17 +7,24 @@ public class Bus {
 
     @SerializedName("bike-rack")
     @Expose
-    String bikeRack;
+    boolean bikeRack;
     @SerializedName("easy-access")
     @Expose
-    String easyAccess;
+    boolean easyAccess;
+    @SerializedName("wifi")
+    @Expose
+    boolean wifi;
 
-    public String getBikeRack() {
+    public boolean getBikeRack() {
         return bikeRack;
     }
 
-    public String getEasyAccess() {
+    public boolean getEasyAccess() {
         return easyAccess;
+    }
+
+    public boolean hasWifi() {
+        return wifi;
     }
 
     @Override
@@ -25,6 +32,7 @@ public class Bus {
         return "Bus{" +
                 "bikeRack='" + bikeRack + '\'' +
                 ", easyAccess='" + easyAccess + '\'' +
+                ", wifi='" + wifi + '\'' +
                 '}';
     }
 }

@@ -35,4 +35,7 @@
     <color name="crosshair">#7700796B</color>
 
     <color name="text_secondary">#757575</color>
+
+    <color name="wifi">#0179bf</color>
+
 </resources>

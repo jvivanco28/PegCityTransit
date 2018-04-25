@@ -29,7 +29,6 @@ public class BusStopScheduleRepository {
 
         return restApi.getBusStopSchedule(busStopKey)
                 .map(WinnipegTransitResponse::getElement)
-
                 // Iterate all routes...
                 .flatMapObservable(stopSchedule -> Observable.fromIterable(stopSchedule.getRouteSchedules()))
                 // ... and each scheduled stop...

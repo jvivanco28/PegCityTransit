@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cell_container"
@@ -26,7 +25,7 @@
             <jessevivanco.com.pegcitytransit.ui.views.BusRouteTextView
                 android:id="@+id/route_number"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/route_name"
@@ -37,14 +36,14 @@
                 android:layout_marginLeft="@dimen/material_spacing_small"
                 android:layout_marginStart="@dimen/material_spacing_small"
                 android:ellipsize="end"
-                android:textSize="@dimen/text_title"/>
+                android:textSize="@dimen/text_title" />
 
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/stroke_width"
-            android:background="@color/divider"/>
+            android:background="@color/divider" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -61,7 +60,24 @@
                 fontPath="fonts/bariol_bold.ttf"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/text_title"/>
+                android:textSize="@dimen/text_title"
+                tools:text="Departs in 5 minutes" />
+
+            <com.joanzapata.iconify.widget.IconTextView
+                android:id="@+id/has_wifi"
+                fontPath="fonts/bariol_bold.ttf"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/material_spacing_small"
+                android:layout_marginStart="@dimen/material_spacing_small"
+                android:layout_toEndOf="@id/departure_time"
+                android:layout_toRightOf="@id/departure_time"
+                android:text="{md-wifi}"
+                android:textColor="@color/wifi"
+                android:textSize="@dimen/text_title"
+                android:visibility="gone"
+                tools:text="A" />
 
             <TextView
                 android:id="@+id/status"
@@ -71,7 +87,7 @@
                 android:layout_alignParentRight="true"
                 android:textAllCaps="true"
                 android:textSize="@dimen/text_title"
-                tools:ignore="MissingPrefix"/>
+                tools:ignore="MissingPrefix" />
 
         </RelativeLayout>
     </LinearLayout>
