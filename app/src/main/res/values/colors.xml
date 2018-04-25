@@ -36,6 +36,6 @@
 
     <color name="text_secondary">#757575</color>
 
-    <color name="wifi">#0179bf</color>
+    <color name="wifi">@color/colorPrimary</color>
 
 </resources>

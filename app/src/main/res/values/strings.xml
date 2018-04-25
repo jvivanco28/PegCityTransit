@@ -33,7 +33,7 @@
     <string name="settings_toolbar_title">{md-settings} Settings</string>
     <string name="departs_in">Departs in {time} {time_unit}</string>
     <string name="due">Due</string>
-    <string name="checked_at">Checked at {time}</string>
+    <string name="checked_at">Schedule (Checked at {time})</string>
     <string name="filter_by_route">Filter by Route</string>
     <string name="schedule">Schedule</string>
 

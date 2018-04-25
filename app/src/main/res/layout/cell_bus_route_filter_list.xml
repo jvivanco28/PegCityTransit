@@ -2,15 +2,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:background="@color/colorPrimaryLight"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/material_spacing_small"
+    android:paddingTop="@dimen/material_spacing_x_small">
 
-    <TextView
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        fontPath="fonts/bariol_bold.ttf"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/material_spacing_small"
         android:layout_marginStart="@dimen/material_spacing_small"
+        android:background="@color/colorPrimaryDark"
+        android:maxLines="1"
+        android:padding="@dimen/material_spacing_x_small"
+        android:text="@string/filter_by_route"
+        android:textColor="@color/white"
         android:textSize="@dimen/text_medium"
-        android:text="@string/filter_by_route" />
+        tools:ignore="MissingPrefix"
+        tools:text="Hello" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/bus_route_filter_recycler_view"

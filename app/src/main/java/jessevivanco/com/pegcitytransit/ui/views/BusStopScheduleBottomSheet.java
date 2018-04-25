@@ -27,7 +27,7 @@ import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.ui.adapters.ScheduledStopAdapter;
 import jessevivanco.com.pegcitytransit.ui.callbacks.OnBusRouteSelectedListener;
-import jessevivanco.com.pegcitytransit.ui.item_decorations.StopScheduleListItemDecoration;
+import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.ViewState;
 import jessevivanco.com.pegcitytransit.ui.view_holders.ScheduledStopCellViewHolder;
@@ -111,7 +111,7 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
 
         layoutManager = new OneShotAnimatedLinearLayoutManager(getContext(), stopScheduleRecyclerView);
         stopScheduleRecyclerView.setLayoutManager(layoutManager);
-        stopScheduleRecyclerView.addItemDecoration(new StopScheduleListItemDecoration(getContext()));
+        stopScheduleRecyclerView.addItemDecoration(new VerticalListItemDecoration(getResources().getDimensionPixelSize(R.dimen.material_spacing_small), getResources().getDimensionPixelSize(R.dimen.material_spacing_small), 1));
 
         stopScheduleRecyclerView.setAdapter(stopScheduleAdapter);
 

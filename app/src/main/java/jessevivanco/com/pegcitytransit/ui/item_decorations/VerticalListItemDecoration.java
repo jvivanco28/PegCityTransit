@@ -8,10 +8,18 @@ public class VerticalListItemDecoration extends RecyclerView.ItemDecoration {
 
     private final int MARGIN_TB;
     private final int MARGIN_LR;
+    private final int SKIP_NUM_HEADER_CELLS;
 
     public VerticalListItemDecoration(int lrMargin, int marginBetweenCells) {
         MARGIN_TB = lrMargin;
         MARGIN_LR = marginBetweenCells;
+        SKIP_NUM_HEADER_CELLS = 0;
+    }
+
+    public VerticalListItemDecoration(int lrMargin, int marginBetweenCells, int skipNumHeaderCells) {
+        MARGIN_TB = lrMargin;
+        MARGIN_LR = marginBetweenCells;
+        SKIP_NUM_HEADER_CELLS = skipNumHeaderCells;
     }
 
     @Override
@@ -20,11 +28,14 @@ public class VerticalListItemDecoration extends RecyclerView.ItemDecoration {
         int position = parent.getChildAdapterPosition(view);
 
         // Only add top margin to fist cell.
-        if (position == 0) {
-            outRect.top = MARGIN_TB;
+        if (position > SKIP_NUM_HEADER_CELLS - 1) {
+
+            if (position == 0 || position == SKIP_NUM_HEADER_CELLS) {
+                outRect.top = MARGIN_TB;
+            }
+            outRect.bottom = MARGIN_TB;
+            outRect.left = MARGIN_LR;
+            outRect.right = MARGIN_LR;
         }
-        outRect.bottom = MARGIN_TB;
-        outRect.left = MARGIN_LR;
-        outRect.right = MARGIN_LR;
     }
 }

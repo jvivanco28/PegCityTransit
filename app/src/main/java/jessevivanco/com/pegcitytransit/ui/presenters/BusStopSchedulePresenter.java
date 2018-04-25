@@ -63,9 +63,6 @@ public class BusStopSchedulePresenter {
                 })
                 .subscribe(
                         busStopScheduleViewModel -> {
-
-                            // TODO show routes filter.
-
                             if (busStopScheduleViewModel.getScheduledStops().size() == 0) {
                                 viewContract.showErrorMessage(context.getString(R.string.no_schedule));
                                 viewContract.showViewState(ViewState.ERROR);
