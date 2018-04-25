@@ -57,17 +57,20 @@ public class BusStopSchedulePresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> {
-                    viewContract.setScheduledStops(null, null);
+                    viewContract.setScheduledStops(null, null, null);
                     viewContract.showErrorMessage(null);
                     viewContract.showViewState(ViewState.LOADING);
                 })
                 .subscribe(
                         busStopScheduleViewModel -> {
+
+                            // TODO show routes filter.
+
                             if (busStopScheduleViewModel.getScheduledStops().size() == 0) {
                                 viewContract.showErrorMessage(context.getString(R.string.no_schedule));
                                 viewContract.showViewState(ViewState.ERROR);
                             } else {
-                                viewContract.setScheduledStops(busStopScheduleViewModel.getScheduledStops(), busStopScheduleViewModel.getQueryTime());
+                                viewContract.setScheduledStops(busStopScheduleViewModel.getScheduledStops(), busStopScheduleViewModel.getBusRoutes(), busStopScheduleViewModel.getQueryTime());
                                 viewContract.showViewState(ViewState.LIST);
                             }
                         },
@@ -138,7 +141,7 @@ public class BusStopSchedulePresenter {
 
     public interface ViewContract extends ErrorMessageViewContract, BaseListViewContract {
 
-        void setScheduledStops(List<ScheduledStopViewModel> scheduledStops, String queryTime);
+        void setScheduledStops(List<ScheduledStopViewModel> scheduledStops, List<BusRouteViewModel> busRoutes, String queryTime);
 
         void onBusRouteLoaded(BusRouteViewModel busRouteViewModel);
     }

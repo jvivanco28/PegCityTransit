@@ -58,7 +58,7 @@ public class BusRouteViewModel {
     public RouteCoverage getCoverage() {
         return coverage;
     }
-
+    
     public static final class Builder {
         private Long key;
         private Integer number;

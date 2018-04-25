@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jessevivanco.com.pegcitytransit.ui.views.BusRouteTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bus_route_text_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
