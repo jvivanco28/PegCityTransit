@@ -45,6 +45,7 @@ import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
 import jessevivanco.com.pegcitytransit.ui.fragments.PermissionDeniedDialog;
 import jessevivanco.com.pegcitytransit.ui.fragments.SettingsDialogFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment;
+import jessevivanco.com.pegcitytransit.ui.presenters.MainActivityPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.SearchStopsPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
@@ -116,6 +117,11 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
+
+        if (savedInstanceState == null) {
+            MainActivityPresenter mainActivityPresenter = new MainActivityPresenter(getInjector());
+            mainActivityPresenter.checkIfAppUpdated();
+        }
 
         initialActivityLoadFinished = savedInstanceState != null;
         setupMap(savedInstanceState);

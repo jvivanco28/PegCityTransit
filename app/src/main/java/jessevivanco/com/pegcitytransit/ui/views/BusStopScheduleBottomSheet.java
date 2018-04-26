@@ -159,6 +159,10 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements OnBusRou
     public void loadScheduleForBusStop(BusStopViewModel busStop) {
         this.busStop = busStop;
 
+        // Preemptively scroll to the top of the list. If we don't do this then we might start
+        // somewhere in the middle.
+        layoutManager.scrollToPosition(0);
+
         displayBusStopInfo(busStop);
         stopSchedulePresenter.loadScheduleForBusStop(busStop.getKey(), false);
     }

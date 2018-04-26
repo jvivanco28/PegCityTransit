@@ -10,6 +10,7 @@ public class PreferencesRepository {
 
     private static final String KEY_USE_24_HOUR_CLOCK = "24_hour_clock";
     private static final String KEY_MAP_SEARCH_RADIUS = "map_search_radius";
+    private static final String KEY_LAST_USED_APP_VERSION_CODE = "last_app_version";
 
     private Context context;
 
@@ -31,5 +32,13 @@ public class PreferencesRepository {
 
     public int getMapSearchRadius() {
         return Prefs.getInt(KEY_MAP_SEARCH_RADIUS, context.getResources().getInteger(R.integer.default_map_search_radius));
+    }
+
+    public void setLastUsedAppVersionCode(int versionCode) {
+        Prefs.putInt(KEY_LAST_USED_APP_VERSION_CODE, versionCode);
+    }
+
+    public int getLastUsedAppVersionCode() {
+        return Prefs.getInt(KEY_LAST_USED_APP_VERSION_CODE, -1);
     }
 }

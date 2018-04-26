@@ -5,4 +5,4 @@
 √ Use request query time instead of System time.
 * Tapping favs tab should not alter map position unless tapped a second time.
 √ Use a bus route filter on the upcoming schedules list
-* scroll to top of schedule list after refresh?
+√ scroll to top of schedule list after refresh?

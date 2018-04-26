@@ -122,4 +122,10 @@ public class BusRoutesRepository {
                 });
 
     }
+
+    public void clearAllRoutesCache() {
+        if (cacheManager != null) {
+            cacheManager.unset(CACHE_KEY_ALL_ROUTES);
+        }
+    }
 }
