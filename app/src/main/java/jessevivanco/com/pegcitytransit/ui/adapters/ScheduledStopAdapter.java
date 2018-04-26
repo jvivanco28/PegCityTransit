@@ -47,6 +47,15 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<RecyclerView.View
      */
     private ScheduledStopCellViewHolder.OnBusRouteNumberClickedListener onBusRouteClickedListener;
 
+    /**
+     * Not gonna lie, is seems hacky as fuck. We need to <b>not</b> bind the filter cell unless we
+     * actually make changes to the list. Simply scrolling up and down the list should not trigger
+     * a re-bind. This might cause some of the bus route filter cells to be re-created (although
+     * I'm not sure why... they should just be rebound instead of fully recreated) which causes
+     * some janky behaviour when scrolling back to the top.
+     */
+    private boolean rebindFilterCell;
+
     public ScheduledStopAdapter(OnBusRouteFilterChangedListener onBusRouteFilterSelectedListener, ScheduledStopCellViewHolder.OnBusRouteNumberClickedListener onBusRouteClickedListener, @Nullable Bundle savedInstanceState) {
         this.onBusRouteFilterSelectedListener = onBusRouteFilterSelectedListener;
         this.onBusRouteClickedListener = onBusRouteClickedListener;
@@ -57,6 +66,7 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<RecyclerView.View
             busRoutes = Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_ROUTES_LIST));
             queryTime = savedInstanceState.getString(STATE_KEY_QUERY_TIME);
 
+            this.rebindFilterCell = true;
             notifyDataSetChanged();
         }
     }
@@ -84,6 +94,7 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_BUS_ROUTE_FILTER) {
+            this.rebindFilterCell = true;
             return new BusRouteFilterListCellViewHolder(parent, onBusRouteFilterSelectedListener);
         } else if (viewType == VIEW_TYPE_QUERY_TIME) {
             return new QueryTimeCellViewHolder(parent);
@@ -96,8 +107,10 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof BusRouteFilterListCellViewHolder) {
+        if (holder instanceof BusRouteFilterListCellViewHolder && rebindFilterCell) {
             ((BusRouteFilterListCellViewHolder) holder).bind(busRoutes);
+            rebindFilterCell = false;
+
         } else if (holder instanceof QueryTimeCellViewHolder) {
             ((QueryTimeCellViewHolder) holder).bind(queryTime);
         } else if (holder instanceof ScheduledStopCellViewHolder) {
@@ -124,18 +137,14 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         // Clear out filters.
         this.filteredList = stops;
+        this.rebindFilterCell = true;
 
         notifyDataSetChanged();
     }
 
     public void setFilteredList(List<ScheduledStopViewModel> filteredList) {
         this.filteredList = filteredList;
-
-        notifyDataSetChanged();
-    }
-
-    public void clearFilters() {
-        this.filteredList = fullStopList;
+        this.rebindFilterCell = true;
 
         notifyDataSetChanged();
     }
