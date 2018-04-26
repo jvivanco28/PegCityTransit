@@ -1,9 +1,8 @@
 package jessevivanco.com.pegcitytransit.ui.presenters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -136,16 +135,37 @@ public class BusStopSchedulePresenter {
                 );
     }
 
-    // TODO change this eventually
-    public void applyFilterToList(List<ScheduledStopViewModel> fullStopList, @NonNull BusRouteViewModel filter) {
+    /**
+     * Iterates and returns the list of stops that have a
+     */
+    public void refreshFilteredList(List<ScheduledStopViewModel> fullStopList, List<BusRouteViewModel> busRoutes) {
         DisposableUtil.dispose(filteredListAssembler);
 
-        filteredListAssembler = Observable.fromIterable(fullStopList)
-                .filter(scheduledStopViewModel -> scheduledStopViewModel.getRouteNumber().equals(filter.getNumber()))
-                .toList()
-                .subscribe(
-                        newFilteredList -> viewContract.showFilteredSchedule(newFilteredList, filter)
-                );
+        boolean filterApplied = false;
+
+        // Could probably throw this in the RX chain if we wanted.
+        final SparseArray<BusRouteViewModel> routesMap = new SparseArray<>();
+        for (BusRouteViewModel route : busRoutes) {
+            routesMap.put(route.getNumber(), route);
+
+            if (route.isFilterApplied()) {
+                filterApplied = true;
+            }
+        }
+
+        // If no filters are applied, then return the full stop list
+        if (!filterApplied) {
+            viewContract.showFilteredSchedule(fullStopList);
+        } else {
+            // Else iterate the list and only return the stops with the routes that we care about.
+            filteredListAssembler = Observable.fromIterable(fullStopList)
+                    // Check if the current stop's route has the filter flag raised in our routes map. If it does, then we can show this stop.
+                    .filter(scheduledStopViewModel -> routesMap.get(scheduledStopViewModel.getRouteNumber()).isFilterApplied())
+                    .toList()
+                    .subscribe(
+                            newFilteredList -> viewContract.showFilteredSchedule(newFilteredList)
+                    );
+        }
     }
 
     public void tearDown() {
@@ -159,7 +179,7 @@ public class BusStopSchedulePresenter {
 
         void showNewFullScheduled(List<ScheduledStopViewModel> scheduledStops, List<BusRouteViewModel> busRoutes, String queryTime);
 
-        void showFilteredSchedule(List<ScheduledStopViewModel> filteredList, @Nullable BusRouteViewModel filter);
+        void showFilteredSchedule(List<ScheduledStopViewModel> filteredList);
 
         void onBusRouteLoaded(BusRouteViewModel busRouteViewModel);
     }

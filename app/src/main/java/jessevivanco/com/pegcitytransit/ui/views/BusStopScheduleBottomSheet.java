@@ -26,7 +26,7 @@ import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.ui.adapters.ScheduledStopAdapter;
-import jessevivanco.com.pegcitytransit.ui.callbacks.OnBusRouteFilterSelectedListener;
+import jessevivanco.com.pegcitytransit.ui.callbacks.OnBusRouteFilterChangedListener;
 import jessevivanco.com.pegcitytransit.ui.callbacks.OnBusRouteSelectedListener;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
@@ -37,7 +37,7 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.layout_manager.OneShotAnimatedLinearLayoutManager;
 
-public class BusStopScheduleBottomSheet extends LinearLayout implements OnBusRouteFilterSelectedListener, BusStopSchedulePresenter.ViewContract, ScheduledStopCellViewHolder.OnBusRouteNumberClickedListener {
+public class BusStopScheduleBottomSheet extends LinearLayout implements OnBusRouteFilterChangedListener, BusStopSchedulePresenter.ViewContract, ScheduledStopCellViewHolder.OnBusRouteNumberClickedListener {
 
     private static final String TAG = BusStopScheduleBottomSheet.class.getSimpleName();
 
@@ -194,24 +194,12 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements OnBusRou
     }
 
     /**
-     * A bus route was selected from the filter header.
+     * A bus route filter was enabled or disabled. We'll need to apply these changes to the list.
      */
     @Override
-    public void onBusRouteFilterSelected(BusRouteViewModel busRoute, boolean enableFilter) {
+    public void onBusRouteFilterChanged() {
 
-        List<ScheduledStopViewModel> fullSchedule = stopScheduleAdapter.getList();
-
-        if (enableFilter) {
-            // Apply filter
-            stopSchedulePresenter.applyFilterToList(fullSchedule, busRoute);
-        } else {
-            // TODO fix this!
-            layoutManager.setAnimateNextLayout(true);
-            layoutManager.omitTopXCells(1); // Don't animate the header cell!
-
-            // Remove all filters
-            stopScheduleAdapter.clearFilters();
-        }
+        stopSchedulePresenter.refreshFilteredList(stopScheduleAdapter.getFullStopList(), stopScheduleAdapter.getBusRoutes());
     }
 
     @Override
@@ -222,11 +210,11 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements OnBusRou
     }
 
     @Override
-    public void showFilteredSchedule(List<ScheduledStopViewModel> filteredList, @Nullable BusRouteViewModel filter) {
+    public void showFilteredSchedule(List<ScheduledStopViewModel> filteredList) {
         layoutManager.setAnimateNextLayout(filteredList != null);
-        layoutManager.omitTopXCells(1); // Don't animate the header cell!
+        layoutManager.omitTopXCells(2); // Don't animate the header cells!
 
-        stopScheduleAdapter.setFilteredList(filteredList, filter);
+        stopScheduleAdapter.setFilteredList(filteredList);
     }
 
     @OnClick(R.id.toolbar_fav_stop)
