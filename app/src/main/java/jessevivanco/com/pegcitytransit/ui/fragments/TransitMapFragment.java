@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -119,7 +120,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         mapFragment.getMapAsync(this);
 
         // We're re-using the same info window when tapping on a marker.
-        busStopInfoWindow = new BusStopInfoView(getActivity());
+        busStopInfoWindow = (BusStopInfoView) LayoutInflater.from(getContext()).inflate(R.layout.view_bus_stop_info, null);
 
         if (savedInstanceState != null) {
             restoredCameraPosition = savedInstanceState.getParcelable(STATE_KEY_MAP_CAMERA);
