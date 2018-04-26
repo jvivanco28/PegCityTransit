@@ -1,6 +1,8 @@
 package jessevivanco.com.pegcitytransit.ui.presenters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -9,6 +11,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -43,6 +46,7 @@ public class BusStopSchedulePresenter {
     private Disposable loadScheduleSubscription;
     private Disposable saveBusStopSubscription;
     private Disposable loadBusRouteSubscription;
+    private Disposable filteredListAssembler;
 
     public BusStopSchedulePresenter(AppComponent injector,
                                     ViewContract viewContract) {
@@ -50,14 +54,14 @@ public class BusStopSchedulePresenter {
         this.viewContract = viewContract;
     }
 
-    public void loadScheduleForBusStop(Long busStopKey) {
+    public void loadScheduleForBusStop(Long busStopKey, boolean fromRefresh) {
         DisposableUtil.dispose(loadScheduleSubscription);
 
         loadScheduleSubscription = scheduleRepository.getBusStopSchedule(busStopKey, preferencesRepository.isUsing24HourClock())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> {
-                    viewContract.setScheduledStops(null, null, null);
+                    viewContract.showNewFullScheduled(null, null, null);
                     viewContract.showErrorMessage(null);
                     viewContract.showViewState(ViewState.LOADING);
                 })
@@ -67,7 +71,9 @@ public class BusStopSchedulePresenter {
                                 viewContract.showErrorMessage(context.getString(R.string.no_schedule));
                                 viewContract.showViewState(ViewState.ERROR);
                             } else {
-                                viewContract.setScheduledStops(busStopScheduleViewModel.getScheduledStops(), busStopScheduleViewModel.getBusRoutes(), busStopScheduleViewModel.getQueryTime());
+                                viewContract.showNewFullScheduled(busStopScheduleViewModel.getScheduledStops(),
+                                        busStopScheduleViewModel.getBusRoutes(),
+                                        busStopScheduleViewModel.getQueryTime());
                                 viewContract.showViewState(ViewState.LIST);
                             }
                         },
@@ -125,8 +131,20 @@ public class BusStopSchedulePresenter {
                         busRouteViewModel -> viewContract.onBusRouteLoaded(busRouteViewModel),
                         throwable -> {
                             Crashlytics.logException(throwable);
-                            Log.e(TAG, "Errow loading bus route.", throwable);
+                            Log.e(TAG, "Error loading bus route.", throwable);
                         }
+                );
+    }
+
+    // TODO change this eventually
+    public void applyFilterToList(List<ScheduledStopViewModel> fullStopList, @NonNull BusRouteViewModel filter) {
+        DisposableUtil.dispose(filteredListAssembler);
+
+        filteredListAssembler = Observable.fromIterable(fullStopList)
+                .filter(scheduledStopViewModel -> scheduledStopViewModel.getRouteNumber().equals(filter.getNumber()))
+                .toList()
+                .subscribe(
+                        newFilteredList -> viewContract.showFilteredSchedule(newFilteredList, filter)
                 );
     }
 
@@ -134,11 +152,14 @@ public class BusStopSchedulePresenter {
         DisposableUtil.dispose(loadScheduleSubscription);
         DisposableUtil.dispose(saveBusStopSubscription);
         DisposableUtil.dispose(loadBusRouteSubscription);
+        DisposableUtil.dispose(filteredListAssembler);
     }
 
     public interface ViewContract extends ErrorMessageViewContract, BaseListViewContract {
 
-        void setScheduledStops(List<ScheduledStopViewModel> scheduledStops, List<BusRouteViewModel> busRoutes, String queryTime);
+        void showNewFullScheduled(List<ScheduledStopViewModel> scheduledStops, List<BusRouteViewModel> busRoutes, String queryTime);
+
+        void showFilteredSchedule(List<ScheduledStopViewModel> filteredList, @Nullable BusRouteViewModel filter);
 
         void onBusRouteLoaded(BusRouteViewModel busRouteViewModel);
     }

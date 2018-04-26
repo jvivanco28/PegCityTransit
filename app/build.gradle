@@ -140,7 +140,7 @@ dependencies {
 
     // Lightweight Animation Library
     // https://github.com/willowtreeapps/spruce-android
-    compile 'com.willowtreeapps.spruce:spruce-android:1.0.0'
+    compile 'com.willowtreeapps.spruce:spruce-android:1.0.1'
 
     // Shared Preferences helper
     // https://github.com/Pixplicity/EasyPreferences

@@ -9,6 +9,7 @@ import org.parceler.Parcels;
 
 import java.util.List;
 
+import jessevivanco.com.pegcitytransit.ui.callbacks.OnBusRouteFilterSelectedListener;
 import jessevivanco.com.pegcitytransit.ui.view_holders.BusRouteFilterListCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_holders.QueryTimeCellViewHolder;
 import jessevivanco.com.pegcitytransit.ui.view_holders.ScheduledStopCellViewHolder;
@@ -23,19 +24,36 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private static final int VIEW_TYPE_BUS_ROUTE_FILTER = BusRouteFilterListCellViewHolder.getLayoutResId();
     private static final int VIEW_TYPE_QUERY_TIME = QueryTimeCellViewHolder.getLayoutResId();
-    //    private static final int VIEW_TYPE_SCHEDULE_TITLE = 0; // We don't have a viewholder class for this so just use some arbitrary ID.
     private static final int VIEW_TYPE_SCHEDULE = ScheduledStopCellViewHolder.getLayoutResId();
 
     private String queryTime;
-    private List<ScheduledStopViewModel> stopList;
+    private List<ScheduledStopViewModel> fullStopList;
     private List<BusRouteViewModel> busRoutes;
+
+    @Nullable
+    private BusRouteViewModel activeBusRouteFilter;
+    /**
+     * NOTE: We always show the filtered list. If no filter is applied to the list, then this just
+     * references the full {@code fullStopList}.
+     */
+    private List<ScheduledStopViewModel> filteredList;
+
+    /**
+     * Bus route filter listener in the header cell. This will alter the stop list.
+     */
+    private OnBusRouteFilterSelectedListener onBusRouteFilterSelectedListener;
+
+    /**
+     * Bus route listener for each stop cell. This will load the entire route on the map.
+     */
     private ScheduledStopCellViewHolder.OnBusRouteNumberClickedListener onBusRouteClickedListener;
 
-    public ScheduledStopAdapter(ScheduledStopCellViewHolder.OnBusRouteNumberClickedListener onBusRouteClickedListener, @Nullable Bundle savedInstanceState) {
+    public ScheduledStopAdapter(OnBusRouteFilterSelectedListener onBusRouteFilterSelectedListener, ScheduledStopCellViewHolder.OnBusRouteNumberClickedListener onBusRouteClickedListener, @Nullable Bundle savedInstanceState) {
+        this.onBusRouteFilterSelectedListener = onBusRouteFilterSelectedListener;
         this.onBusRouteClickedListener = onBusRouteClickedListener;
 
         if (savedInstanceState != null) {
-            stopList = Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_STOPS_LIST));
+            fullStopList = Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_STOPS_LIST));
             busRoutes = Parcels.unwrap(savedInstanceState.getParcelable(STATE_KEY_ROUTES_LIST));
             queryTime = savedInstanceState.getString(STATE_KEY_QUERY_TIME);
         }
@@ -43,11 +61,11 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public int getItemCount() {
-        return stopList != null ?
+        return filteredList != null ?
                 // We're going to show two header cells:
                 // 1. Bus Route filter
                 // 2. Query time
-                stopList.size() + 2 :
+                filteredList.size() + 2 :
                 0;
     }
 
@@ -64,7 +82,7 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_BUS_ROUTE_FILTER) {
-            return new BusRouteFilterListCellViewHolder(parent);
+            return new BusRouteFilterListCellViewHolder(parent, onBusRouteFilterSelectedListener);
         } else if (viewType == VIEW_TYPE_QUERY_TIME) {
             return new QueryTimeCellViewHolder(parent);
         } else if (viewType == VIEW_TYPE_SCHEDULE) {
@@ -77,28 +95,53 @@ public class ScheduledStopAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof BusRouteFilterListCellViewHolder) {
-            ((BusRouteFilterListCellViewHolder) holder).bind(busRoutes);
+            ((BusRouteFilterListCellViewHolder) holder).bind(busRoutes, activeBusRouteFilter);
         } else if (holder instanceof QueryTimeCellViewHolder) {
             ((QueryTimeCellViewHolder) holder).bind(queryTime);
         } else if (holder instanceof ScheduledStopCellViewHolder) {
-            ((ScheduledStopCellViewHolder) holder).bind(stopList.get(position - 2));
+            ((ScheduledStopCellViewHolder) holder).bind(filteredList.get(position - 2));
         }
     }
 
     public void onSaveInstanceState(Bundle outState) {
-        if (stopList != null) {
-            outState.putParcelable(STATE_KEY_STOPS_LIST, Parcels.wrap(stopList));
+        if (fullStopList != null) {
+            outState.putParcelable(STATE_KEY_STOPS_LIST, Parcels.wrap(fullStopList));
             outState.putParcelable(STATE_KEY_ROUTES_LIST, Parcels.wrap(busRoutes));
             outState.putString(STATE_KEY_QUERY_TIME, queryTime);
         }
-
     }
 
-    public void setList(List<ScheduledStopViewModel> list, List<BusRouteViewModel> busRoutes, String queryTime) {
-        this.stopList = list;
+    public void setFullStopList(List<ScheduledStopViewModel> stops,
+                                List<BusRouteViewModel> busRoutes,
+                                String queryTime) {
+
+        this.fullStopList = stops;
         this.busRoutes = busRoutes;
         this.queryTime = queryTime;
+
+        // Clear out filters.
+        this.activeBusRouteFilter = null;
+        this.filteredList = stops;
+
         notifyDataSetChanged();
+    }
+
+    public void setFilteredList(List<ScheduledStopViewModel> filteredList, @Nullable BusRouteViewModel activeBusRouteFilter) {
+        this.filteredList = filteredList;
+        this.activeBusRouteFilter = activeBusRouteFilter;
+
+        notifyDataSetChanged();
+    }
+
+    public void clearFilters() {
+        this.activeBusRouteFilter = null;
+        this.filteredList = fullStopList;
+
+        notifyDataSetChanged();
+    }
+
+    public List<ScheduledStopViewModel> getList() {
+        return fullStopList;
     }
 }
 

@@ -26,6 +26,7 @@ import butterknife.OnClick;
 import jessevivanco.com.pegcitytransit.R;
 import jessevivanco.com.pegcitytransit.data.dagger.components.AppComponent;
 import jessevivanco.com.pegcitytransit.ui.adapters.ScheduledStopAdapter;
+import jessevivanco.com.pegcitytransit.ui.callbacks.OnBusRouteFilterSelectedListener;
 import jessevivanco.com.pegcitytransit.ui.callbacks.OnBusRouteSelectedListener;
 import jessevivanco.com.pegcitytransit.ui.item_decorations.VerticalListItemDecoration;
 import jessevivanco.com.pegcitytransit.ui.presenters.BusStopSchedulePresenter;
@@ -36,7 +37,7 @@ import jessevivanco.com.pegcitytransit.ui.view_models.BusStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.view_models.ScheduledStopViewModel;
 import jessevivanco.com.pegcitytransit.ui.views.layout_manager.OneShotAnimatedLinearLayoutManager;
 
-public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopSchedulePresenter.ViewContract, ScheduledStopCellViewHolder.OnBusRouteNumberClickedListener {
+public class BusStopScheduleBottomSheet extends LinearLayout implements OnBusRouteFilterSelectedListener, BusStopSchedulePresenter.ViewContract, ScheduledStopCellViewHolder.OnBusRouteNumberClickedListener {
 
     private static final String TAG = BusStopScheduleBottomSheet.class.getSimpleName();
 
@@ -107,7 +108,7 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
 
         // Setup recycler view and adapter
         stopSchedulePresenter = new BusStopSchedulePresenter(injector, this);
-        stopScheduleAdapter = new ScheduledStopAdapter(this, savedInstanceState);
+        stopScheduleAdapter = new ScheduledStopAdapter(this, this, savedInstanceState);
 
         layoutManager = new OneShotAnimatedLinearLayoutManager(getContext(), stopScheduleRecyclerView);
         stopScheduleRecyclerView.setLayoutManager(layoutManager);
@@ -159,17 +160,11 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
         this.busStop = busStop;
 
         displayBusStopInfo(busStop);
-        stopSchedulePresenter.loadScheduleForBusStop(busStop.getKey());
+        stopSchedulePresenter.loadScheduleForBusStop(busStop.getKey(), false);
     }
 
     public void setOnCloseButtonClickedListener(OnClickListener listener) {
         closeButton.setOnClickListener(listener);
-    }
-
-    @Override
-    public void setScheduledStops(List<ScheduledStopViewModel> scheduledStops, List<BusRouteViewModel> busRoutes, String queryTime) {
-        layoutManager.setAnimateNextLayout(scheduledStops != null);
-        stopScheduleAdapter.setList(scheduledStops, busRoutes, queryTime);
     }
 
     @Override
@@ -198,6 +193,41 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
         onBusRouteSelectedListener.onBusRouteSelected(busRouteViewModel);
     }
 
+    /**
+     * A bus route was selected from the filter header.
+     */
+    @Override
+    public void onBusRouteFilterSelected(BusRouteViewModel busRoute, boolean enableFilter) {
+
+        List<ScheduledStopViewModel> fullSchedule = stopScheduleAdapter.getList();
+
+        if (enableFilter) {
+            // Apply filter
+            stopSchedulePresenter.applyFilterToList(fullSchedule, busRoute);
+        } else {
+            layoutManager.setAnimateNextLayout(true);
+            layoutManager.omitTopXCells(1); // Don't animate the header cell!
+
+            // Remove all filters
+            stopScheduleAdapter.clearFilters();
+        }
+    }
+
+    @Override
+    public void showNewFullScheduled(List<ScheduledStopViewModel> scheduledStops, List<BusRouteViewModel> busRoutes, String queryTime) {
+        layoutManager.setAnimateNextLayout(scheduledStops != null);
+
+        stopScheduleAdapter.setFullStopList(scheduledStops, busRoutes, queryTime);
+    }
+
+    @Override
+    public void showFilteredSchedule(List<ScheduledStopViewModel> filteredList, @Nullable BusRouteViewModel filter) {
+        layoutManager.setAnimateNextLayout(filteredList != null);
+        layoutManager.omitTopXCells(1); // Don't animate the header cell!
+
+        stopScheduleAdapter.setFilteredList(filteredList, filter);
+    }
+
     @OnClick(R.id.toolbar_fav_stop)
     public void toggleFavStop() {
 
@@ -218,7 +248,7 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements BusStopS
 
     @OnClick(R.id.bottom_sheet_toolbar_refresh_button)
     public void refresh() {
-        stopSchedulePresenter.loadScheduleForBusStop(busStop.getKey());
+        stopSchedulePresenter.loadScheduleForBusStop(busStop.getKey(), true);
     }
 
     public void tearDown() {
