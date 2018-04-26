@@ -37,7 +37,7 @@ public class BusRouteFilterListCellViewHolder extends RecyclerView.ViewHolder {
 
         layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
         stopScheduleRecyclerView.setLayoutManager(layoutManager);
-        stopScheduleRecyclerView.addItemDecoration(new HorizontalListItemDecoration(context.getResources().getDimensionPixelSize(R.dimen.material_spacing_small), context.getResources().getDimensionPixelSize(R.dimen.material_spacing_small)));
+        stopScheduleRecyclerView.addItemDecoration(new HorizontalListItemDecoration(context.getResources().getDimensionPixelSize(R.dimen.material_spacing_small), 0));
 
         busRoutesFilterAdapter = new BusRoutesFilterAdapter(onBusRouteFilterSelectedListener);
         stopScheduleRecyclerView.setAdapter(busRoutesFilterAdapter);

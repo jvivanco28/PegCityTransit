@@ -27,6 +27,7 @@ public class BusRouteViewModel {
     String name;
     String customerType;
     RouteCoverage coverage;
+    boolean isFilterApplied;
 
     public BusRouteViewModel() {
     }
@@ -58,7 +59,15 @@ public class BusRouteViewModel {
     public RouteCoverage getCoverage() {
         return coverage;
     }
-    
+
+    public boolean isFilterApplied() {
+        return isFilterApplied;
+    }
+
+    public void setFilterApplied(boolean filterApplied) {
+        this.isFilterApplied = filterApplied;
+    }
+
     public static final class Builder {
         private Long key;
         private Integer number;

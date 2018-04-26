@@ -205,6 +205,7 @@ public class BusStopScheduleBottomSheet extends LinearLayout implements OnBusRou
             // Apply filter
             stopSchedulePresenter.applyFilterToList(fullSchedule, busRoute);
         } else {
+            // TODO fix this!
             layoutManager.setAnimateNextLayout(true);
             layoutManager.omitTopXCells(1); // Don't animate the header cell!
 
