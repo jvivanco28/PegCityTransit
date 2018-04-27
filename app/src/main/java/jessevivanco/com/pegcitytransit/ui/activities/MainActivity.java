@@ -415,11 +415,13 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 View.VISIBLE :
                 View.GONE);
 
-        transitMapFragment.setMapPaddingTop(searchStopsView.getVisibility() == View.VISIBLE || busRouteCell.getVisibility() == View.VISIBLE ?
-                // We'll need to shift the top map elements downward so that they're not occluded
-                // by any of the header views.
-                getResources().getDimensionPixelSize(R.dimen.map_padding_top_offset) :
-                0);
+        if (transitMapFragment != null) {
+            transitMapFragment.setMapPaddingTop(searchStopsView.getVisibility() == View.VISIBLE || busRouteCell.getVisibility() == View.VISIBLE ?
+                    // We'll need to shift the top map elements downward so that they're not occluded
+                    // by any of the header views.
+                    getResources().getDimensionPixelSize(R.dimen.map_padding_top_offset) :
+                    0);
+        }
     }
 
     @Override
