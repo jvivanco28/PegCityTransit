@@ -357,7 +357,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             if (busRoutesModal == null) {
                 busRoutesModal = BusRoutesDialogFragment.newInstance();
             }
-            busRoutesModal.show(getSupportFragmentManager(), BusRoutesDialogFragment.TAG);
+            FragmentUtils.showFragmentIfNotAlreadyShowing(getSupportFragmentManager(), busRoutesModal, BusRoutesDialogFragment.TAG);
         }
     }
 
@@ -370,7 +370,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         if (settingsModal == null) {
             settingsModal = SettingsDialogFragment.newInstance();
         }
-        settingsModal.show(getSupportFragmentManager(), SettingsDialogFragment.TAG);
+        FragmentUtils.showFragmentIfNotAlreadyShowing(getSupportFragmentManager(), settingsModal, SettingsDialogFragment.TAG);
     }
 
     /**

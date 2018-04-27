@@ -28,4 +28,14 @@ public abstract class FragmentUtils {
 
         dialogToShow.show(fragmentManager, DIALOG_FRAGMENT_TAG);
     }
+
+    public static void showFragmentIfNotAlreadyShowing(FragmentManager fragmentManager,
+                                                       DialogFragment dialogToShow,
+                                                       final String DIALOG_FRAGMENT_TAG) {
+
+        if (dialogToShow.getDialog() == null || !dialogToShow.getDialog().isShowing()) {
+
+            showFragment(fragmentManager, dialogToShow, DIALOG_FRAGMENT_TAG);
+        }
+    }
 }
