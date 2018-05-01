@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -48,7 +49,7 @@ public class BusStopInfoView extends LinearLayout {
 
     private void setup() {
         setOrientation(VERTICAL);
-        LayoutInflater.from(getContext()).inflate(R.layout.view_info_window_bus_stop, this, true);
+        LayoutInflater.from(getContext()).inflate(R.layout.view_bus_stop_info_window_contents, this, true);
         ButterKnife.bind(this);
 
         busStopKeyTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.text_small));

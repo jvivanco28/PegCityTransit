@@ -6,12 +6,12 @@ import android.view.View;
 
 public class HorizontalListItemDecoration extends RecyclerView.ItemDecoration {
 
-    private final int MARGIN_TB;
     private final int MARGIN_LR;
+    private final int MARGIN_BETWEEN;
 
-    public HorizontalListItemDecoration(int tbMargin, int marginBetweenCells) {
-        MARGIN_TB = tbMargin;
-        MARGIN_LR = marginBetweenCells;
+    public HorizontalListItemDecoration(int lrMargin, int marginBetweenCells) {
+        MARGIN_LR = lrMargin;
+        MARGIN_BETWEEN = marginBetweenCells;
     }
 
     @Override
@@ -22,9 +22,10 @@ public class HorizontalListItemDecoration extends RecyclerView.ItemDecoration {
         // Only add left margin for the first item
         if (position == 0) {
             outRect.left = MARGIN_LR;
+        } else if ( position == parent.getAdapter().getItemCount() - 1) {
+            outRect.right = MARGIN_LR;
+        } else {
+            outRect.left = MARGIN_BETWEEN;
         }
-        outRect.top = MARGIN_TB;
-        outRect.bottom = MARGIN_TB;
-        outRect.right = MARGIN_LR;
     }
 }

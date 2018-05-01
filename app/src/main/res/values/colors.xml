@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#00796B</color>
     <color name="colorAccent">#40c4ff</color>
     <color name="colorPrimaryLight">#B2DFDB</color>
+    <color name="pink">#FF4081</color>
 
     <color name="button">@color/colorAccent</color>
     <color name="button_pressed_prelollipop">#b94141</color>
@@ -24,7 +25,7 @@
     <color name="early">#4CAF50</color>
     <color name="late">#F44336</color>
 
-    <color name="progress_bar">#FF4081</color>
+    <color name="progress_bar">@color/pink</color>
 
     <color name="spirit_route">#008000</color>
     <color name="normal_route">@color/white</color>
@@ -36,6 +37,6 @@
 
     <color name="text_secondary">#757575</color>
 
-    <color name="wifi">#0179bf</color>
-
+    <color name="wifi">@color/colorPrimary</color>
+    <color name="filter_checkmark">@color/colorAccent</color>
 </resources>

@@ -58,7 +58,8 @@ public class BusRoutesRepository {
                         .map(WinnipegTransitResponse::getElement)
                         .flatMapObservable(Observable::fromIterable)
                         .map(BusRouteViewModel::createFromBusRoute)
-                        .toList()
+                        // Sort by route number.
+                        .toSortedList((o1, o2) -> o1.getNumber().compareTo(o2.getNumber()))
                         .doOnSuccess(busRouteViewModels -> {
                             if (cacheManager != null) {
                                 cacheManager.put(CACHE_KEY_ALL_ROUTES, busRouteViewModels, ALL_BUS_ROUTES_CACHE_EXPIRY, false);
@@ -89,7 +90,8 @@ public class BusRoutesRepository {
                         .map(WinnipegTransitResponse::getElement)
                         .flatMapObservable(Observable::fromIterable)
                         .map(BusRouteViewModel::createFromBusRoute)
-                        .toList()
+                        // Sort by route number.
+                        .toSortedList((o1, o2) -> o1.getNumber().compareTo(o2.getNumber()))
                         .doOnSuccess(busRouteViewModels -> {
                             if (cacheManager != null) {
                                 cacheManager.put(CACHE_KEY, busRouteViewModels, BUS_ROUTES_AT_BUS_STOP_CACHE_EXPIRY, false);
@@ -119,5 +121,11 @@ public class BusRoutesRepository {
                             .map(BusRouteViewModel::createFromBusRoute);
                 });
 
+    }
+
+    public void clearAllRoutesCache() {
+        if (cacheManager != null) {
+            cacheManager.unset(CACHE_KEY_ALL_ROUTES);
+        }
     }
 }

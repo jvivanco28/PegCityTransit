@@ -2,6 +2,7 @@ package jessevivanco.com.pegcitytransit.ui.presenters;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -9,6 +10,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -43,6 +45,7 @@ public class BusStopSchedulePresenter {
     private Disposable loadScheduleSubscription;
     private Disposable saveBusStopSubscription;
     private Disposable loadBusRouteSubscription;
+    private Disposable filteredListAssembler;
 
     public BusStopSchedulePresenter(AppComponent injector,
                                     ViewContract viewContract) {
@@ -50,14 +53,14 @@ public class BusStopSchedulePresenter {
         this.viewContract = viewContract;
     }
 
-    public void loadScheduleForBusStop(Long busStopKey) {
+    public void loadScheduleForBusStop(Long busStopKey, boolean fromRefresh) {
         DisposableUtil.dispose(loadScheduleSubscription);
 
         loadScheduleSubscription = scheduleRepository.getBusStopSchedule(busStopKey, preferencesRepository.isUsing24HourClock())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> {
-                    viewContract.setScheduledStops(null, null);
+                    viewContract.showNewFullScheduled(null, null, null);
                     viewContract.showErrorMessage(null);
                     viewContract.showViewState(ViewState.LOADING);
                 })
@@ -67,7 +70,9 @@ public class BusStopSchedulePresenter {
                                 viewContract.showErrorMessage(context.getString(R.string.no_schedule));
                                 viewContract.showViewState(ViewState.ERROR);
                             } else {
-                                viewContract.setScheduledStops(busStopScheduleViewModel.getScheduledStops(), busStopScheduleViewModel.getQueryTime());
+                                viewContract.showNewFullScheduled(busStopScheduleViewModel.getScheduledStops(),
+                                        busStopScheduleViewModel.getBusRoutes(),
+                                        busStopScheduleViewModel.getQueryTime());
                                 viewContract.showViewState(ViewState.LIST);
                             }
                         },
@@ -125,20 +130,56 @@ public class BusStopSchedulePresenter {
                         busRouteViewModel -> viewContract.onBusRouteLoaded(busRouteViewModel),
                         throwable -> {
                             Crashlytics.logException(throwable);
-                            Log.e(TAG, "Errow loading bus route.", throwable);
+                            Log.e(TAG, "Error loading bus route.", throwable);
                         }
                 );
+    }
+
+    /**
+     * Iterates and returns the list of stops that have a
+     */
+    public void refreshFilteredList(List<ScheduledStopViewModel> fullStopList, List<BusRouteViewModel> busRoutes) {
+        DisposableUtil.dispose(filteredListAssembler);
+
+        boolean filterApplied = false;
+
+        // Could probably throw this in the RX chain if we wanted.
+        final SparseArray<BusRouteViewModel> routesMap = new SparseArray<>();
+        for (BusRouteViewModel route : busRoutes) {
+            routesMap.put(route.getNumber(), route);
+
+            if (route.isFilterApplied()) {
+                filterApplied = true;
+            }
+        }
+
+        // If no filters are applied, then return the full stop list
+        if (!filterApplied) {
+            viewContract.showFilteredSchedule(fullStopList);
+        } else {
+            // Else iterate the list and only return the stops with the routes that we care about.
+            filteredListAssembler = Observable.fromIterable(fullStopList)
+                    // Check if the current stop's route has the filter flag raised in our routes map. If it does, then we can show this stop.
+                    .filter(scheduledStopViewModel -> routesMap.get(scheduledStopViewModel.getRouteNumber()).isFilterApplied())
+                    .toList()
+                    .subscribe(
+                            newFilteredList -> viewContract.showFilteredSchedule(newFilteredList)
+                    );
+        }
     }
 
     public void tearDown() {
         DisposableUtil.dispose(loadScheduleSubscription);
         DisposableUtil.dispose(saveBusStopSubscription);
         DisposableUtil.dispose(loadBusRouteSubscription);
+        DisposableUtil.dispose(filteredListAssembler);
     }
 
     public interface ViewContract extends ErrorMessageViewContract, BaseListViewContract {
 
-        void setScheduledStops(List<ScheduledStopViewModel> scheduledStops, String queryTime);
+        void showNewFullScheduled(List<ScheduledStopViewModel> scheduledStops, List<BusRouteViewModel> busRoutes, String queryTime);
+
+        void showFilteredSchedule(List<ScheduledStopViewModel> filteredList);
 
         void onBusRouteLoaded(BusRouteViewModel busRouteViewModel);
     }

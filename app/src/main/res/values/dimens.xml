@@ -21,6 +21,8 @@
 
     <dimen name="bus_route_cell_height">56dp</dimen>
 
+    <dimen name="bus_stop_info_window_width">150dp</dimen>
+
     <!-- FYI: Only applies in MainActivity -->
     <!-- (bus_route_cell_height (56dp) + bus_route_cell_height (8dp) ) = 64dp  -->
     <dimen name="map_padding_top_offset">64dp</dimen>
@@ -28,6 +30,7 @@
     <dimen name="fav_button_size">56dp</dimen>
     <dimen name="bottom_nav_height">56dp</dimen>
     <dimen name="fab_size">56dp</dimen>
+    <dimen name="filter_checkmark">24dp</dimen>
 
     <dimen name="top_fab_margin_bottom_gps_enabled">88dp</dimen>
     <dimen name="top_fab_margin_bottom_gps_disabled">@dimen/material_spacing_medium</dimen>

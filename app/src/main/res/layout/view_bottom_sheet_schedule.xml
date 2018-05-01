@@ -1,5 +1,4 @@
-<merge
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -25,7 +24,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:text="{md-close}"/>
+                android:text="{md-close}" />
 
             <!-- Fav button -->
             <com.airbnb.lottie.LottieAnimationView
@@ -37,7 +36,7 @@
                 android:layout_toStartOf="@+id/bottom_sheet_toolbar_refresh_button"
                 android:foregroundGravity="center"
                 android:scaleType="centerCrop"
-                app:lottie_fileName="star.json"/>
+                app:lottie_fileName="star.json" />
 
             <!-- Refresh button -->
             <com.joanzapata.iconify.widget.IconButton
@@ -49,7 +48,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:text="{md-refresh}"
-                android:textColor="@color/colorPrimaryLight"/>
+                android:textColor="@color/colorPrimaryLight" />
 
             <TextView
                 android:id="@+id/bottom_sheet_toolbar_title"
@@ -68,7 +67,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:singleLine="true"
-                tools:text="Southbound Main at Broadway (Union Station)"/>
+                tools:text="Southbound Main at Broadway (Union Station)" />
 
         </RelativeLayout>
 
@@ -85,16 +84,16 @@
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:indeterminate="true"/>
+            android:indeterminate="true" />
 
         <include
             layout="@layout/view_loading_indicator"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/schedule_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
         <!-- This nested scroll view allows us to swipe down to dismiss the entire bottom sheet
         (when the recycler view is not visible). -->
@@ -107,7 +106,7 @@
             <jessevivanco.com.pegcitytransit.ui.views.ErrorStateCell
                 android:id="@+id/error_state_cell"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
         </android.support.v4.widget.NestedScrollView>
 

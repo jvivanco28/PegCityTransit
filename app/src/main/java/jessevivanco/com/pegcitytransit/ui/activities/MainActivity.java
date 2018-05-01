@@ -45,6 +45,7 @@ import jessevivanco.com.pegcitytransit.ui.fragments.FragmentUtils;
 import jessevivanco.com.pegcitytransit.ui.fragments.PermissionDeniedDialog;
 import jessevivanco.com.pegcitytransit.ui.fragments.SettingsDialogFragment;
 import jessevivanco.com.pegcitytransit.ui.fragments.TransitMapFragment;
+import jessevivanco.com.pegcitytransit.ui.presenters.MainActivityPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.SearchStopsPresenter;
 import jessevivanco.com.pegcitytransit.ui.presenters.TransmitMapPresenter;
 import jessevivanco.com.pegcitytransit.ui.util.IntentRequestCodes;
@@ -116,6 +117,11 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
+
+        if (savedInstanceState == null) {
+            MainActivityPresenter mainActivityPresenter = new MainActivityPresenter(getInjector());
+            mainActivityPresenter.checkIfAppUpdated();
+        }
 
         initialActivityLoadFinished = savedInstanceState != null;
         setupMap(savedInstanceState);
@@ -351,7 +357,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             if (busRoutesModal == null) {
                 busRoutesModal = BusRoutesDialogFragment.newInstance();
             }
-            busRoutesModal.show(getSupportFragmentManager(), BusRoutesDialogFragment.TAG);
+            FragmentUtils.showFragmentIfNotAlreadyShowing(getSupportFragmentManager(), busRoutesModal, BusRoutesDialogFragment.TAG);
         }
     }
 
@@ -364,7 +370,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         if (settingsModal == null) {
             settingsModal = SettingsDialogFragment.newInstance();
         }
-        settingsModal.show(getSupportFragmentManager(), SettingsDialogFragment.TAG);
+        FragmentUtils.showFragmentIfNotAlreadyShowing(getSupportFragmentManager(), settingsModal, SettingsDialogFragment.TAG);
     }
 
     /**
@@ -409,11 +415,13 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 View.VISIBLE :
                 View.GONE);
 
-        transitMapFragment.setMapPaddingTop(searchStopsView.getVisibility() == View.VISIBLE || busRouteCell.getVisibility() == View.VISIBLE ?
-                // We'll need to shift the top map elements downward so that they're not occluded
-                // by any of the header views.
-                getResources().getDimensionPixelSize(R.dimen.map_padding_top_offset) :
-                0);
+        if (transitMapFragment != null) {
+            transitMapFragment.setMapPaddingTop(searchStopsView.getVisibility() == View.VISIBLE || busRouteCell.getVisibility() == View.VISIBLE ?
+                    // We'll need to shift the top map elements downward so that they're not occluded
+                    // by any of the header views.
+                    getResources().getDimensionPixelSize(R.dimen.map_padding_top_offset) :
+                    0);
+        }
     }
 
     @Override

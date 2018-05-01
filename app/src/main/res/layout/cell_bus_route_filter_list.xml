@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimaryLight"
+    android:orientation="vertical">
+
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/textView"
+        fontPath="fonts/bariol_bold.ttf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/material_spacing_small"
+        android:layout_marginStart="@dimen/material_spacing_small"
+        android:layout_marginTop="@dimen/material_spacing_x_small"
+        android:background="@color/colorPrimaryDark"
+        android:maxLines="1"
+        android:padding="@dimen/material_spacing_x_small"
+        android:text="@string/filter_by_route"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_medium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingPrefix"
+        tools:text="Hello" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/bus_route_filter_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/material_spacing_x_small"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <View
+        android:id="@+id/left_gradient"
+        android:layout_width="@dimen/material_spacing_small"
+        android:layout_height="0dp"
+        android:background="@drawable/route_filter_left_gradient"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/bus_route_filter_recycler_view"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <View
+        android:id="@+id/right_gradient"
+        android:layout_width="@dimen/material_spacing_small"
+        android:layout_height="0dp"
+        android:background="@drawable/route_filter_right_gradient"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/bus_route_filter_recycler_view"
+        app:layout_constraintVertical_bias="0.0" />
+
+</android.support.constraint.ConstraintLayout>

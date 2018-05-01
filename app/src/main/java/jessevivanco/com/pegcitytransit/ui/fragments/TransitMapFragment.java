@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -119,7 +120,7 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         mapFragment.getMapAsync(this);
 
         // We're re-using the same info window when tapping on a marker.
-        busStopInfoWindow = new BusStopInfoView(getActivity());
+        busStopInfoWindow = (BusStopInfoView) LayoutInflater.from(getContext()).inflate(R.layout.view_bus_stop_info, null);
 
         if (savedInstanceState != null) {
             restoredCameraPosition = savedInstanceState.getParcelable(STATE_KEY_MAP_CAMERA);
@@ -199,7 +200,9 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
      * Shows an info window on the map for the provided bus stop.
      */
     public void showInfoWindowForBusStop(BusStopViewModel busStop) {
-        busStopInfoWindowAdapter.showInfoWindowForBusStop(busStop);
+        if (isAdded()) {
+            busStopInfoWindowAdapter.showInfoWindowForBusStop(busStop);
+        }
     }
 
     /**
@@ -248,26 +251,28 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
      */
     public void resetBearingAndZoomToBounds(final LatLngBounds bounds) {
 
-        // NOTE: We're actually doing two separate camera animations here.
-        // If the camera is tilted or rotated (or both), the map origin will be slightly off. This
-        // is because the rotate and tilt axis are in the direct middle of the map with disregard
-        // to the padding that might be applied. Thus, we may need to do TWO camera updates:
-        // 1: Reset bearing and tilt.
-        // 2: Move to the bounds and adjust zoom scale.
-        if (googleMap.getCameraPosition().bearing != 0 || googleMap.getCameraPosition().tilt != 0) {
-            resetBearingAndTilt(new GoogleMap.CancelableCallback() {
-                @Override
-                public void onFinish() {
-                    zoomToBounds(bounds);
-                }
+        if (isAdded()) {
+            // NOTE: We're actually doing two separate camera animations here.
+            // If the camera is tilted or rotated (or both), the map origin will be slightly off. This
+            // is because the rotate and tilt axis are in the direct middle of the map with disregard
+            // to the padding that might be applied. Thus, we may need to do TWO camera updates:
+            // 1: Reset bearing and tilt.
+            // 2: Move to the bounds and adjust zoom scale.
+            if (googleMap.getCameraPosition().bearing != 0 || googleMap.getCameraPosition().tilt != 0) {
+                resetBearingAndTilt(new GoogleMap.CancelableCallback() {
+                    @Override
+                    public void onFinish() {
+                        zoomToBounds(bounds);
+                    }
 
-                @Override
-                public void onCancel() {
-                    // Do nothing.
-                }
-            });
-        } else {
-            zoomToBounds(bounds);
+                    @Override
+                    public void onCancel() {
+                        // Do nothing.
+                    }
+                });
+            } else {
+                zoomToBounds(bounds);
+            }
         }
     }
 
@@ -321,28 +326,29 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
     public void showBusStops(List<BusStopViewModel> busStops,
                              long delayMarkerVisibilityMillis,
                              boolean animateCamera) {
+        if (isAdded()) {
+            clearMarkers();
 
-        clearMarkers();
+            // Add the bus stops as markers to the map. We're given the bounding box of all of the
+            // markers such that we can zoom to fit all markers on the map.
+            LatLngBounds bounds = busStopInfoWindowAdapter.showBusStopsAsMarkers(googleMap, busStops, delayMarkerVisibilityMillis);
 
-        // Add the bus stops as markers to the map. We're given the bounding box of all of the
-        // markers such that we can zoom to fit all markers on the map.
-        LatLngBounds bounds = busStopInfoWindowAdapter.showBusStopsAsMarkers(googleMap, busStops, delayMarkerVisibilityMillis);
+            if (animateCamera) {
+                // If we've drawn a circular "search" area, then zoom in on the map such that we fit the
+                // entire circle within the view bounds.
+                if (searchArea != null) {
+                    bounds = getLatLngBoundsOfCircle(searchArea.getCenter(), searchArea.getRadius());
+                }
 
-        if (animateCamera) {
-            // If we've drawn a circular "search" area, then zoom in on the map such that we fit the
-            // entire circle within the view bounds.
-            if (searchArea != null) {
-                bounds = getLatLngBoundsOfCircle(searchArea.getCenter(), searchArea.getRadius());
-            }
-
-            if (searchArea != null || busStops.size() > 1) {
-                resetBearingAndZoomToBounds(bounds);
-            } else {
-                // If there's only ony marker and no search area, then we definitely don't need to
-                // zoom to MAX.
-                zoomToLocation(busStops.get(0).getLatLng().latitude,
-                        busStops.get(0).getLatLng().longitude,
-                        getResources().getInteger(R.integer.default_my_location_map_zoom));
+                if (searchArea != null || busStops.size() > 1) {
+                    resetBearingAndZoomToBounds(bounds);
+                } else {
+                    // If there's only ony marker and no search area, then we definitely don't need to
+                    // zoom to MAX.
+                    zoomToLocation(busStops.get(0).getLatLng().latitude,
+                            busStops.get(0).getLatLng().longitude,
+                            getResources().getInteger(R.integer.default_my_location_map_zoom));
+                }
             }
         }
     }
@@ -351,16 +357,18 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
      * Shifts all map UI elements downward by the provided offset.
      */
     public void setMapPaddingTop(int offset) {
-        // The status bar occludes the compass unless we apply a top padding to the map view.
-        // However, applying only a top padding will mess up the camera origin (it will be off-center)
-        // so we also have to apply a bottom padding.
-        // See https://stackoverflow.com/questions/15043006/how-to-move-the-android-google-maps-api-compass-position
-        offset += ScreenUtil.getStatusBarHeightIfNeeded(getContext());
-        googleMap.setPadding(0, offset, 0, 0);
+        if (isAdded()) {
+            // The status bar occludes the compass unless we apply a top padding to the map view.
+            // However, applying only a top padding will mess up the camera origin (it will be off-center)
+            // so we also have to apply a bottom padding.
+            // See https://stackoverflow.com/questions/15043006/how-to-move-the-android-google-maps-api-compass-position
+            offset += ScreenUtil.getStatusBarHeightIfNeeded(getContext());
+            googleMap.setPadding(0, offset, 0, 0);
 
-        ViewGroup.MarginLayoutParams crosshairLayoutParams = (ViewGroup.MarginLayoutParams) crosshairOverlay.getLayoutParams();
-        crosshairLayoutParams.topMargin = offset > 0 ? offset / 2 : 0;
-        crosshairOverlay.setLayoutParams(crosshairLayoutParams);
+            ViewGroup.MarginLayoutParams crosshairLayoutParams = (ViewGroup.MarginLayoutParams) crosshairOverlay.getLayoutParams();
+            crosshairLayoutParams.topMargin = offset > 0 ? offset / 2 : 0;
+            crosshairOverlay.setLayoutParams(crosshairLayoutParams);
+        }
     }
 
     public void showCrosshairOverlay(boolean visible) {
@@ -379,7 +387,6 @@ public class TransitMapFragment extends BaseFragment implements OnMapReadyCallba
         googleMap.setInfoWindowAdapter(this);
         googleMap.setOnInfoWindowClickListener(this);
         googleMap.setOnInfoWindowCloseListener(this);
-
 
         setMapPaddingTop(0);
 

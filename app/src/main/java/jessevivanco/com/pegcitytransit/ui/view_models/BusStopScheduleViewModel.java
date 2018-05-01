@@ -16,14 +16,18 @@ public class BusStopScheduleViewModel {
     @NonNull
     private List<ScheduledStopViewModel> scheduledStops;
     @NonNull
+    private List<BusRouteViewModel> busRoutes;
+    @NonNull
     private String queryTime;
 
     public BusStopScheduleViewModel(List<ScheduledStopViewModel> scheduledStops,
+                                    List<BusRouteViewModel> busRoutes,
                                     Date queryTime,
                                     boolean use24HourTime,
                                     Context context) {
 
         this.scheduledStops = scheduledStops;
+        this.busRoutes = busRoutes;
 
         this.queryTime = Phrase.from(context.getString(R.string.checked_at))
                 .put("time", TimeUtil.getTimeFormatted(queryTime, use24HourTime))
@@ -37,5 +41,9 @@ public class BusStopScheduleViewModel {
 
     public String getQueryTime() {
         return queryTime;
+    }
+
+    public List<BusRouteViewModel> getBusRoutes() {
+        return busRoutes;
     }
 }
